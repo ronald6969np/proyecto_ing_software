@@ -17,6 +17,18 @@ const pool = mysql.createPool({
 async function initDatabaseTables() {
     try {
         console.log('--- Inicializando Tablas de la Base de Datos ---');
+        // Crear tabla usuarios
+        await pool.query(`
+            CREATE TABLE IF NOT EXISTS usuarios (
+                id INT AUTO_INCREMENT PRIMARY KEY,
+                nombre VARCHAR(100) NOT NULL,
+                email VARCHAR(100) NOT NULL UNIQUE,
+                password VARCHAR(255) NOT NULL,
+                rol ENUM('admin', 'usuario', 'vendedor', 'agente', 'transportista') NOT NULL DEFAULT 'usuario',
+                fecha_creacion TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            )
+        `);
+
         // Crear tabla productos
         await pool.query(`
             CREATE TABLE IF NOT EXISTS productos (
@@ -81,21 +93,22 @@ async function initDatabaseTables() {
                 FOREIGN KEY (usuario_id) REFERENCES usuarios(id) ON DELETE CASCADE
             )
         `);
-        console.log('✅ Tablas de la base de datos (productos, clientes, entregas, pedidos_importacion, mensajes_chat) inicializadas correctamente.');
+        console.log('✅ Tablas de la base de datos (usuarios, productos, clientes, entregas, pedidos_importacion, mensajes_chat) inicializadas correctamente.');
     } catch (error) {
         console.error('❌ Error al inicializar tablas de la base de datos:', error);
     }
 }
 
-// Probar la conexión inicial
+// Probar la conexión inicial, inicializar tablas y correr seed secuencialmente
 pool.getConnection()
     .then(async connection => {
         console.log('Conexión a la base de datos MySQL establecida correctamente.');
         connection.release();
         await initDatabaseTables();
+        await seedDatabase();
     })
     .catch(err => {
-        console.error('Error al conectar con la base de datos:', err);
+        console.error('Error al conectar o inicializar la base de datos:', err);
     });
 
 // --- Script de inicialización y seed ---
@@ -160,11 +173,5 @@ async function seedDatabase() {
     }
     console.log('--- Seed finalizado ---');
 }
-
-// Ejecutar seed después de que las tablas estén listas
-pool.getConnection()
-    .then(conn => { conn.release(); return seedDatabase(); })
-    .catch(err => console.error('Error en seed:', err));
-
 
 module.exports = pool;

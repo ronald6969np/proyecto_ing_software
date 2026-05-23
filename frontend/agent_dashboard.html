@@ -1,0 +1,1065 @@
+<!DOCTYPE html>
+<html lang="es" class="h-full bg-slate-950 text-slate-100">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TechStore Imports — Panel del Agente de Ventas</title>
+    <meta name="description" content="Panel interno de ventas y cotización aduanera para agentes de TechStore Imports.">
+    <link rel="icon" type="image/png" href="/frontend/logo.png">
+    <!-- Google Fonts: Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Tailwind CSS v3 CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        brand: {
+                            50: '#eef2ff',
+                            100: '#e0e7ff',
+                            500: '#6366f1',
+                            600: '#4f46e5',
+                            700: '#4338ca',
+                            950: '#090d16',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        /* Custom Scrollbar for premium feel */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: rgba(15, 23, 42, 0.3);
+        }
+        ::-webkit-scrollbar-thumb {
+            background: rgba(99, 102, 241, 0.2);
+            border-radius: 99px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(99, 102, 241, 0.4);
+        }
+    </style>
+</head>
+<body class="h-full flex flex-col font-sans overflow-hidden bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-slate-900 via-slate-950 to-brand-950">
+
+    <!-- CABECERA PRINCIPAL (HEADER) -->
+    <header class="h-[60px] flex items-center justify-between px-6 bg-slate-900/70 backdrop-blur-xl border-b border-slate-800/70 z-10 shadow-sm flex-shrink-0">
+        <div class="flex items-center gap-3">
+            <img src="/frontend/logo.png" alt="TechStore" class="h-8 w-auto rounded-lg p-1 bg-indigo-950 border border-indigo-800/50">
+            <div class="flex flex-col">
+                <span class="text-[0.8125rem] font-bold tracking-tight text-slate-100 leading-tight">TechStore Imports</span>
+                <span class="text-[0.65rem] text-indigo-400/80 leading-tight">Panel del Agente de Ventas</span>
+            </div>
+        </div>
+
+        <div class="flex items-center gap-4">
+            <div class="flex items-center gap-2.5 bg-slate-800/50 border border-slate-700/40 rounded-full px-3 py-1.5">
+                <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                <span class="text-[0.75rem] font-semibold text-slate-300" id="agent-name-display">Agente</span>
+            </div>
+            <div class="flex items-center gap-3">
+                <a id="btn-back" href="index.html" class="text-[0.75rem] font-medium text-slate-500 hover:text-slate-200 transition-colors hidden">← Volver al Panel</a>
+                <button onclick="handleLogout()" class="text-[0.75rem] font-medium text-slate-500 hover:text-red-400 transition-colors">Cerrar Sesión</button>
+            </div>
+        </div>
+    </header>
+
+    <!-- PANEL PRINCIPAL (3 COLUMNAS) -->
+    <main class="flex-1 flex overflow-hidden">
+
+        <!-- ================= COLUMNA IZQUIERDA (20%): LEADS ACTIVOS ================= -->
+        <section class="w-[22%] min-w-[270px] border-r border-slate-800/50 bg-slate-900/20 flex flex-col h-full">
+            <!-- Header del Panel -->
+            <div class="px-4 pt-4 pb-3 border-b border-slate-800/50">
+                <div class="flex items-center justify-between mb-3">
+                    <span class="text-[0.65rem] font-bold text-slate-500 uppercase tracking-wider">Solicitudes Activas</span>
+                    <span class="text-[0.65rem] text-indigo-400 font-semibold" id="leads-counter">—</span>
+                </div>
+                <div class="relative">
+                    <input type="text" placeholder="Buscar solicitud..." class="w-full bg-slate-950/80 border border-slate-800/80 rounded-lg py-2 pl-8 pr-3 text-[0.75rem] focus:outline-none focus:border-indigo-500/70 focus:ring-1 focus:ring-indigo-500/20 transition-all placeholder-slate-600 text-slate-200">
+                    <span class="absolute left-2.5 top-2.5 text-slate-600 text-[0.7rem]">🔍</span>
+                </div>
+            </div>
+
+            <!-- Listado de Solicitudes -->
+            <div class="flex-1 overflow-y-auto p-3 space-y-2" id="leads-list">
+                <div class="flex justify-center items-center py-10">
+                    <div class="flex items-center gap-2 text-[0.75rem] text-slate-500">
+                        <div class="w-4 h-4 border-2 border-indigo-500/30 border-t-indigo-500 rounded-full animate-spin"></div>
+                        Conectando...
+                    </div>
+                </div>
+            </div>
+
+            <!-- Footer -->
+            <div class="px-4 py-2.5 border-t border-slate-800/40 flex items-center justify-between bg-slate-950/30">
+                <button id="btn-reload-leads" class="text-[0.7rem] text-indigo-400 font-semibold hover:text-indigo-300 transition-colors flex items-center gap-1">
+                    ↺ Recargar leads
+                </button>
+            </div>
+        </section>
+
+        <!-- ================= COLUMNA CENTRAL (50%): ÁREA DE CHAT ================= -->
+        <section class="flex-1 flex flex-col h-full bg-slate-950/10">
+            <!-- Encabezado del Chat -->
+            <div class="h-[60px] border-b border-slate-800/50 flex items-center justify-between px-6 bg-slate-900/10 flex-shrink-0">
+                <div>
+                    <h2 class="text-[0.875rem] font-bold text-slate-100 leading-tight" id="chat-client-name">Selecciona un lead</h2>
+                    <p class="text-[0.7rem] text-indigo-400/80 flex items-center gap-1.5 mt-0.5">
+                        <span class="w-1.5 h-1.5 rounded-full bg-indigo-500/80"></span>
+                        Cotización: <span id="chat-product-name" class="text-indigo-300">—</span>
+                    </p>
+                </div>
+            </div>
+
+            <!-- Historial de Mensajes (Scrollable) - poblado dinámicamente por cargarMensajes() -->
+            <div class="flex-1 overflow-y-auto p-6 space-y-4" id="chat-messages-container">
+                <div class="flex justify-center items-center h-full">
+                    <p class="text-xs text-slate-500">Selecciona un pedido para ver el chat.</p>
+                </div>
+            </div>
+
+            <!-- Entrada de Texto / Envío de Mensaje -->
+            <div class="p-4 border-t border-slate-800/50 bg-slate-900/10 flex-shrink-0">
+                <form id="chat-form" onsubmit="sendChatMessage(event)" class="flex gap-2">
+                    <input type="text" id="chat-input" placeholder="Escribe tu respuesta al cliente..." autocomplete="off"
+                           class="flex-1 bg-slate-950 border border-slate-800/80 text-[0.8125rem] rounded-xl px-4 py-2.5
+                                  focus:outline-none focus:border-indigo-500/70 focus:ring-1 focus:ring-indigo-500/15
+                                  placeholder-slate-600 text-slate-100 transition-all">
+                    <button type="submit"
+                            class="bg-indigo-600 hover:bg-indigo-500 active:bg-indigo-700 text-white rounded-xl px-5 py-2.5
+                                   transition-all text-[0.8125rem] font-semibold shadow-md shadow-indigo-600/20
+                                   flex items-center gap-1.5">
+                        <span>Enviar</span>
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-3.5 h-3.5">
+                            <path d="M3.105 2.289a.75.75 0 00-.826.95l1.414 4.925A1.5 1.5 0 005.135 9.25h6.115a.75.75 0 010 1.5H5.135a1.5 1.5 0 00-1.442 1.086l-1.414 4.926a.75.75 0 00.826.95 28.896 28.896 0 0015.293-7.154.75.75 0 000-1.115A28.897 28.897 0 003.105 2.289z"/>
+                        </svg>
+                    </button>
+                </form>
+            </div>
+        </section>
+
+        <!-- ================= COLUMNA DERECHA (30%): FORMULARIO DE COTIZACIÓN ================= -->
+        <section class="w-[30%] min-w-[340px] border-l border-slate-800/50 bg-slate-900/20 flex flex-col h-full overflow-y-auto">
+            
+            <!-- Título de Sección -->
+            <div class="h-[60px] border-b border-slate-800/50 flex items-center px-5 bg-slate-900/10 flex-shrink-0">
+                <div class="flex items-center gap-2.5">
+                    <span class="text-base">⚖️</span>
+                    <div>
+                        <h2 class="text-[0.75rem] font-bold text-slate-200 leading-tight">Cotización Aduanera</h2>
+                        <p class="text-[0.65rem] text-slate-500 leading-tight">Formulario interno del agente</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Formulario del Cálculo -->
+            <form id="quote-form" onsubmit="submitQuote(event)" class="p-6 space-y-5 flex-1">
+                
+                <!-- Sección 1: Costos de Origen -->
+                <div class="space-y-3">
+                    <h3 class="text-[10px] font-bold text-indigo-400 uppercase tracking-widest border-b border-slate-800/50 pb-1">1. Costos de Origen</h3>
+                    
+                    <div class="grid grid-cols-2 gap-3">
+                        <div class="space-y-1">
+                            <label class="block text-[10px] font-semibold text-slate-400">Precio Producto (USD)</label>
+                            <div class="relative">
+                                <span class="absolute left-3 top-2.5 text-slate-500 text-[11px]">$</span>
+                                <input type="number" id="inp-price" value="1499.00" step="0.01" oninput="calculateAduana()" class="w-full bg-slate-950 border border-slate-800 rounded-lg py-2 pl-6 pr-3 text-xs text-slate-100 font-semibold focus:outline-none focus:border-indigo-500 transition-colors">
+                            </div>
+                        </div>
+
+                        <div class="space-y-1">
+                            <label class="block text-[10px] font-semibold text-slate-400">Flete Int. (USD)</label>
+                            <div class="relative">
+                                <span class="absolute left-3 top-2.5 text-slate-500 text-[11px]">$</span>
+                                <input type="number" id="inp-freight" value="85.00" step="0.01" oninput="calculateAduana()" class="w-full bg-slate-950 border border-slate-800 rounded-lg py-2 pl-6 pr-3 text-xs text-slate-100 font-semibold focus:outline-none focus:border-indigo-500 transition-colors">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-3">
+                        <div class="space-y-1">
+                            <label class="block text-[10px] font-semibold text-slate-400">Costo Seguro (USD)</label>
+                            <div class="relative">
+                                <span class="absolute left-3 top-2.5 text-slate-500 text-[11px]">$</span>
+                                <input type="number" id="inp-insurance" value="25.00" step="0.01" oninput="calculateAduana()" class="w-full bg-slate-950 border border-slate-800 rounded-lg py-2 pl-6 pr-3 text-xs text-slate-100 font-semibold focus:outline-none focus:border-indigo-500 transition-colors">
+                            </div>
+                        </div>
+                        <div class="space-y-1">
+                            <label class="block text-[10px] font-semibold text-slate-400">Valor CIF (Calculado)</label>
+                            <div class="relative bg-slate-900 border border-slate-800/80 rounded-lg py-2 px-3 text-xs text-slate-400 font-bold" id="val-cif">
+                                $1,609.00
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Sección 2: Gravámenes e Impuestos -->
+                <div class="space-y-3 pt-2">
+                    <h3 class="text-[10px] font-bold text-indigo-400 uppercase tracking-widest border-b border-slate-800/50 pb-1">2. Impuestos & Aduana</h3>
+                    
+                    <div class="grid grid-cols-2 gap-3">
+                        <div class="space-y-1">
+                            <label class="block text-[10px] font-semibold text-slate-400">Arancel Ad-Valorem (%)</label>
+                            <div class="relative">
+                                <input type="number" id="inp-tariff-pct" value="6.0" step="0.1" oninput="calculateAduana()" class="w-full bg-slate-950 border border-slate-800 rounded-lg py-2 px-3 text-xs text-slate-100 font-semibold focus:outline-none focus:border-indigo-500 transition-colors">
+                                <span class="absolute right-3 top-2.5 text-slate-500 text-[11px]">%</span>
+                            </div>
+                        </div>
+
+                        <div class="space-y-1">
+                            <label class="block text-[10px] font-semibold text-slate-400">Impuesto IVA (%)</label>
+                            <div class="relative">
+                                <input type="number" id="inp-vat-pct" value="19.0" step="0.1" oninput="calculateAduana()" class="w-full bg-slate-950 border border-slate-800 rounded-lg py-2 px-3 text-xs text-slate-100 font-semibold focus:outline-none focus:border-indigo-500 transition-colors">
+                                <span class="absolute right-3 top-2.5 text-slate-500 text-[11px]">%</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Desglose de Resultados -->
+                    <div class="bg-slate-950/80 border border-slate-800/50 rounded-xl p-3.5 space-y-2 mt-2">
+                        <div class="flex items-center justify-between text-xs text-slate-400">
+                            <span>Arancel Calculado:</span>
+                            <span class="font-bold text-slate-200" id="res-tariff">$96.54</span>
+                        </div>
+                        <div class="flex items-center justify-between text-xs text-slate-400">
+                            <span>IVA Internación (19%):</span>
+                            <span class="font-bold text-slate-200" id="res-vat">$324.05</span>
+                        </div>
+                        <div class="flex items-center justify-between text-xs text-slate-400">
+                            <span>Gastos Operacionales:</span>
+                            <span class="font-bold text-slate-200">$45.00</span>
+                        </div>
+                        <div class="border-t border-slate-800/80 my-2 pt-2 flex items-center justify-between text-xs font-semibold text-indigo-400">
+                            <span>Total Impuestos:</span>
+                            <span class="font-bold" id="res-total-taxes">$465.59</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Sección 3: Resumen de Pago -->
+                <div class="space-y-3 pt-2">
+                    <h3 class="text-[10px] font-bold text-indigo-400 uppercase tracking-widest border-b border-slate-800/50 pb-1">3. Resumen Final a Cobrar</h3>
+                    
+                    <div class="bg-gradient-to-br from-indigo-950/50 to-indigo-900/20 border border-indigo-500/20 rounded-xl p-4 flex flex-col items-center justify-center text-center">
+                        <span class="text-[10px] font-bold uppercase tracking-wider text-indigo-400">Total a Pagar por Cliente</span>
+                        <span class="text-3xl font-extrabold text-white mt-1 tracking-tight" id="res-total-pay">$2,074.59</span>
+                        <span class="text-[9px] text-slate-500 mt-1">Valores expresados en USD (dólares americanos)</span>
+                    </div>
+                </div>
+
+                <!-- Panel QR: aparece tras cotizar exitosamente -->
+                <div id="qr-panel" class="hidden space-y-3 pt-1">
+                    <h3 class="text-[10px] font-bold text-emerald-400 uppercase tracking-widest border-b border-slate-800/50 pb-1">4. Código QR de Pago</h3>
+                    <div class="bg-slate-950/80 border border-emerald-500/20 rounded-xl p-4 flex flex-col items-center gap-3">
+                        <img id="qr-image" src="" alt="QR de pago" class="w-32 h-32 rounded-lg border border-slate-700/40 shadow-md bg-white p-1">
+                        <div class="text-center">
+                            <p class="text-[10px] text-emerald-400 font-semibold">QR generado y enviado al chat</p>
+                            <p class="text-[9px] text-slate-500 mt-0.5">El cliente debe escanear este código para pagar</p>
+                        </div>
+                        <div class="w-full flex items-center gap-2 bg-slate-900/60 border border-slate-800/50 rounded-lg px-3 py-2">
+                            <span class="w-2 h-2 rounded-full bg-blue-400 animate-pulse flex-shrink-0"></span>
+                            <span class="text-[10px] text-blue-400 font-semibold">Esperando confirmación de pago...</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Botones de acción -->
+                <div class="space-y-2.5 pt-1">
+                    <!-- Botón principal: Enviar Cotización -->
+                    <button type="submit" id="btn-submit-quote"
+                        class="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-3 px-4 rounded-xl text-xs transition-all shadow-lg shadow-indigo-600/20 hover:shadow-indigo-500/35 border border-indigo-500/40 hover:-translate-y-0.5 active:translate-y-0 flex items-center justify-center gap-2">
+                        <span>Enviar Cotización Final</span> ⚡
+                    </button>
+
+                    <!-- Botón dev: Simular Pago (solo visible en estado 'esperando_pago') -->
+                    <button type="button" id="btn-simular-pago"
+                        onclick="simularPago()"
+                        class="hidden w-full bg-emerald-600/10 hover:bg-emerald-600/20 text-emerald-400 font-bold py-3 px-4 rounded-xl text-xs transition-all border border-emerald-500/30 hover:border-emerald-500/50 flex items-center justify-center gap-2">
+                        <span>🧪 Simular Pago Cliente (Dev)</span>
+                    </button>
+                </div>
+
+            </form>
+        </section>
+    </main>
+
+    <!-- SISTEMA DE NOTIFICACIÓN DE TOASTS FLOTANTES -->
+    <div id="toast-container" class="fixed bottom-6 right-6 z-50 flex flex-col gap-2 pointer-events-none"></div>
+
+    <!-- SCRIPT PRINCIPAL: SISTEMA DE CHAT RELACIONAL POR TICKET -->
+    <script>
+        // ============================================================
+        // CONFIGURACIÓN GLOBAL
+        // ============================================================
+        const API_URL = 'http://localhost:3000';
+
+        // Estado de la aplicación
+        let currentUser         = null;   // Usuario autenticado
+        let currentPedidoId     = null;   // ID del pedido/lead activo
+        let currentPedidoEstado = null;   // Estado actual del pedido seleccionado
+        let lastMessageId       = 0;      // Para dedup en el short polling
+        let pollingIntervalId   = null;   // Referencia al setInterval del short polling
+        let isSending           = false;  // Guard para evitar doble envío
+
+        // ============================================================
+        // HELPERS DE AUTENTICACIÓN
+        // ============================================================
+        function getAuthHeaders() {
+            const token = localStorage.getItem('token');
+            return {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            };
+        }
+
+        function handleLogout() {
+            stopPolling();
+            localStorage.removeItem('token');
+            localStorage.removeItem('currentUser');
+            window.location.href = 'index.html';
+        }
+
+        // ============================================================
+        // SISTEMA DE TOASTS
+        // ============================================================
+        function showToast(title, desc = '', type = 'success') {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            const icons = { success: '✅', error: '❌', warning: '⚠️', info: '⚡' };
+            const icon  = icons[type] || icons.info;
+
+            toast.className = 'flex items-start gap-3.5 p-4 rounded-xl border bg-slate-900 text-slate-100 shadow-xl pointer-events-auto min-w-[300px] transition-all duration-300';
+            toast.style.borderColor = type === 'error' ? 'rgba(239,68,68,0.3)' : 'rgba(99,102,241,0.3)';
+            toast.innerHTML = `
+                <div class="text-base mt-0.5">${icon}</div>
+                <div class="flex-1">
+                    <h4 class="text-xs font-bold text-slate-200">${title}</h4>
+                    ${desc ? `<p class="text-[10px] text-slate-400 mt-0.5">${desc}</p>` : ''}
+                </div>
+                <button onclick="this.closest('.pointer-events-auto').remove()" class="text-slate-600 hover:text-slate-400 text-xs ml-1">✕</button>
+            `;
+            container.appendChild(toast);
+
+            // Auto-dismiss
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                toast.style.transform = 'translateY(4px)';
+                setTimeout(() => toast.remove(), 320);
+            }, 4500);
+        }
+
+        // ============================================================
+        // UTILIDADES DE RENDERIZADO
+        // ============================================================
+
+        /** Genera las iniciales de un nombre completo */
+        function getInitials(nombre = '') {
+            return nombre.split(' ').slice(0, 2).map(n => n[0]).join('').toUpperCase() || '??';
+        }
+
+        /** Formatea una fecha ISO como texto relativo legible */
+        function timeAgo(isoString) {
+            if (!isoString) return '';
+            const now  = Date.now();
+            const then = new Date(isoString).getTime();
+            const diff = Math.floor((now - then) / 1000); // segundos
+
+            if (diff < 60)   return 'Ahora mismo';
+            if (diff < 3600) return `Hace ${Math.floor(diff / 60)} min`;
+            if (diff < 86400) return `Hace ${Math.floor(diff / 3600)} h`;
+            return new Date(isoString).toLocaleDateString('es-CL', { day: '2-digit', month: 'short' });
+        }
+
+        /** Badge de estado con colores semánticos */
+        function estadoBadgeHTML(estado) {
+            const map = {
+                cotizando:      'bg-amber-500/10 text-amber-400 border-amber-500/20',
+                esperando_pago: 'bg-blue-500/10 text-blue-400 border-blue-500/20',
+                finalizado:     'bg-emerald-500/10 text-emerald-400 border-emerald-500/20',
+            };
+            const labels = {
+                cotizando: 'Cotizando', esperando_pago: 'Esp. Pago', finalizado: 'Finalizado'
+            };
+            const cls = map[estado] || 'bg-slate-500/10 text-slate-400 border-slate-500/20';
+            return `<span class="px-2 py-0.5 text-[9px] rounded-full font-medium border ${cls}">${labels[estado] || estado}</span>`;
+        }
+
+        // ============================================================
+        // COLUMNA IZQUIERDA: CARGAR Y RENDERIZAR LEADS (PEDIDOS)
+        // ============================================================
+        async function cargarLeads() {
+            try {
+                const res = await fetch(`${API_URL}/api/pedidos`, { headers: getAuthHeaders() });
+                if (!res.ok) {
+                    if (res.status === 401 || res.status === 403) { handleLogout(); return; }
+                    throw new Error(`HTTP ${res.status}`);
+                }
+                const pedidos = await res.json();
+                renderLeads(pedidos);
+
+                // Si hay pedidos, seleccionar el primero por defecto
+                if (pedidos.length > 0 && !currentPedidoId) {
+                    selectLead(pedidos[0].id, pedidos[0]);
+                }
+
+                // Actualizar contador
+                const counter = document.getElementById('leads-counter');
+                if (counter) counter.textContent = `Leads activos: ${pedidos.filter(p => p.estado !== 'finalizado').length}`;
+            } catch (err) {
+                console.error('[cargarLeads]', err);
+            }
+        }
+
+        function renderLeads(pedidos) {
+            const list = document.getElementById('leads-list');
+            if (!pedidos.length) {
+                list.innerHTML = `
+                    <div class="flex flex-col items-center justify-center py-10 text-center">
+                        <span class="text-2xl mb-2">📭</span>
+                        <p class="text-xs text-slate-500">Sin pedidos activos aún.</p>
+                    </div>`;
+                return;
+            }
+
+            list.innerHTML = pedidos.map(pedido => {
+                const isActive = pedido.id === currentPedidoId;
+                const activeClasses = isActive
+                    ? 'border-indigo-500/30 bg-indigo-500/5'
+                    : 'border-slate-800 bg-slate-900/40 hover:border-slate-700/80 hover:bg-slate-900/60';
+                const urlShort = pedido.url_producto.replace(/^https?:\/\/[^/]+/, '').substring(0, 30) + '…';
+                const initials = getInitials(pedido.cliente_nombre);
+
+                return `
+                <div onclick="selectLeadById(${pedido.id})"
+                     id="lead-card-${pedido.id}"
+                     class="lead-card group cursor-pointer p-3.5 rounded-xl border ${activeClasses} transition-all duration-300">
+                    <div class="flex items-center justify-between mb-1.5">
+                        <span class="text-[10px] font-bold ${isActive ? 'text-indigo-400' : 'text-slate-500'} tracking-wide uppercase">
+                            PED-#${String(pedido.id).padStart(4, '0')}
+                        </span>
+                        ${estadoBadgeHTML(pedido.estado)}
+                    </div>
+                    <h3 class="text-xs font-semibold ${isActive ? 'text-slate-100' : 'text-slate-200'} group-hover:text-indigo-300 transition-colors">
+                        ${pedido.cliente_nombre}
+                    </h3>
+                    <p class="text-[11px] text-slate-400 mt-1 truncate" title="${pedido.url_producto}">${urlShort}</p>
+                    <div class="flex items-center justify-between mt-2.5 text-[10px] text-slate-500">
+                        <span>${timeAgo(pedido.fecha_creacion)}</span>
+                        <span class="flex items-center gap-1">
+                            <span class="w-1.5 h-1.5 rounded-full ${isActive ? 'bg-indigo-400' : 'bg-slate-600'}"></span>
+                            $${Number(pedido.total_a_pagar).toFixed(2)}
+                        </span>
+                    </div>
+                </div>`;
+            }).join('');
+        }
+
+        // Selección de lead por ID (llamado desde onclick en HTML dinámico)
+        async function selectLeadById(pedidoId) {
+            try {
+                const res = await fetch(`${API_URL}/api/pedidos/${pedidoId}`, { headers: getAuthHeaders() });
+                if (!res.ok) throw new Error(`HTTP ${res.status}`);
+                const pedido = await res.json();
+                selectLead(pedidoId, pedido);
+            } catch (err) {
+                console.error('[selectLeadById]', err);
+                showToast('Error', 'No se pudo cargar el pedido seleccionado.', 'error');
+            }
+        }
+
+        function selectLead(pedidoId, pedidoData) {
+            currentPedidoId     = pedidoId;
+            currentPedidoEstado = pedidoData.estado;
+            lastMessageId       = 0; // Resetear tracking de mensajes
+
+            // Actualizar UI de tarjetas
+            document.querySelectorAll('.lead-card').forEach(card => {
+                card.classList.remove('border-indigo-500/30', 'bg-indigo-500/5');
+                card.classList.add('border-slate-800', 'bg-slate-900/40');
+                const label = card.querySelector('span.font-bold');
+                if (label) label.classList.replace('text-indigo-400', 'text-slate-500');
+            });
+            const activeCard = document.getElementById(`lead-card-${pedidoId}`);
+            if (activeCard) {
+                activeCard.classList.add('border-indigo-500/30', 'bg-indigo-500/5');
+                activeCard.classList.remove('border-slate-800', 'bg-slate-900/40');
+                const label = activeCard.querySelector('span.font-bold');
+                if (label) label.classList.replace('text-slate-500', 'text-indigo-400');
+            }
+
+            // Actualizar cabecera del chat
+            document.getElementById('chat-client-name').textContent = pedidoData.cliente_nombre || `Pedido #${pedidoId}`;
+            const productEl = document.getElementById('chat-product-name');
+            const urlShort  = (pedidoData.url_producto || '').replace(/^https?:\/\/[^/]+/, '').substring(0, 50);
+            productEl.textContent = urlShort || pedidoData.url_producto;
+
+            // Prellenar calculadora con datos del pedido
+            const precio = Number(pedidoData.precio_origen) || 0;
+            document.getElementById('inp-price').value     = precio.toFixed(2);
+            document.getElementById('inp-freight').value   = (85).toFixed(2);
+            document.getElementById('inp-insurance').value = (25).toFixed(2);
+            calculateAduana();
+
+            // Sincronizar visibilidad del boton Simular Pago y panel QR
+            actualizarUIEstado(pedidoData.estado);
+
+            // Cargar mensajes reales desde la API
+            cargarMensajes(pedidoId);
+
+            // Reiniciar polling para este pedido
+            stopPolling();
+            startPolling(pedidoId);
+        }
+
+        /**
+         * Sincroniza el boton Simular Pago y el panel QR segun el estado del pedido.
+         * - esperando_pago: muestra el boton de simulacion
+         * - finalizado: oculta QR panel y boton
+         * - cotizando: solo oculta ambos
+         */
+        function actualizarUIEstado(estado) {
+            const btnSimular = document.getElementById('btn-simular-pago');
+            const qrPanel    = document.getElementById('qr-panel');
+
+            if (estado === 'esperando_pago') {
+                if (btnSimular) btnSimular.classList.remove('hidden');
+            } else {
+                if (btnSimular) btnSimular.classList.add('hidden');
+                if (qrPanel)    qrPanel.classList.add('hidden');
+            }
+        }
+
+        // ============================================================
+        // COLUMNA CENTRAL: CHAT EN TIEMPO REAL
+        // ============================================================
+
+        /** Renderiza una sola burbuja de mensaje en el DOM */
+        function renderMessageBubble(msg, appendTo) {
+            const isAgent    = (msg.usuario_rol === 'agente' || msg.usuario_rol === 'admin');
+            const initials   = getInitials(msg.usuario_nombre);
+            const avatarBg   = isAgent
+                ? 'bg-indigo-600 text-white shadow-md shadow-indigo-600/20'
+                : 'bg-indigo-500/10 text-indigo-400 border border-indigo-500/20';
+            const msgBg      = isAgent
+                ? 'bg-indigo-600 text-white rounded-tr-none'
+                : 'bg-slate-900/80 border border-slate-800/60 text-slate-200 rounded-tl-none';
+            const align      = isAgent ? 'ml-auto flex-row-reverse' : '';
+            const timeAlign  = isAgent ? 'text-right' : '';
+
+            const bubble = document.createElement('div');
+            bubble.className = `flex items-start gap-3 max-w-[80%] ${align}`;
+            bubble.dataset.msgId = msg.id;
+            bubble.innerHTML = `
+                <div class="w-8 h-8 rounded-full ${avatarBg} flex items-center justify-center font-bold text-xs flex-shrink-0">
+                    ${initials}
+                </div>
+                <div class="min-w-0">
+                    <div class="${msgBg} rounded-2xl p-3 text-xs leading-relaxed shadow-sm break-words">
+                        ${escapeHTML(msg.contenido_mensaje)}
+                    </div>
+                    <span class="text-[10px] text-slate-500 mt-1 block px-1 ${timeAlign}">
+                        ${timeAgo(msg.fecha_envio)}
+                        <span class="text-slate-600 ml-1">${isAgent ? '· Agente' : '· Cliente'}</span>
+                    </span>
+                </div>
+            `;
+            appendTo.appendChild(bubble);
+        }
+
+        /** Sanitiza HTML para evitar XSS al mostrar mensajes */
+        function escapeHTML(str) {
+            const div = document.createElement('div');
+            div.appendChild(document.createTextNode(str));
+            return div.innerHTML;
+        }
+
+        /**
+         * cargarMensajes(pedidoId)
+         * Carga todos los mensajes desde GET /api/pedidos/:id/mensajes
+         * y los renderiza. Actualiza lastMessageId.
+         */
+        async function cargarMensajes(pedidoId) {
+            const container = document.getElementById('chat-messages-container');
+
+            // Mostrar estado de carga
+            if (!lastMessageId) {
+                container.innerHTML = `
+                    <div class="flex justify-center items-center h-full">
+                        <div class="flex items-center gap-2 text-xs text-slate-500">
+                            <div class="w-4 h-4 border-2 border-indigo-500/40 border-t-indigo-500 rounded-full animate-spin"></div>
+                            Cargando mensajes...
+                        </div>
+                    </div>`;
+            }
+
+            try {
+                const res = await fetch(`${API_URL}/api/pedidos/${pedidoId}/mensajes`, {
+                    headers: getAuthHeaders()
+                });
+
+                if (!res.ok) {
+                    if (res.status === 401) { handleLogout(); return; }
+                    throw new Error(`HTTP ${res.status}`);
+                }
+
+                const mensajes = await res.json();
+
+                // Si es la primera carga (lastMessageId === 0), limpiar y renderizar todo
+                if (!lastMessageId) {
+                    container.innerHTML = '';
+                    if (mensajes.length === 0) {
+                        container.innerHTML = `
+                            <div class="flex flex-col items-center justify-center h-full text-center">
+                                <span class="text-3xl mb-3">💬</span>
+                                <p class="text-xs text-slate-500">Aún no hay mensajes en este pedido.</p>
+                                <p class="text-[10px] text-slate-600 mt-1">Sé el primero en escribir.</p>
+                            </div>`;
+                        return;
+                    }
+                    mensajes.forEach(msg => renderMessageBubble(msg, container));
+                    lastMessageId = mensajes[mensajes.length - 1].id;
+                } else {
+                    // Solo agregar mensajes nuevos (id > lastMessageId)
+                    const nuevos = mensajes.filter(m => m.id > lastMessageId);
+                    if (nuevos.length > 0) {
+                        // Si el área estaba vacía, limpiar el placeholder
+                        if (container.querySelector('.justify-center')) {
+                            container.innerHTML = '';
+                        }
+                        nuevos.forEach(msg => renderMessageBubble(msg, container));
+                        lastMessageId = nuevos[nuevos.length - 1].id;
+                    }
+                }
+
+                // Auto-scroll al último mensaje
+                scrollToBottom();
+
+            } catch (err) {
+                console.error('[cargarMensajes]', err);
+                if (!lastMessageId) {
+                    container.innerHTML = `
+                        <div class="flex flex-col items-center justify-center h-full text-center">
+                            <span class="text-3xl mb-3">⚠️</span>
+                            <p class="text-xs text-red-400">Error al cargar mensajes.</p>
+                            <button onclick="cargarMensajes(${pedidoId})"
+                                class="mt-3 text-[10px] text-indigo-400 hover:underline">Reintentar</button>
+                        </div>`;
+                }
+            }
+        }
+
+        /** Hace scroll suave al final del contenedor de chat */
+        function scrollToBottom() {
+            const container = document.getElementById('chat-messages-container');
+            requestAnimationFrame(() => {
+                container.scrollTo({ top: container.scrollHeight, behavior: 'smooth' });
+            });
+        }
+
+        /**
+         * Manejador del formulario de chat.
+         * POST /api/pedidos/:id/mensajes  → guarda en BD → inyecta en DOM.
+         */
+        async function sendChatMessage(e) {
+            e.preventDefault();
+            if (isSending || !currentPedidoId) return;
+
+            const input = document.getElementById('chat-input');
+            const text  = input.value.trim();
+            if (!text) return;
+
+            const submitBtn = e.target.querySelector('button[type="submit"]');
+            isSending = true;
+            submitBtn.disabled  = true;
+            submitBtn.innerHTML = '<span class="w-3.5 h-3.5 border-2 border-white/40 border-t-white rounded-full animate-spin"></span>';
+
+            try {
+                const res = await fetch(`${API_URL}/api/pedidos/${currentPedidoId}/mensajes`, {
+                    method: 'POST',
+                    headers: getAuthHeaders(),
+                    body: JSON.stringify({ contenido_mensaje: text })
+                });
+
+                if (!res.ok) {
+                    if (res.status === 401) { handleLogout(); return; }
+                    const err = await res.json().catch(() => ({}));
+                    throw new Error(err.mensaje || `HTTP ${res.status}`);
+                }
+
+                const nuevoMensaje = await res.json();
+                input.value = '';
+
+                // Inyectar burbuja inmediatamente en el DOM
+                const container = document.getElementById('chat-messages-container');
+                // Si estaba el estado vacío, limpiarlo
+                const placeholder = container.querySelector('.justify-center');
+                if (placeholder) container.innerHTML = '';
+
+                renderMessageBubble(nuevoMensaje, container);
+                lastMessageId = nuevoMensaje.id;
+                scrollToBottom();
+
+            } catch (err) {
+                console.error('[sendChatMessage]', err);
+                showToast('Error al enviar', err.message, 'error');
+            } finally {
+                isSending = false;
+                submitBtn.disabled  = false;
+                submitBtn.innerHTML = '<span>Enviar</span> 🚀';
+            }
+        }
+
+        // ============================================================
+        // SHORT POLLING (cada 4 segundos)
+        // ============================================================
+
+        function startPolling(pedidoId) {
+            stopPolling(); // Limpiar cualquier intervalo previo
+            pollingIntervalId = setInterval(async () => {
+                if (currentPedidoId && !isSending) {
+                    await cargarMensajes(pedidoId);
+                }
+            }, 4000);
+        }
+
+        function stopPolling() {
+            if (pollingIntervalId) {
+                clearInterval(pollingIntervalId);
+                pollingIntervalId = null;
+            }
+        }
+
+        // ============================================================
+        // COLUMNA DERECHA: CALCULADORA ADUANERA REACTIVA
+        // ============================================================
+        function calculateAduana() {
+            const price      = parseFloat(document.getElementById('inp-price').value)      || 0;
+            const freight    = parseFloat(document.getElementById('inp-freight').value)    || 0;
+            const insurance  = parseFloat(document.getElementById('inp-insurance').value)  || 0;
+            const tariffPct  = parseFloat(document.getElementById('inp-tariff-pct').value) || 0;
+            const vatPct     = parseFloat(document.getElementById('inp-vat-pct').value)    || 0;
+
+            const fmt = n => `$${n.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+
+            const cif   = price + freight + insurance;
+            document.getElementById('val-cif').textContent = fmt(cif);
+
+            const tariff = cif * (tariffPct / 100);
+            document.getElementById('res-tariff').textContent = fmt(tariff);
+
+            const vat = (cif + tariff) * (vatPct / 100);
+            document.getElementById('res-vat').textContent = fmt(vat);
+
+            const opex       = 45.00;
+            const totalTaxes = tariff + vat + opex;
+            document.getElementById('res-total-taxes').textContent = fmt(totalTaxes);
+
+            const totalToPay = cif + totalTaxes;
+            document.getElementById('res-total-pay').textContent = fmt(totalToPay);
+        }
+
+        /**
+         * submitQuote - Envia cotizacion a POST /api/pedidos/:id/cotizar.
+         * Recibe la URL del QR, lo muestra en el panel lateral e inyecta
+         * un mensaje formal con la imagen QR en el chat.
+         */
+        async function submitQuote(e) {
+            e.preventDefault();
+            if (!currentPedidoId) {
+                showToast('Sin pedido', 'Selecciona un pedido primero.', 'warning');
+                return;
+            }
+
+            // Capturar valores de la calculadora
+            const precioOrigen = parseFloat(document.getElementById('inp-price').value)    || 0;
+            const freight      = parseFloat(document.getElementById('inp-freight').value)   || 0;
+            const insurance    = parseFloat(document.getElementById('inp-insurance').value)  || 0;
+            const tariffPct    = parseFloat(document.getElementById('inp-tariff-pct').value) || 0;
+            const vatPct       = parseFloat(document.getElementById('inp-vat-pct').value)    || 0;
+
+            const cif       = precioOrigen + freight + insurance;
+            const arancel   = cif * (tariffPct / 100);
+            const vat       = (cif + arancel) * (vatPct / 100);
+            const totalAPagar = cif + arancel + vat + 45.00; // +opex
+
+            const clientName   = document.getElementById('chat-client-name').textContent;
+            const totalDisplay = document.getElementById('res-total-pay').textContent;
+
+            const submitBtn    = document.getElementById('btn-submit-quote');
+            const originalHTML = submitBtn.innerHTML;
+            submitBtn.disabled  = true;
+            submitBtn.innerHTML = '<span class="w-3.5 h-3.5 border-2 border-white/40 border-t-white rounded-full animate-spin"></span><span>Procesando...</span>';
+
+            try {
+                const res = await fetch(`${API_URL}/api/pedidos/${currentPedidoId}/cotizar`, {
+                    method: 'POST',
+                    headers: getAuthHeaders(),
+                    body: JSON.stringify({
+                        precio_origen:     parseFloat(precioOrigen.toFixed(2)),
+                        arancel_calculado: parseFloat(arancel.toFixed(2)),
+                        total_a_pagar:     parseFloat(totalAPagar.toFixed(2))
+                    })
+                });
+
+                if (!res.ok) {
+                    if (res.status === 401) { handleLogout(); return; }
+                    const errData = await res.json().catch(() => ({}));
+                    throw new Error(errData.mensaje || 'HTTP ' + res.status);
+                }
+
+                const data  = await res.json();
+                const qrUrl = data.qr_url;
+
+                // 1. Mostrar QR en el panel lateral derecho
+                const qrPanel = document.getElementById('qr-panel');
+                const qrImg   = document.getElementById('qr-image');
+                qrImg.src     = qrUrl;
+                qrPanel.classList.remove('hidden');
+
+                // 2. Actualizar estado interno y UI
+                currentPedidoEstado = 'esperando_pago';
+                actualizarUIEstado('esperando_pago');
+                updateLeadBadge(currentPedidoId, 'esperando_pago');
+
+                // 3. Componer mensaje formal de cotizacion (texto plano, sin emoji para el body)
+                const pedidoNum  = String(currentPedidoId).padStart(4, '0');
+                const mensajeTxt = 'Cotizacion Oficial - Pedido #' + pedidoNum + '\n\n'
+                    + 'Estimado/a ' + clientName + ',\n\n'
+                    + 'Se ha generado su cotizacion aduanera final:\n'
+                    + '* Total a pagar: ' + totalDisplay + ' USD\n\n'
+                    + 'Por favor escanee el codigo QR adjunto para proceder con el pago seguro.'
+                    + ' El codigo es valido por 24 horas.\n\n'
+                    + 'Gracias por confiar en TechStore Imports.';
+
+                // Guardar el mensaje de texto en la BD
+                const msgRes = await fetch(`${API_URL}/api/pedidos/${currentPedidoId}/mensajes`, {
+                    method: 'POST',
+                    headers: getAuthHeaders(),
+                    body: JSON.stringify({ contenido_mensaje: mensajeTxt })
+                });
+
+                if (msgRes.ok) {
+                    const nuevoMsg = await msgRes.json();
+                    const container = document.getElementById('chat-messages-container');
+                    const placeholder = container.querySelector('.justify-center');
+                    if (placeholder) container.innerHTML = '';
+
+                    renderMessageBubble(nuevoMsg, container);
+                    renderQRBubble(qrUrl, totalDisplay, container);
+                    lastMessageId = nuevoMsg.id;
+                    scrollToBottom();
+                }
+
+                showToast('Cotizacion Enviada', 'QR de pago generado para ' + clientName + '. Total: ' + totalDisplay, 'success');
+
+            } catch (err) {
+                console.error('[submitQuote]', err);
+                showToast('Error al cotizar', err.message, 'error');
+            } finally {
+                submitBtn.disabled  = false;
+                submitBtn.innerHTML = originalHTML;
+            }
+        }
+
+        /**
+         * Renderiza una burbuja especial con la imagen QR en el chat.
+         * No se persiste en la BD — es decorativa del lado del agente.
+         * Se marca con data-qr-bubble para poder eliminarla antes de simular pago.
+         */
+        function renderQRBubble(qrUrl, totalDisplay, appendTo) {
+            const initials = currentUser ? getInitials(currentUser.nombre) : 'AG';
+            const bubble   = document.createElement('div');
+            bubble.className    = 'flex items-start gap-3 max-w-[80%] ml-auto flex-row-reverse';
+            bubble.dataset.qrBubble = 'true';
+            bubble.innerHTML = `
+                <div class="w-8 h-8 rounded-full bg-indigo-600 text-white shadow-md shadow-indigo-600/20 flex items-center justify-center font-bold text-xs flex-shrink-0">
+                    ${initials}
+                </div>
+                <div class="min-w-0">
+                    <div class="bg-indigo-600 rounded-2xl rounded-tr-none p-3 shadow-sm space-y-2">
+                        <p class="text-[10px] text-indigo-200 font-semibold">Codigo QR de Pago &mdash; ${totalDisplay} USD</p>
+                        <div class="bg-white rounded-lg p-2 flex items-center justify-center">
+                            <img src="${qrUrl}" alt="QR de pago" class="w-28 h-28" loading="lazy">
+                        </div>
+                        <p class="text-[9px] text-indigo-200/70 text-center">Escanea con tu app bancaria para pagar</p>
+                    </div>
+                    <span class="text-[10px] text-slate-500 mt-1 block px-1 text-right">
+                        Ahora mismo <span class="text-slate-600 ml-1">&middot; Agente</span>
+                    </span>
+                </div>
+            `;
+            appendTo.appendChild(bubble);
+        }
+
+        /**
+         * Actualiza el badge de estado en la tarjeta del lead del sidebar.
+         */
+        function updateLeadBadge(pedidoId, nuevoEstado) {
+            const card = document.getElementById('lead-card-' + pedidoId);
+            if (!card) return;
+            const badges = card.querySelectorAll('span.rounded-full');
+            const badge  = Array.from(badges).find(el => !el.classList.contains('w-1'));
+            if (!badge) return;
+
+            const map = {
+                cotizando:      'bg-amber-500/10 text-amber-400 border-amber-500/20',
+                esperando_pago: 'bg-blue-500/10 text-blue-400 border-blue-500/20',
+                finalizado:     'bg-emerald-500/10 text-emerald-400 border-emerald-500/20',
+            };
+            const labels = { cotizando: 'Cotizando', esperando_pago: 'Esp. Pago', finalizado: 'Finalizado' };
+            badge.className   = 'px-2 py-0.5 text-[9px] rounded-full font-medium border ' + (map[nuevoEstado] || '');
+            badge.textContent = labels[nuevoEstado] || nuevoEstado;
+        }
+
+        /**
+         * simularPago - Llama a POST /api/pedidos/:id/simular-pago.
+         * Inyecta el mensaje de confirmacion en el chat, actualiza
+         * todos los elementos de UI al estado 'finalizado'.
+         */
+        async function simularPago() {
+            if (!currentPedidoId) return;
+
+            const btn = document.getElementById('btn-simular-pago');
+            btn.disabled  = true;
+            btn.innerHTML = '<span class="w-3.5 h-3.5 border-2 border-emerald-500/40 border-t-emerald-400 rounded-full animate-spin"></span><span>Procesando pago...</span>';
+
+            try {
+                const res = await fetch(`${API_URL}/api/pedidos/${currentPedidoId}/simular-pago`, {
+                    method: 'POST',
+                    headers: getAuthHeaders()
+                });
+
+                if (!res.ok) {
+                    if (res.status === 401) { handleLogout(); return; }
+                    const errData = await res.json().catch(() => ({}));
+                    throw new Error(errData.mensaje || 'HTTP ' + res.status);
+                }
+
+                const data = await res.json();
+
+                // 1. Inyectar el mensaje automatico de confirmacion en el chat
+                if (data.mensaje_chat) {
+                    const container = document.getElementById('chat-messages-container');
+                    // Eliminar la burbuja QR decorativa si existe
+                    container.querySelectorAll('[data-qr-bubble]').forEach(el => el.remove());
+                    renderMessageBubble(data.mensaje_chat, container);
+                    lastMessageId = data.mensaje_chat.id;
+                    scrollToBottom();
+                }
+
+                // 2. Actualizar estado interno
+                currentPedidoEstado = 'finalizado';
+
+                // 3. Actualizar UI: ocultar QR panel y boton dev
+                actualizarUIEstado('finalizado');
+
+                // 4. Actualizar badge del lead en sidebar
+                updateLeadBadge(currentPedidoId, 'finalizado');
+
+                // 5. Actualizar contador de leads activos
+                const counter = document.getElementById('leads-counter');
+                if (counter) {
+                    const current = parseInt(counter.textContent.replace(/[^0-9]/g, '')) || 0;
+                    if (current > 0) counter.textContent = 'Leads activos: ' + (current - 1);
+                }
+
+                showToast('Pago Confirmado', 'Factura ' + data.factura + ' emitida. Proceso logistico iniciado.', 'success');
+
+            } catch (err) {
+                console.error('[simularPago]', err);
+                showToast('Error', err.message, 'error');
+            } finally {
+                btn.disabled  = false;
+                btn.innerHTML = '<span>Simular Pago Cliente (Dev)</span>';
+            }
+        }
+
+        // ============================================================
+        // INICIALIZACIÓN DE LA APLICACIÓN
+        // ============================================================
+        document.addEventListener('DOMContentLoaded', () => {
+            // 1. Validar sesión
+            const token       = localStorage.getItem('token');
+            const storedUser  = localStorage.getItem('currentUser');
+
+            if (!token || !storedUser) {
+                window.location.href = 'index.html';
+                return;
+            }
+
+            try {
+                currentUser = JSON.parse(storedUser);
+                if (currentUser.rol !== 'agente' && currentUser.rol !== 'admin') {
+                    window.location.href = 'index.html';
+                    return;
+                }
+                if (currentUser.nombre) {
+                    document.getElementById('agent-name-display').textContent = `Agente: ${currentUser.nombre}`;
+                }
+                if (currentUser.rol === 'admin') {
+                    document.getElementById('btn-back').classList.remove('hidden');
+                }
+            } catch (err) {
+                console.error('[init] Error al parsear usuario:', err);
+                window.location.href = 'index.html';
+                return;
+            }
+
+            // 2. Calcular aduana con valores iniciales del HTML
+            calculateAduana();
+
+            // 3. Asignar formularios
+            document.getElementById('chat-form').addEventListener('submit', sendChatMessage);
+            document.getElementById('quote-form').addEventListener('submit', submitQuote);
+
+            // 4. Buscar en la barra de leads
+            const searchInput = document.querySelector('#leads-list').previousElementSibling?.querySelector('input');
+            if (searchInput) {
+                searchInput.addEventListener('input', e => {
+                    const q = e.target.value.toLowerCase();
+                    document.querySelectorAll('.lead-card').forEach(card => {
+                        const text = card.textContent.toLowerCase();
+                        card.style.display = text.includes(q) ? '' : 'none';
+                    });
+                });
+            }
+
+            // 5. Botón recargar leads
+            const reloadBtn = document.getElementById('btn-reload-leads');
+            if (reloadBtn) reloadBtn.addEventListener('click', cargarLeads);
+
+            // 6. Cargar los pedidos desde la API y auto-seleccionar si hay ?pedidoId=
+            const params = new URLSearchParams(window.location.search);
+            const paramId = params.get('pedidoId');
+            if (paramId) {
+                currentPedidoId = parseInt(paramId);
+            }
+            cargarLeads().then(() => {
+                if (paramId) {
+                    selectLeadById(parseInt(paramId));
+                }
+            });
+
+            // 7. Detener polling si la ventana pierde foco (optimización de red)
+            document.addEventListener('visibilitychange', () => {
+                if (document.hidden) {
+                    stopPolling();
+                } else if (currentPedidoId) {
+                    startPolling(currentPedidoId);
+                }
+            });
+        });
+    </script>
+</body>
+</html>

@@ -2,6 +2,7 @@ const express = require('express');
 const cors = require('cors');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
+const path = require('path');
 require('dotenv').config();
 
 const db = require('./db');
@@ -16,6 +17,9 @@ const ROLES_VALIDOS = ['admin', 'usuario', 'vendedor', 'agente', 'transportista'
 // Middlewares
 app.use(cors());
 app.use(express.json());
+
+// Servir archivos estáticos del frontend (carpeta frontend un nivel arriba)
+app.use(express.static(path.join(__dirname, '../frontend')));
 
 // ==========================================
 // MIDDLEWARE DE AUTENTICACIÓN
@@ -783,6 +787,11 @@ app.post('/api/pedidos/:id/simular-pago', verificarToken, async (req, res) => {
         console.error('[POST /api/pedidos/:id/simular-pago]', error);
         res.status(500).json({ mensaje: 'Error al simular el pago' });
     }
+});
+
+// Ruta para servir el archivo index.html en la raíz
+app.get('/', (req, res) => {
+    res.sendFile(path.join(__dirname, '../frontend', 'index.html'));
 });
 
 // Iniciar servidor

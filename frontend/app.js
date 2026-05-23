@@ -1,4 +1,4 @@
-const API_URL = 'http://localhost:3000';
+const API_URL = '';
 
 // Elementos del DOM - Autenticación y Layout
 const sections = {
@@ -79,7 +79,7 @@ function showToast(message, type = 'info') {
     const container = document.getElementById('toast-container');
     const toast = document.createElement('div');
     toast.className = `toast ${type}`;
-    
+
     let icon = 'ℹ️';
     if (type === 'success') icon = '✅';
     if (type === 'error') icon = '❌';
@@ -89,7 +89,7 @@ function showToast(message, type = 'info') {
     container.appendChild(toast);
 
     setTimeout(() => {
-        if(toast.parentNode) {
+        if (toast.parentNode) {
             toast.remove();
         }
     }, 4500);
@@ -97,7 +97,7 @@ function showToast(message, type = 'info') {
 
 function showSection(sectionName) {
     Object.values(sections).forEach(sec => sec.classList.remove('active'));
-    if(sections[sectionName]) {
+    if (sections[sectionName]) {
         sections[sectionName].classList.add('active');
     }
 }
@@ -121,14 +121,14 @@ function switchTab(tabId) {
     // Desactivar todos los botones de pestaña y contenidos
     document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
     document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
-    
+
     // Activar el correspondiente
     const targetBtn = document.querySelector(`.tab-btn[data-tab="${tabId}"]`);
     const targetContent = document.getElementById(tabId);
-    
+
     if (targetBtn) targetBtn.classList.add('active');
     if (targetContent) targetContent.classList.add('active');
-    
+
     // Cargar los datos correspondientes
     if (tabId === 'usuarios-tab') {
         fetchUsers();
@@ -176,7 +176,7 @@ async function handleLogin(e) {
         showToast('Bienvenido a TechStore Imports', 'success');
         showSection('dashboard');
         loginForm.reset();
-        
+
         // Cargar vista por defecto (usuarios)
         switchTab('usuarios-tab');
 
@@ -237,7 +237,7 @@ async function fetchUsers() {
     usersTableBody.innerHTML = '';
 
     console.log('[FetchUsers] Solicitando lista de usuarios...');
-    
+
     try {
         if (!token) throw new Error('No hay sesión activa. Por favor, inicia sesión.');
 
@@ -249,7 +249,7 @@ async function fetchUsers() {
         let data;
         try {
             data = await response.json();
-        } catch(parseError) {
+        } catch (parseError) {
             throw new Error('Error al leer la respuesta del servidor (JSON inválido)');
         }
 
@@ -284,25 +284,25 @@ async function fetchUsers() {
 
 function renderUsers(users) {
     usersTableBody.innerHTML = '';
-    
+
     users.forEach(user => {
         const tr = document.createElement('tr');
-        const fecha = user.fecha_creacion 
-            ? new Date(user.fecha_creacion).toLocaleDateString('es-ES', { year: 'numeric', month: 'short', day: 'numeric' }) 
+        const fecha = user.fecha_creacion
+            ? new Date(user.fecha_creacion).toLocaleDateString('es-ES', { year: 'numeric', month: 'short', day: 'numeric' })
             : 'N/A';
-            
+
         const rolColors = {
-            admin:         { bg: '#dbeafe', color: '#1e40af' },
-            usuario:       { bg: '#f1f5f9', color: '#475569' },
-            vendedor:      { bg: '#dcfce7', color: '#166534' },
-            agente:        { bg: '#fef9c3', color: '#854d0e' },
+            admin: { bg: '#dbeafe', color: '#1e40af' },
+            usuario: { bg: '#f1f5f9', color: '#475569' },
+            vendedor: { bg: '#dcfce7', color: '#166534' },
+            agente: { bg: '#fef9c3', color: '#854d0e' },
             transportista: { bg: '#fce7f3', color: '#9d174d' }
         };
         const rc = rolColors[user.rol] || rolColors.usuario;
         const rolBadge = `<span class="badge" style="background:${rc.bg}; color:${rc.color};">${ROL_LABELS[user.rol] || user.rol}</span>`;
 
         // Mostrar acciones de edición y borrado SOLO si el logueado es admin
-        const actionsHtml = currentUser && currentUser.rol === 'admin' 
+        const actionsHtml = currentUser && currentUser.rol === 'admin'
             ? `<button class="btn btn-outline btn-sm" onclick="editUser(${user.id}, '${user.nombre.replace(/'/g, "\\'")}', '${user.email}', '${user.rol}')">Editar</button>
                <button class="btn btn-danger btn-sm" onclick="deleteUser(${user.id})">Eliminar</button>`
             : `<span style="color:var(--text-muted); font-size:0.75rem;">Sin permisos</span>`;
@@ -322,12 +322,12 @@ function renderUsers(users) {
 function openModal(mode = 'create', user = null) {
     const isEdit = mode === 'edit';
     modalTitle.textContent = isEdit ? 'Editar Usuario' : 'Nuevo Usuario';
-    
+
     document.getElementById('user-id').value = user ? user.id : '';
     document.getElementById('user-name').value = user ? user.nombre : '';
     document.getElementById('user-email').value = user ? user.email : '';
     document.getElementById('user-role').value = user ? user.rol : 'usuario';
-    
+
     if (isEdit) {
         passwordInput.required = false;
         passwordInput.value = '';
@@ -348,17 +348,17 @@ function closeModal() {
 
 async function handleUserSubmit(e) {
     e.preventDefault();
-    
+
     const id = document.getElementById('user-id').value;
     const nombre = document.getElementById('user-name').value;
     const email = document.getElementById('user-email').value;
     const password = document.getElementById('user-password').value;
     const rol = document.getElementById('user-role').value;
-    
+
     const isEdit = id !== '';
     const endpoint = isEdit ? `${API_URL}/usuarios/${id}` : `${API_URL}/usuarios`;
     const method = isEdit ? 'PUT' : 'POST';
-    
+
     const payload = { nombre, email, rol };
     if (!isEdit || (isEdit && password.trim() !== '')) {
         payload.password = password;
@@ -377,7 +377,7 @@ async function handleUserSubmit(e) {
         });
 
         let data;
-        try { data = await response.json(); } catch(err) { data = {}; }
+        try { data = await response.json(); } catch (err) { data = {}; }
 
         if (!response.ok) {
             if (response.status === 403) throw new Error('No tienes permisos suficientes');
@@ -397,18 +397,18 @@ async function handleUserSubmit(e) {
     }
 }
 
-window.editUser = function(id, nombre, email, rol) {
+window.editUser = function (id, nombre, email, rol) {
     openModal('edit', { id, nombre, email, rol });
 };
 
-window.deleteUser = async function(id) {
+window.deleteUser = async function (id) {
     if (currentUser && currentUser.id === id) {
         showToast('No puedes eliminar tu propia cuenta.', 'warning');
         return;
     }
 
     if (!confirm('¿Estás seguro de que deseas eliminar este usuario de forma permanente?')) return;
-    
+
     try {
         const response = await fetch(`${API_URL}/usuarios/${id}`, {
             method: 'DELETE',
@@ -418,7 +418,7 @@ window.deleteUser = async function(id) {
         if (!response.ok) {
             if (response.status === 403) throw new Error('Acceso Denegado: Solo un administrador puede realizar esta acción.');
             let data;
-            try { data = await response.json(); } catch(e) { data = {}; }
+            try { data = await response.json(); } catch (e) { data = {}; }
             throw new Error(data.mensaje || data.error || 'Error al eliminar usuario');
         }
 
@@ -467,8 +467,8 @@ function renderProducts(products) {
     productsTableBody.innerHTML = '';
     products.forEach(p => {
         const tr = document.createElement('tr');
-        
-        const imgHtml = p.imagen_url 
+
+        const imgHtml = p.imagen_url
             ? `<img src="${p.imagen_url}" alt="${p.nombre}" style="width:40px; height:40px; object-fit:cover; border-radius:6px; border: 1px solid var(--border);">`
             : `<span style="font-size:1.5rem;">📦</span>`;
 
@@ -492,7 +492,7 @@ function renderProducts(products) {
 function openProductModal(mode = 'create', product = null) {
     const isEdit = mode === 'edit';
     productModalTitle.textContent = isEdit ? 'Editar Producto' : 'Nuevo Producto';
-    
+
     document.getElementById('product-id').value = product ? product.id : '';
     document.getElementById('product-name').value = product ? product.nombre : '';
     document.getElementById('product-desc').value = product ? product.descripcion : '';
@@ -550,11 +550,11 @@ async function handleProductSubmit(e) {
     }
 }
 
-window.editProduct = function(id, nombre, descripcion, precio, stock, categoria, imagen_url) {
+window.editProduct = function (id, nombre, descripcion, precio, stock, categoria, imagen_url) {
     openProductModal('edit', { id, nombre, descripcion, precio, stock, categoria, imagen_url });
 };
 
-window.deleteProduct = async function(id) {
+window.deleteProduct = async function (id) {
     if (!confirm('¿Estás seguro de que deseas eliminar este producto permanentemente?')) return;
     try {
         const response = await fetch(`${API_URL}/productos/${id}`, {
@@ -609,9 +609,9 @@ function renderClients(clients) {
     clientsTableBody.innerHTML = '';
     clients.forEach(c => {
         const tr = document.createElement('tr');
-        
-        const fecha = c.fecha_creacion 
-            ? new Date(c.fecha_creacion).toLocaleDateString('es-ES', { year: 'numeric', month: 'short', day: 'numeric' }) 
+
+        const fecha = c.fecha_creacion
+            ? new Date(c.fecha_creacion).toLocaleDateString('es-ES', { year: 'numeric', month: 'short', day: 'numeric' })
             : 'N/A';
 
         tr.innerHTML = `
@@ -633,7 +633,7 @@ function renderClients(clients) {
 function openClientModal(mode = 'create', client = null) {
     const isEdit = mode === 'edit';
     clientModalTitle.textContent = isEdit ? 'Editar Cliente' : 'Nuevo Cliente';
-    
+
     document.getElementById('client-id').value = client ? client.id : '';
     document.getElementById('client-name').value = client ? client.nombre : '';
     document.getElementById('client-email').value = client ? client.email : '';
@@ -687,11 +687,11 @@ async function handleClientSubmit(e) {
     }
 }
 
-window.editClient = function(id, nombre, email, telefono, direccion) {
+window.editClient = function (id, nombre, email, telefono, direccion) {
     openClientModal('edit', { id, nombre, email, telefono, direccion });
 };
 
-window.deleteClient = async function(id) {
+window.deleteClient = async function (id) {
     if (!confirm('¿Estás seguro de que deseas eliminar este cliente? Se borrarán sus entregas asociadas.')) return;
     try {
         const response = await fetch(`${API_URL}/clientes/${id}`, {
@@ -746,9 +746,9 @@ function renderDeliveries(deliveries) {
     entregasTableBody.innerHTML = '';
     deliveries.forEach(e => {
         const tr = document.createElement('tr');
-        
-        const fecha = e.fecha 
-            ? new Date(e.fecha).toLocaleDateString('es-ES', { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' }) 
+
+        const fecha = e.fecha
+            ? new Date(e.fecha).toLocaleDateString('es-ES', { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })
             : 'N/A';
 
         let badgeClass = 'badge-pendiente';
@@ -821,7 +821,7 @@ async function populateEntregaDropdowns(selectedClientId = '', selectedProductId
 async function openEntregaModal(mode = 'create', entrega = null) {
     const isEdit = mode === 'edit';
     entregaModalTitle.textContent = isEdit ? 'Actualizar Logística de Entrega' : 'Nueva Entrega Logística';
-    
+
     document.getElementById('entrega-id').value = entrega ? entrega.id : '';
     document.getElementById('entrega-qty').value = entrega ? entrega.cantidad : 1;
     document.getElementById('entrega-status').value = entrega ? entrega.estado_entrega : 'pendiente';
@@ -881,11 +881,11 @@ async function handleEntregaSubmit(e) {
     }
 }
 
-window.editEntrega = function(id, cliente_id, producto_id, cantidad, estado_entrega) {
+window.editEntrega = function (id, cliente_id, producto_id, cantidad, estado_entrega) {
     openEntregaModal('edit', { id, cliente_id, producto_id, cantidad, estado_entrega });
 };
 
-window.deleteEntrega = async function(id) {
+window.deleteEntrega = async function (id) {
     if (!confirm('¿Estás seguro de que deseas eliminar este registro de entrega?')) return;
     try {
         const response = await fetch(`${API_URL}/entregas/${id}`, {
@@ -911,7 +911,7 @@ function init() {
     // Asignar Event Listeners de Autenticación
     loginForm.addEventListener('submit', handleLogin);
     btnLogout.addEventListener('click', handleLogout);
-    
+
     // Event Listeners: MODAL USUARIOS
     btnCreateUser.addEventListener('click', () => openModal('create'));
     btnCloseModal.addEventListener('click', closeModal);

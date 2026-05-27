@@ -1,175 +1,330 @@
 <!DOCTYPE html>
 <html lang="es" class="h-full">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>TechStore Imports — Portal del Cliente</title>
-    <meta name="description" content="Calcula el costo de importación de tus productos favoritos y solicita asesoría personalizada de nuestros agentes.">
-    <link rel="icon" type="image/png" href="/logo.png">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <meta name="description"
+        content="Calcula el costo de importación de tus productos favoritos y solicita asesoría personalizada de nuestros agentes.">
+    <link rel="icon" type="image/png" href="logo.png">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@700;800;900&family=Space+Mono:wght@400;700&display=swap"
+        rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
             theme: {
                 extend: {
-                    fontFamily: { sans: ['Inter', 'sans-serif'] },
-                    colors: {
-                        brand: {
-                            50: '#eef2ff', 100: '#e0e7ff',
-                            400: '#818cf8', 500: '#6366f1', 600: '#4f46e5',
-                            700: '#4338ca', 900: '#312e81', 950: '#1e1b4b',
-                        }
-                    }
+                    fontFamily: { sans: ['Poppins', 'sans-serif'] }
                 }
             }
         }
     </script>
     <style>
-        ::-webkit-scrollbar { width: 5px; height: 5px; }
-        ::-webkit-scrollbar-track { background: transparent; }
-        ::-webkit-scrollbar-thumb { background: rgba(99,102,241,0.25); border-radius: 99px; }
-        ::-webkit-scrollbar-thumb:hover { background: rgba(99,102,241,0.45); }
-
-        body {
-            background: #0a0f1e;
-            background-image:
-                radial-gradient(ellipse 80% 60% at 70% -10%, rgba(79,70,229,0.12) 0%, transparent 60%),
-                radial-gradient(ellipse 60% 40% at 0% 100%, rgba(16,185,129,0.06) 0%, transparent 60%);
-            background-attachment: fixed;
+        /* ═══ COMIC / NEO-BRUTALIST — client_dashboard.html ═══ */
+        :root {
+            --ink:          #000000;
+            --paper:        #FFFBF0;
+            --panel-bg:     #FFF9E8;
+            --paper-aged:   #F5EFD7;
+            --neon-green:   #39FF14;
+            --neon-yellow:  #FFE000;
+            --sky-blue:     #C8E8FF;
+            --punch-red:    #E8001C;
+            --border-thick: 3px solid #000;
+            --shadow-hard:  3px 3px 0 0 rgba(0,0,0,0.06);
+            --shadow-hard-sm: 2px 2px 0 0 rgba(0,0,0,0.04);
+            --font-comic:   'Poppins', 'Arial Black', sans-serif;
+            --radius:       3px;
+            --radius-sm:    2px;
         }
 
-        .glass {
-            background: rgba(15, 23, 55, 0.55);
-            backdrop-filter: blur(16px);
-            -webkit-backdrop-filter: blur(16px);
-            border: 1px solid rgba(99,102,241,0.13);
-        }
-        .glass-light {
-            background: rgba(30, 41, 80, 0.45);
-            backdrop-filter: blur(12px);
-            border: 1px solid rgba(148,163,184,0.08);
+        *, *::before, *::after { box-sizing: border-box; }
+
+        html, body {
+            font-family: var(--font-comic) !important;
+            background: linear-gradient(160deg, #FFE0E9 0%, #E8D5FF 40%, #C8E8FF 100%) fixed !important;
+            color: var(--ink) !important;
+            min-height: 100vh;
+            margin: 0;
+            padding: 0;
+            position: relative;
         }
 
-        .inp {
-            width: 100%;
-            background: rgba(2, 6, 30, 0.75);
-            border: 1.5px solid rgba(51,65,100,0.7);
-            border-radius: 0.625rem;
-            padding: 0.5625rem 0.875rem;
-            font-size: 0.8125rem;
-            color: #e2e8f0;
-            font-family: 'Inter', sans-serif;
-            outline: none;
-            transition: border-color 0.18s, box-shadow 0.18s;
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background-image: radial-gradient(circle, rgba(0,0,0,0.05) 1px, transparent 1px);
+            background-size: 20px 20px;
+            pointer-events: none;
+            z-index: 0;
         }
-        .inp:focus {
-            border-color: rgba(99,102,241,0.65);
-            box-shadow: 0 0 0 3px rgba(99,102,241,0.12);
+
+        header, main, section, aside, footer { position: relative; z-index: 1; }
+
+        ::-webkit-scrollbar {
+            width: 7px;
+            height: 7px;
         }
-        .inp::placeholder { color: rgba(100,116,139,0.8); }
+
+        ::-webkit-scrollbar-track {
+            background: #F5EFD7;
+            border-left: 2px solid #000;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #000;
+        }
+
+        /* ── Header ── */
+        header {
+            background: var(--panel-bg) !important;
+            border-bottom: 3px solid #000 !important;
+            box-shadow: 0 4px 0 0 rgba(0,0,0,0.05) !important;
+            color: var(--ink) !important;
+        }
+
+        header [class*="bg-slate-"], header [class*="bg-slate-"] {
+            background: var(--paper-aged) !important;
+            border: 2px solid #000 !important;
+            border-radius: var(--radius-sm) !important;
+            color: var(--ink) !important;
+            box-shadow: 2px 2px 0 0 #000 !important;
+        }
+
+        header button {
+            background: transparent !important;
+            border: none !important;
+            box-shadow: none !important;
+            color: var(--ink) !important;
+            text-decoration: underline !important;
+            cursor: pointer;
+        }
+
+        header button:hover {
+            color: var(--punch-red) !important;
+            transform: none !important;
+            box-shadow: none !important;
+        }
+
+        /* ── Glass Containers ── */
+        .glass, .glass-card {
+            background: var(--panel-bg) !important;
+            border: var(--border-thick) !important;
+            border-radius: var(--radius) !important;
+            box-shadow: var(--shadow-hard) !important;
+            color: var(--ink) !important;
+            padding: 1.25rem !important;
+        }
+
+        /* Base pedido-card style */
+        .pedido-card {
+            background: var(--panel-bg);
+            border: var(--border-thick);
+            border-radius: var(--radius);
+            color: var(--ink);
+            padding: 1.125rem;
+            transition: transform 0.12s ease, border-color 0.1s ease !important;
+        }
+
+        /* ── URL input — campo protagonista ── */
+        #inp-url {
+            background: #FDFFB6 !important;
+            padding: 15px 20px !important;
+            font-size: 1.05rem !important;
+            font-weight: 800 !important;
+            letter-spacing: -0.01em !important;
+            box-shadow: 3px 3px 0 0 rgba(0,0,0,0.08) !important;
+        }
+
+        #inp-url:focus {
+            background: #FFFFF0 !important;
+            box-shadow: 4px 4px 0 0 var(--neon-green) !important;
+        }
+
+        .pedido-card:hover {
+            border-left: 4px solid var(--neon-green) !important;
+            box-shadow: none !important;
+            transform: translateX(2px) !important;
+        }
+
+        /* ── Inputs ── */
+        .inp, input, select, textarea {
+            background: #FEFAE8 !important;
+            border: 3px solid #000 !important;
+            border-radius: var(--radius) !important;
+            color: var(--ink) !important;
+            font-family: var(--font-comic) !important;
+            font-weight: 700 !important;
+            box-shadow: 3px 3px 0 0 #000 !important;
+            outline: none !important;
+        }
+
+        .inp:focus, input:focus, select:focus {
+            background: #FFFCE0 !important;
+            box-shadow: 4px 4px 0 0 var(--neon-green) !important;
+        }
+
         .inp-label {
             display: block;
-            font-size: 0.7rem;
-            font-weight: 600;
-            color: #94a3b8;
+            font-family: var(--font-comic) !important;
+            font-size: 0.75rem !important;
+            font-weight: 800 !important;
+            color: var(--ink) !important;
             margin-bottom: 0.35rem;
-            letter-spacing: 0.03em;
             text-transform: uppercase;
+            letter-spacing: 0.04em;
         }
 
         .section-title {
-            font-size: 0.65rem;
-            font-weight: 700;
-            color: #818cf8;
+            font-family: var(--font-comic) !important;
+            font-size: 0.75rem !important;
+            font-weight: 900 !important;
+            color: var(--ink) !important;
             text-transform: uppercase;
             letter-spacing: 0.08em;
-            border-bottom: 1px solid rgba(99,102,241,0.12);
+            border-bottom: 3px solid #000 !important;
             padding-bottom: 0.5rem;
             margin-bottom: 0.875rem;
+        }
+
+        /* ── Buttons ── */
+        .btn-cta, button, [role="button"] {
+            font-family: var(--font-comic) !important;
+            font-weight: 800 !important;
+            text-transform: uppercase !important;
+            background: var(--neon-green) !important;
+            color: var(--ink) !important;
+            border: var(--border-thick) !important;
+            border-radius: var(--radius) !important;
+            box-shadow: var(--shadow-hard) !important;
+            transition: box-shadow 0s, transform 0s !important;
+            cursor: pointer;
+        }
+
+        .btn-cta:hover, button:hover {
+            box-shadow: 2px 2px 0 0 #000 !important;
+            transform: translate(2px, 2px) !important;
+        }
+
+        .btn-cta:active, button:active {
+            transform: translate(3px, 3px) !important;
+            box-shadow: 1px 1px 0 0 #000 !important;
+        }
+
+        .btn-cta:disabled, button:disabled {
+            background: #e2e8f0 !important;
+            color: #94a3b8 !important;
+            border-color: #cbd5e1 !important;
+            box-shadow: none !important;
+            cursor: not-allowed;
+            transform: none !important;
+        }
+
+        /* ── Badges / Status ── */
+        .status-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.3rem;
+            padding: 0.2rem 0.625rem !important;
+            border-radius: var(--radius) !important;
+            font-size: 0.68rem !important;
+            font-weight: 900 !important;
+            border: 2px solid #000 !important;
+            text-transform: uppercase !important;
+            letter-spacing: 0.04em !important;
+            box-shadow: 2px 2px 0 0 #000 !important;
+        }
+
+        .status-cotizando {
+            background: #FFF3CC !important;
+            color: #7A4A00 !important;
+            border-color: #7A4A00 !important;
+        }
+
+        .status-esperando_pago {
+            background: var(--sky-blue) !important;
+            color: #00296B !important;
+            border-color: #00296B !important;
+        }
+
+        .status-finalizado {
+            background: #CCFFCC !important;
+            color: #00500A !important;
+            border-color: #00500A !important;
         }
 
         .result-row {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 0.3125rem 0;
-            font-size: 0.78rem;
-            color: #94a3b8;
+            padding: 0.4rem 0;
+            font-size: 0.8rem;
+            color: var(--ink);
+            border-bottom: 1px dashed rgba(0,0,0,0.1);
         }
-        .result-row .val { font-weight: 700; color: #e2e8f0; }
 
-        .status-pill {
-            display: inline-flex;
-            align-items: center;
-            gap: 0.3rem;
-            padding: 0.2rem 0.625rem;
-            border-radius: 999px;
-            font-size: 0.68rem;
-            font-weight: 700;
-            border: 1px solid;
-            text-transform: uppercase;
-            letter-spacing: 0.04em;
+        .result-row .val {
+            font-weight: 900;
+            color: var(--ink);
         }
-        .status-cotizando      { background: rgba(245,158,11,0.1); color: #fbbf24; border-color: rgba(245,158,11,0.25); }
-        .status-esperando_pago { background: rgba(99,102,241,0.12); color: #a5b4fc; border-color: rgba(99,102,241,0.3); }
-        .status-finalizado     { background: rgba(16,185,129,0.1); color: #34d399; border-color: rgba(16,185,129,0.25); }
 
-        .pedido-card {
-            background: rgba(15,23,55,0.5);
-            border: 1px solid rgba(99,102,241,0.1);
-            border-radius: 14px;
-            padding: 1rem 1.125rem;
-            transition: border-color 0.2s, background 0.2s;
+        /* ── Color overrides to preserve comic readability ── */
+        body, .glass, .pedido-card, h1, h2, h3, h4, h5, p, span, label, strong {
+            color: var(--ink) !important;
         }
-        .pedido-card:hover {
-            border-color: rgba(99,102,241,0.28);
-            background: rgba(20,30,70,0.6);
+
+        .text-slate-400, .text-slate-500, .text-slate-600 {
+            color: rgba(0,0,0,0.6) !important;
+        }
+
+        .text-slate-300, .text-slate-200, .text-slate-100 {
+            color: var(--ink) !important;
+        }
+
+        /* ── Toast overrides to blend into theme ── */
+        .toast {
+            font-family: var(--font-comic) !important;
+            background: var(--paper) !important;
+            border: 3px solid #000 !important;
+            box-shadow: 3px 3px 0 0 rgba(0,0,0,0.08) !important;
+            border-radius: var(--radius) !important;
+            color: var(--ink) !important;
+            animation: toast-in 0.3s ease-out forwards;
+            max-width: 320px;
+        }
+
+        .toast.success { border-color: #10B981 !important; box-shadow: 2px 2px 0 0 rgba(16,185,129,0.25) !important; }
+        .toast.error   { border-color: #EF4444 !important; box-shadow: 2px 2px 0 0 rgba(239,68,68,0.25) !important; }
+        .toast.warning { border-color: #F59E0B !important; box-shadow: 2px 2px 0 0 rgba(245,158,11,0.25) !important; }
+
+        @keyframes toast-in {
+            from { transform: translateY(1rem) scale(0.95); opacity: 0; }
+            to   { transform: translateY(0) scale(1); opacity: 1; }
         }
 
         @keyframes fadeUp {
             from { opacity: 0; transform: translateY(10px); }
-            to   { opacity: 1; transform: translateY(0); }
+            to { opacity: 1; transform: translateY(0); }
         }
-        .anim-in { animation: fadeUp 0.35s ease forwards; }
 
-        .btn-cta {
-            width: 100%;
-            background: linear-gradient(135deg, #4f46e5 0%, #6366f1 100%);
-            color: #fff;
-            font-weight: 700;
-            font-size: 0.875rem;
-            padding: 0.875rem 1.5rem;
-            border-radius: 12px;
-            border: 1px solid rgba(99,102,241,0.4);
-            cursor: pointer;
-            transition: all 0.2s;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 0.5rem;
-            letter-spacing: -0.01em;
-            box-shadow: 0 4px 16px rgba(79,70,229,0.25);
-            font-family: 'Inter', sans-serif;
+        .anim-in {
+            animation: fadeUp 0.35s ease forwards;
         }
-        .btn-cta:hover {
-            background: linear-gradient(135deg, #4338ca 0%, #4f46e5 100%);
-            box-shadow: 0 6px 24px rgba(79,70,229,0.4);
-            transform: translateY(-1px);
-        }
-        .btn-cta:active { transform: translateY(0); }
-        .btn-cta:disabled { opacity: 0.65; cursor: not-allowed; transform: none; }
     </style>
 </head>
 
 <body class="min-h-screen flex flex-col font-sans text-slate-100">
 
-    <!-- ═══════════════════════════ HEADER ═══════════════════════════ -->
     <header class="sticky top-0 z-30 h-[60px] flex items-center justify-between px-6
                    bg-[rgba(10,15,35,0.8)] backdrop-blur-xl border-b border-slate-800/70 shadow-sm">
         <div class="flex items-center gap-3">
-            <img src="/logo.png" alt="TechStore" class="h-8 w-auto rounded-lg p-1 bg-indigo-950 border border-indigo-800/40">
+            <img src="logo.png" alt="TechStore"
+                class="h-8 w-auto rounded-lg p-1 bg-indigo-950 border border-indigo-800/40">
             <div class="flex flex-col">
-                <span class="text-[0.8125rem] font-bold tracking-tight text-slate-100 leading-tight">TechStore Imports</span>
+                <span class="text-[0.8125rem] font-bold tracking-tight text-slate-100 leading-tight">TechStore
+                    Imports</span>
                 <span class="text-[0.65rem] text-slate-500 leading-tight">Portal del Cliente</span>
             </div>
         </div>
@@ -178,7 +333,8 @@
                 <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
                 <span class="text-[0.75rem] font-semibold text-slate-300" id="client-name-display">Cliente</span>
             </div>
-            <button onclick="handleLogout()" class="text-[0.75rem] font-medium text-slate-500 hover:text-red-400 transition-colors">
+            <button onclick="handleLogout()"
+                class="text-[0.75rem] font-medium text-slate-500 hover:text-red-400 transition-colors">
                 Cerrar Sesión
             </button>
         </div>
@@ -194,7 +350,6 @@
                 <h1 class="text-[1.25rem] font-extrabold text-white tracking-tight">Calculadora de Importación</h1>
                 <p class="text-[0.8125rem] text-slate-400 mt-1 leading-relaxed">
                     Ingresa los datos de tu producto y obtén una estimación de costos al instante.
-                    Cuando estés listo, solicita la asistencia de un agente con un clic.
                 </p>
             </div>
 
@@ -204,10 +359,10 @@
                 <div class="space-y-1">
                     <div class="section-title">1. Producto a Importar</div>
                     <label class="inp-label" for="inp-url">URL del Producto (tienda de origen)</label>
-                    <input type="url" id="inp-url" class="inp"
-                           placeholder="https://www.amazon.com/dp/B0XXXXXX"
-                           autocomplete="off">
-                    <p class="text-[0.7rem] text-slate-600 mt-1">Pega el enlace exacto del producto que deseas importar.</p>
+                    <input type="url" id="inp-url" class="inp" placeholder="https://www.amazon.com/dp/B0XXXXXX"
+                        autocomplete="off">
+                    <p class="text-[0.7rem] text-slate-600 mt-1">Pega el enlace exacto del producto que deseas importar.
+                    </p>
                 </div>
 
                 <!-- 2. Costos Origen -->
@@ -218,21 +373,24 @@
                             <label class="inp-label" for="c-price">Precio Producto</label>
                             <div class="relative">
                                 <span class="absolute left-3 top-[9px] text-slate-500 text-[11px] select-none">$</span>
-                                <input type="number" id="c-price" class="inp pl-5" value="0" step="0.01" min="0" oninput="calcClient()">
+                                <input type="number" id="c-price" class="inp pl-5" value="0" step="0.01" min="0"
+                                    oninput="calcClient()">
                             </div>
                         </div>
                         <div>
                             <label class="inp-label" for="c-freight">Flete Internacional</label>
                             <div class="relative">
                                 <span class="absolute left-3 top-[9px] text-slate-500 text-[11px] select-none">$</span>
-                                <input type="number" id="c-freight" class="inp pl-5" value="85" step="0.01" min="0" oninput="calcClient()">
+                                <input type="number" id="c-freight" class="inp pl-5" value="85" step="0.01" min="0"
+                                    oninput="calcClient()">
                             </div>
                         </div>
                         <div>
                             <label class="inp-label" for="c-insurance">Seguro</label>
                             <div class="relative">
                                 <span class="absolute left-3 top-[9px] text-slate-500 text-[11px] select-none">$</span>
-                                <input type="number" id="c-insurance" class="inp pl-5" value="25" step="0.01" min="0" oninput="calcClient()">
+                                <input type="number" id="c-insurance" class="inp pl-5" value="25" step="0.01" min="0"
+                                    oninput="calcClient()">
                             </div>
                         </div>
                     </div>
@@ -245,14 +403,16 @@
                         <div>
                             <label class="inp-label" for="c-tariff">Arancel Ad-Valorem</label>
                             <div class="relative">
-                                <input type="number" id="c-tariff" class="inp pr-7" value="6" step="0.1" min="0" oninput="calcClient()">
+                                <input type="number" id="c-tariff" class="inp pr-7" value="6" step="0.1" min="0"
+                                    oninput="calcClient()">
                                 <span class="absolute right-3 top-[9px] text-slate-500 text-[11px] select-none">%</span>
                             </div>
                         </div>
                         <div>
                             <label class="inp-label" for="c-vat">IVA de Internación</label>
                             <div class="relative">
-                                <input type="number" id="c-vat" class="inp pr-7" value="19" step="0.1" min="0" oninput="calcClient()">
+                                <input type="number" id="c-vat" class="inp pr-7" value="19" step="0.1" min="0"
+                                    oninput="calcClient()">
                                 <span class="absolute right-3 top-[9px] text-slate-500 text-[11px] select-none">%</span>
                             </div>
                         </div>
@@ -260,32 +420,34 @@
                 </div>
 
                 <!-- Live Results -->
-                <div class="bg-[rgba(2,6,30,0.7)] border border-slate-800/60 rounded-xl p-4 space-y-1.5">
+                <div class="bg-[#FEFAE8] border-3 border-black rounded-lg p-4 space-y-1.5 shadow-sm">
                     <div class="result-row"><span>Valor CIF:</span><span class="val" id="r-cif">$0.00</span></div>
-                    <div class="result-row"><span>Arancel calculado:</span><span class="val" id="r-tariff">$0.00</span></div>
+                    <div class="result-row"><span>Arancel calculado:</span><span class="val" id="r-tariff">$0.00</span>
+                    </div>
                     <div class="result-row"><span>IVA internación:</span><span class="val" id="r-vat">$0.00</span></div>
                     <div class="result-row"><span>Gastos operacionales:</span><span class="val">$45.00</span></div>
-                    <div class="border-t border-slate-700/50 pt-2 mt-1 result-row" style="color:#a5b4fc;">
+                    <div class="border-t-2 border-black pt-2 mt-1 result-row">
                         <span class="font-semibold">Total Impuestos:</span>
                         <span class="font-bold" id="r-taxes">$0.00</span>
                     </div>
                 </div>
 
                 <!-- Total Hero -->
-                <div class="bg-gradient-to-br from-indigo-950/70 to-brand-950/40
-                            border border-indigo-600/20 rounded-xl p-5 text-center shadow-inner">
-                    <p class="text-[0.65rem] font-bold uppercase tracking-widest text-indigo-400 mb-1">Total Estimado a Pagar (USD)</p>
-                    <p class="text-[2.75rem] font-black text-white tracking-tight leading-none" id="r-total">$0.00</p>
-                    <p class="text-[0.68rem] text-slate-600 mt-2">Estimación referencial — el agente confirmará el total oficial.</p>
+                <div class="bg-[#FFFCE0] border-3 border-black rounded-lg p-5 text-center shadow-sm">
+                    <p class="text-[0.65rem] font-bold uppercase tracking-widest text-slate-800 mb-1">Total Estimado a
+                        Pagar (USD)</p>
+                    <p class="text-[2.75rem] font-black text-black tracking-tight leading-none" id="r-total">$0.00</p>
+                    <p class="text-[0.68rem] text-slate-600 mt-2">Estimación referencial — el agente confirmará el total
+                        oficial.</p>
                 </div>
 
                 <!-- CTA -->
                 <div class="space-y-2">
                     <button id="btn-solicitar" onclick="solicitarAsesoria()" class="btn-cta">
-                        <span id="btn-solicitar-inner">Solicitar Asesoría de un Agente &nbsp;⚡</span>
+                        <span id="btn-solicitar-inner">Solicitar Asesoría</span>
                     </button>
                     <p class="text-center text-[0.7rem] text-slate-600">
-                        Al solicitar asesoría se crea un ticket activo. Nuestro equipo te responderá en el chat a la brevedad.
+                        Se crea un ticket.
                     </p>
                 </div>
 
@@ -296,8 +458,7 @@
         <section class="lg:col-span-2 space-y-4 anim-in" style="animation-delay:0.12s">
             <div class="flex items-center justify-between">
                 <h2 class="text-[0.9375rem] font-bold text-slate-200">Mis Solicitudes Activas</h2>
-                <button onclick="cargarMisPedidos()"
-                    class="text-[0.7rem] text-indigo-400 hover:text-indigo-300 font-semibold
+                <button onclick="cargarMisPedidos()" class="text-[0.7rem] text-indigo-400 hover:text-indigo-300 font-semibold
                            hover:underline transition-colors flex items-center gap-1">
                     &#8635; Actualizar
                 </button>
@@ -305,7 +466,9 @@
             <div id="mis-pedidos-list" class="space-y-3">
                 <div class="flex justify-center items-center py-12">
                     <div class="flex items-center gap-2 text-[0.8125rem] text-slate-500">
-                        <div class="w-4 h-4 border-2 border-indigo-500/30 border-t-indigo-500 rounded-full animate-spin"></div>
+                        <div
+                            class="w-4 h-4 border-2 border-indigo-500/30 border-t-indigo-500 rounded-full animate-spin">
+                        </div>
                         Cargando solicitudes...
                     </div>
                 </div>
@@ -317,31 +480,10 @@
     <!-- Toast Container -->
     <div id="toast-container" class="fixed bottom-6 right-6 z-50 flex flex-col gap-2 pointer-events-none"></div>
 
-    <style>
-        .toast {
-            display: flex; align-items: flex-start; gap: 0.75rem;
-            background: rgba(15,23,55,0.92);
-            backdrop-filter: blur(12px);
-            border: 1.5px solid rgba(99,102,241,0.2);
-            border-radius: 12px;
-            padding: 0.875rem 1rem;
-            box-shadow: 0 8px 24px rgba(0,0,0,0.4);
-            font-size: 0.8125rem; color: #e2e8f0;
-            pointer-events: auto;
-            animation: toastIn 0.3s ease-out forwards;
-            max-width: 320px; min-width: 260px;
-        }
-        .toast.success { border-color: rgba(16,185,129,0.3); }
-        .toast.error   { border-color: rgba(239,68,68,0.3); }
-        .toast.warning { border-color: rgba(245,158,11,0.3); }
-        @keyframes toastIn {
-            from { transform: translateY(10px) scale(0.97); opacity: 0; }
-            to   { transform: translateY(0) scale(1); opacity: 1; }
-        }
-    </style>
+
 
     <script>
-        const API_URL = '';
+        const API_URL = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' ? `${window.location.protocol}//${window.location.hostname}:3000` : '';
         let currentUser = null;
 
         // ── Helpers ──────────────────────────────────────────
@@ -365,7 +507,7 @@
         function timeAgo(iso) {
             if (!iso) return '';
             const diff = Math.floor((Date.now() - new Date(iso).getTime()) / 1000);
-            if (diff < 60)   return 'Hace un momento';
+            if (diff < 60) return 'Hace un momento';
             if (diff < 3600) return `Hace ${Math.floor(diff / 60)} min`;
             if (diff < 86400) return `Hace ${Math.floor(diff / 3600)} h`;
             return new Date(iso).toLocaleDateString('es-ES', { day: '2-digit', month: 'short' });
@@ -375,10 +517,33 @@
         function showToast(title, message, type = 'info') {
             const container = document.getElementById('toast-container');
             const toast = document.createElement('div');
-            toast.className = `toast ${type}`;
-            const icons = { success: '✅', error: '❌', warning: '⚠️', info: 'ℹ️' };
+            toast.className = `toast ${type} flex items-start gap-2.5`;
+
+            let iconText = '';
+            const textToCheck = ((title || '') + ' ' + (message || '')).toLowerCase();
+            const isLogro = textToCheck.includes('éxito') || 
+                            textToCheck.includes('exito') || 
+                            textToCheck.includes('correctamente') || 
+                            textToCheck.includes('registrad') || 
+                            textToCheck.includes('enviad') || 
+                            textToCheck.includes('confirmad') || 
+                            textToCheck.includes('bienvenido') || 
+                            textToCheck.includes('creado') || 
+                            textToCheck.includes('actualizado') || 
+                            textToCheck.includes('eliminado');
+            const isCredenciales = textToCheck.includes('credenciales') || textToCheck.includes('incorrect');
+
+            if (!isLogro && !isCredenciales) {
+                if (type === 'success') iconText = 'bien';
+                if (type === 'error') iconText = 'error';
+            }
+
+            const iconBadge = iconText 
+                ? `<span class="px-1.5 py-0.5 text-[9px] font-bold uppercase rounded bg-black/40 text-slate-100 border border-slate-700/50 mt-0.5 flex-shrink-0">${iconText}</span>` 
+                : '';
+
             toast.innerHTML = `
-                <span class="text-base mt-0.5">${icons[type] || icons.info}</span>
+                ${iconBadge}
                 <div class="flex flex-col gap-0.5 flex-1">
                     <span class="font-bold text-slate-100 text-[0.8125rem]">${title}</span>
                     ${message ? `<span class="text-slate-400 text-[0.7rem] leading-snug">${message}</span>` : ''}
@@ -389,24 +554,24 @@
 
         // ── Calculadora Cliente ───────────────────────────────
         function calcClient() {
-            const price     = parseFloat(document.getElementById('c-price').value)    || 0;
-            const freight   = parseFloat(document.getElementById('c-freight').value)  || 0;
+            const price = parseFloat(document.getElementById('c-price').value) || 0;
+            const freight = parseFloat(document.getElementById('c-freight').value) || 0;
             const insurance = parseFloat(document.getElementById('c-insurance').value) || 0;
-            const tariffPct = parseFloat(document.getElementById('c-tariff').value)   || 0;
-            const vatPct    = parseFloat(document.getElementById('c-vat').value)      || 0;
+            const tariffPct = parseFloat(document.getElementById('c-tariff').value) || 0;
+            const vatPct = parseFloat(document.getElementById('c-vat').value) || 0;
 
-            const cif    = price + freight + insurance;
+            const cif = price + freight + insurance;
             const tariff = cif * (tariffPct / 100);
-            const vat    = (cif + tariff) * (vatPct / 100);
-            const opex   = 45;
-            const taxes  = tariff + vat + opex;
-            const total  = cif + taxes;
+            const vat = (cif + tariff) * (vatPct / 100);
+            const opex = 45;
+            const taxes = tariff + vat + opex;
+            const total = cif + taxes;
 
-            document.getElementById('r-cif').textContent    = fmt(cif);
+            document.getElementById('r-cif').textContent = fmt(cif);
             document.getElementById('r-tariff').textContent = fmt(tariff);
-            document.getElementById('r-vat').textContent    = fmt(vat);
-            document.getElementById('r-taxes').textContent  = fmt(taxes);
-            document.getElementById('r-total').textContent  = fmt(total);
+            document.getElementById('r-vat').textContent = fmt(vat);
+            document.getElementById('r-taxes').textContent = fmt(taxes);
+            document.getElementById('r-total').textContent = fmt(total);
         }
 
         // ── Mis Pedidos ───────────────────────────────────────
@@ -428,23 +593,23 @@
             if (!pedidos.length) {
                 list.innerHTML = `
                     <div class="flex flex-col items-center justify-center py-12 text-center">
-                        <span class="text-3xl mb-3">📭</span>
+                        <span class="text-3xl mb-3"></span>
                         <p class="text-[0.875rem] font-semibold text-slate-400">Sin solicitudes activas</p>
                         <p class="text-[0.75rem] text-slate-600 mt-1">Usa la calculadora para crear tu primera solicitud.</p>
                     </div>`;
                 return;
             }
-            list.innerHTML = pedidos.map(function(p) {
+            list.innerHTML = pedidos.map(function (p) {
                 const statusClass = 'status-' + p.estado;
                 const statusLabel = { cotizando: 'Cotizando', esperando_pago: 'Esp. Pago', finalizado: 'Finalizado' }[p.estado] || p.estado;
-                const total     = p.total_a_pagar > 0 ? fmt(p.total_a_pagar) : '—';
+                const total = p.total_a_pagar > 0 ? fmt(p.total_a_pagar) : '—';
                 const agenteName = p.agente_nombre || 'Pendiente de asignación';
                 const url = (p.url_producto || '').replace(/^https?:\/\/[^/]+/, '').substring(0, 32);
                 return `
                     <div class="pedido-card">
                         <div class="flex items-start justify-between gap-2 mb-2">
                             <div>
-                                <span class="text-[0.65rem] font-bold text-slate-600 uppercase tracking-wider">PED-#${String(p.id).padStart(4,'0')}</span>
+                                <span class="text-[0.65rem] font-bold text-slate-600 uppercase tracking-wider">PED-#${String(p.id).padStart(4, '0')}</span>
                                 <p class="text-[0.78rem] text-slate-400 truncate mt-0.5" title="${p.url_producto}">${url || p.url_producto}…</p>
                             </div>
                             <span class="status-pill ${statusClass} flex-shrink-0">${statusLabel}</span>
@@ -462,9 +627,9 @@
                         <div class="flex items-center justify-between pt-2.5 border-t border-slate-800/60">
                             <span class="text-[0.65rem] text-slate-700">${timeAgo(p.fecha_creacion)}</span>
                             ${p.estado !== 'finalizado'
-                                ? `<a href="client_chat.html?pedidoId=${p.id}" class="text-[0.72rem] font-semibold text-indigo-400 hover:text-indigo-300 transition-colors flex items-center gap-1">Abrir Chat &rarr;</a>`
-                                : `<span class="text-[0.72rem] text-emerald-400 font-semibold">Proceso completado ✓</span>`
-                            }
+                        ? `<a href="client_chat.html?pedidoId=${p.id}" class="text-[0.72rem] font-semibold text-indigo-400 hover:text-indigo-300 transition-colors flex items-center gap-1">Abrir Chat &rarr;</a>`
+                        : `<span class="text-[0.72rem] text-emerald-400 font-semibold">Proceso completado ✓</span>`
+                    }
                         </div>
                     </div>`;
             }).join('');
@@ -473,13 +638,13 @@
         // ── Solicitar Asesoria de Agente ──────────────────────
         async function solicitarAsesoria() {
             const urlInput = document.getElementById('inp-url');
-            const url      = urlInput.value.trim();
-            const precio   = parseFloat(document.getElementById('c-price').value) || 0;
+            const url = urlInput.value.trim();
+            const precio = parseFloat(document.getElementById('c-price').value) || 0;
 
             if (!url) {
                 urlInput.focus();
                 urlInput.style.borderColor = 'rgba(239,68,68,0.7)';
-                setTimeout(function() { urlInput.style.borderColor = ''; }, 2000);
+                setTimeout(function () { urlInput.style.borderColor = ''; }, 2000);
                 showToast('URL requerida', 'Ingresa el enlace del producto que deseas importar.', 'warning');
                 return;
             }
@@ -488,9 +653,9 @@
                 return;
             }
 
-            const btn   = document.getElementById('btn-solicitar');
+            const btn = document.getElementById('btn-solicitar');
             const inner = document.getElementById('btn-solicitar-inner');
-            btn.disabled   = true;
+            btn.disabled = true;
             inner.innerHTML = '<span class="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></span><span>Registrando solicitud...</span>';
 
             try {
@@ -501,28 +666,28 @@
                 });
                 if (!res.ok) {
                     if (res.status === 401) { handleLogout(); return; }
-                    const err = await res.json().catch(function() { return {}; });
+                    const err = await res.json().catch(function () { return {}; });
                     throw new Error(err.mensaje || 'HTTP ' + res.status);
                 }
                 const nuevoPedido = await res.json();
-                showToast('Solicitud registrada', 'Pedido #' + String(nuevoPedido.id).padStart(4,'0') + ' creado. Un agente se asignará en breve.', 'success');
+                showToast('Solicitud registrada', 'Pedido #' + String(nuevoPedido.id).padStart(4, '0') + ' creado. Un agente se asignará en breve.', 'success');
                 urlInput.value = '';
                 await cargarMisPedidos();
-                setTimeout(function() {
+                setTimeout(function () {
                     window.location.href = 'client_chat.html?pedidoId=' + nuevoPedido.id;
                 }, 1800);
             } catch (err) {
                 console.error('[solicitarAsesoria]', err);
                 showToast('Error al registrar', err.message, 'error');
             } finally {
-                btn.disabled  = false;
+                btn.disabled = false;
                 inner.innerHTML = 'Solicitar Asesoría de un Agente &nbsp;⚡';
             }
         }
 
         // ── Inicialización ────────────────────────────────────
-        document.addEventListener('DOMContentLoaded', function() {
-            var token      = localStorage.getItem('token');
+        document.addEventListener('DOMContentLoaded', function () {
+            var token = localStorage.getItem('token');
             var storedUser = localStorage.getItem('currentUser');
             if (!token || !storedUser) { window.location.href = 'index.html'; return; }
             try {
@@ -535,4 +700,5 @@
         });
     </script>
 </body>
+
 </html>

@@ -13,11 +13,8 @@ const pool = mysql.createPool({
     queueLimit: 0
 });
 
-// --- Script para inicializar las nuevas tablas si no existen ---
 async function initDatabaseTables() {
     try {
-        console.log('--- Inicializando Tablas de la Base de Datos ---');
-        // Crear tabla usuarios
         await pool.query(`
             CREATE TABLE IF NOT EXISTS usuarios (
                 id INT AUTO_INCREMENT PRIMARY KEY,
@@ -93,9 +90,9 @@ async function initDatabaseTables() {
                 FOREIGN KEY (usuario_id) REFERENCES usuarios(id) ON DELETE CASCADE
             )
         `);
-        console.log('✅ Tablas de la base de datos (usuarios, productos, clientes, entregas, pedidos_importacion, mensajes_chat) inicializadas correctamente.');
+        console.log('Tablas de la base de datos (usuarios, productos, clientes, entregas, pedidos_importacion, mensajes_chat) inicializadas correctamente.');
     } catch (error) {
-        console.error('❌ Error al inicializar tablas de la base de datos:', error);
+        console.error('Error al inicializar tablas de la base de datos:', error);
     }
 }
 
@@ -125,19 +122,19 @@ async function seedDatabase() {
         if (adminRows.length === 0) {
             const hash = await bcrypt.hash('admin123', 10);
             await pool.query("INSERT INTO usuarios (nombre, email, password, rol) VALUES ('Admin', ?, ?, 'admin')", [adminEmail, hash]);
-            console.log('✅ Usuario admin creado (admin@techstore.com / admin123)');
+            console.log('Usuario admin creado (admin@techstore.com / admin123)');
         } else {
-            console.log('ℹ️  Admin ya existe.');
+            console.log('Admin ya existe.');
         }
 
-        // Seed Agent
+        // Seed Agentgit 
         const [agentRows] = await pool.query('SELECT id FROM usuarios WHERE email = ?', [agentEmail]);
         if (agentRows.length === 0) {
             const hash = await bcrypt.hash('agente123', 10);
             await pool.query("INSERT INTO usuarios (nombre, email, password, rol) VALUES ('Agente Ronald', ?, ?, 'agente')", [agentEmail, hash]);
-            console.log('✅ Usuario agente creado (agente@techstore.com / agente123)');
+            console.log('Agente creado (agente@techstore.com / agente123)');
         } else {
-            console.log('ℹ️  Agente ya existe.');
+            console.log('Agente ya existe.');
         }
 
         // Seed Demo Client (for pedidos seed)
@@ -145,9 +142,9 @@ async function seedDatabase() {
         if (clientRows.length === 0) {
             const hash = await bcrypt.hash('cliente123', 10);
             await pool.query("INSERT INTO usuarios (nombre, email, password, rol) VALUES ('Cliente Demo', ?, ?, 'usuario')", [clientEmail, hash]);
-            console.log('✅ Usuario cliente demo creado (cliente@techstore.com / cliente123)');
+            console.log('Cliente creado (cliente@techstore.com / cliente123)');
         } else {
-            console.log('ℹ️  Cliente demo ya existe.');
+            console.log('Cliente ya existe.');
         }
 
         // Seed: 1 pedido de prueba limpio (sin mensajes) para empezar desde cero
@@ -163,13 +160,13 @@ async function seedDatabase() {
                      VALUES (?, ?, 'https://example.com/producto-de-prueba', 0.00, 0.00, 0.00, 'cotizando')`,
                     [cliente.id, agente.id]
                 );
-                console.log('✅ Pedido de prueba inicial creado (sin mensajes, listo para usar).');
+                console.log('Pedido de prueba inicial creado listo para usar.');
             }
         } else {
-            console.log('ℹ️  Pedidos ya existen, no se sobreescribe el seed.');
+            console.log('Pedidos ya existen, no se sobreescribe el seed.');
         }
     } catch (err) {
-        console.error('❌ Error durante el seed de la base de datos:', err);
+        console.error('Error durante el seed de la base de datos:', err);
     }
     console.log('--- Seed finalizado ---');
 }

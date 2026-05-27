@@ -2,8 +2,8 @@ const express = require('express');
 const cors = require('cors');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
-const path = require('path');
 require('dotenv').config();
+const path = require('path');
 
 const db = require('./db');
 
@@ -17,9 +17,6 @@ const ROLES_VALIDOS = ['admin', 'usuario', 'vendedor', 'agente', 'transportista'
 // Middlewares
 app.use(cors());
 app.use(express.json());
-
-// Servir archivos estáticos del frontend (carpeta frontend un nivel arriba)
-app.use(express.static(path.join(__dirname, '../frontend')));
 
 // ==========================================
 // MIDDLEWARE DE AUTENTICACIÓN
@@ -678,9 +675,9 @@ app.post('/api/pedidos/:id/cotizar', verificarToken, async (req, res) => {
         return res.status(400).json({ mensaje: 'Se requieren precio_origen, arancel_calculado y total_a_pagar' });
     }
 
-    const precioNum  = parseFloat(precio_origen);
+    const precioNum = parseFloat(precio_origen);
     const arancelNum = parseFloat(arancel_calculado);
-    const totalNum   = parseFloat(total_a_pagar);
+    const totalNum = parseFloat(total_a_pagar);
 
     if (isNaN(precioNum) || isNaN(arancelNum) || isNaN(totalNum) || totalNum <= 0) {
         return res.status(400).json({ mensaje: 'Los valores numéricos son inválidos o el total debe ser mayor a 0' });
@@ -705,14 +702,14 @@ app.post('/api/pedidos/:id/cotizar', verificarToken, async (req, res) => {
         // Generar URL dinámica del código QR (API pública, sin dependencias npm)
         const totalFormatted = totalNum.toFixed(2).replace('.', '_');
         const qrData = encodeURIComponent(`Pago_Pedido_${id}_Total_${totalFormatted}_USD`);
-        const qrUrl  = `https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=${qrData}`;
+        const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=${qrData}`;
 
         res.json({
-            mensaje:   'Cotización enviada exitosamente',
-            estado:    'esperando_pago',
+            mensaje: 'Cotización enviada exitosamente',
+            estado: 'esperando_pago',
             pedido_id: parseInt(id),
             total_a_pagar: totalNum,
-            qr_url:    qrUrl
+            qr_url: qrUrl
         });
 
     } catch (error) {
@@ -744,7 +741,7 @@ app.post('/api/pedidos/:id/simular-pago', verificarToken, async (req, res) => {
         }
 
         // Número de factura aleatorio (formato: FACT-YYYYMMDD-XXXXX)
-        const now  = new Date();
+        const now = new Date();
         const date = `${now.getFullYear()}${String(now.getMonth() + 1).padStart(2, '0')}${String(now.getDate()).padStart(2, '0')}`;
         const rand = Math.floor(10000 + Math.random() * 90000);
         const facturaNum = `FACT-${date}-${rand}`;
@@ -776,22 +773,17 @@ app.post('/api/pedidos/:id/simular-pago', verificarToken, async (req, res) => {
         `, [insertResult.insertId]);
 
         res.json({
-            mensaje:       'Pago simulado exitosamente',
-            estado:        'finalizado',
-            pedido_id:     parseInt(id),
-            factura:       facturaNum,
-            mensaje_chat:  mensajeRows[0]
+            mensaje: 'Pago simulado exitosamente',
+            estado: 'finalizado',
+            pedido_id: parseInt(id),
+            factura: facturaNum,
+            mensaje_chat: mensajeRows[0]
         });
 
     } catch (error) {
         console.error('[POST /api/pedidos/:id/simular-pago]', error);
         res.status(500).json({ mensaje: 'Error al simular el pago' });
     }
-});
-
-// Ruta para servir el archivo index.html en la raíz
-app.get('/', (req, res) => {
-    res.sendFile(path.join(__dirname, '../frontend', 'index.html'));
 });
 
 // Iniciar servidor

@@ -5,387 +5,146 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>TechStore Imports — Sistema de Gestión</title>
-    <meta name="description" content="Panel de gestión de usuarios, inventario, clientes y logística para TechStore Imports.">
-    <link rel="icon" type="image/png" href="/logo.png" />
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <meta name="description"
+        content="Panel de gestión de usuarios, inventario, clientes y logística para TechStore Imports.">
+    <link rel="icon" type="image/png" href="logo.png" />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Poppins:wght@700;800;900&family=Space+Mono:wght@400;700&display=swap"
+        rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
             theme: {
                 extend: {
-                    fontFamily: { sans: ['Inter', 'sans-serif'] },
-                    colors: {
-                        brand: {
-                            50: '#eef2ff', 100: '#e0e7ff',
-                            400: '#818cf8', 500: '#6366f1', 600: '#4f46e5',
-                            700: '#4338ca', 900: '#312e81', 950: '#1e1b4b',
-                        }
-                    }
+                    fontFamily: { sans: ['Poppins', 'Arial Black', 'sans-serif'] },
                 }
             }
         }
     </script>
     <link rel="stylesheet" href="style.css">
-    
+
     <style>
-        /* ═══════════════════════════ PREMIUM DARK SYSTEM ═══════════════════════════ */
-        :root {
-            --primary:        #6366f1; /* Indigo-500 */
-            --primary-hover:  #4f46e5; /* Indigo-600 */
-            --primary-light:  rgba(99, 102, 241, 0.15);
-            --primary-faint:  rgba(99, 102, 241, 0.08);
-            --bg-color:       #0a0f1e;
-            --surface:        rgba(15, 23, 55, 0.55);
-            --surface-2:      rgba(30, 41, 80, 0.45);
-            --text-main:      #f8fafc; /* slate-50 */
-            --text-body:      #e2e8f0; /* slate-200 */
-            --text-muted:     #94a3b8; /* slate-400 */
-            --text-faint:     #64748b; /* slate-500 */
-            --border:         rgba(99, 102, 241, 0.15);
-            --border-strong:  rgba(99, 102, 241, 0.28);
-            --danger:         #f87171; /* red-400 */
-            --danger-hover:   #ef4444; /* red-500 */
-            --danger-light:   rgba(239, 68, 68, 0.1);
-            --success:        #34d399; /* emerald-400 */
-            --success-light:  rgba(16, 185, 129, 0.1);
-            --warning:        #fbbf24; /* amber-400 */
-            --warning-light:  rgba(245, 158, 11, 0.1);
+        /* ═══════════════ COMIC / NEO-BRUTALIST OVERRIDES for index.html ═══════════════ */
+
+        /* Halftone dot pattern on body */
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background-image: radial-gradient(circle, rgba(0, 0, 0, 0.05) 1px, transparent 1px);
+            background-size: 20px 20px;
+            pointer-events: none;
+            z-index: 0;
         }
 
-        ::-webkit-scrollbar { width: 5px; height: 5px; }
-        ::-webkit-scrollbar-track { background: transparent; }
-        ::-webkit-scrollbar-thumb { background: rgba(99,102,241,0.25); border-radius: 99px; }
-        ::-webkit-scrollbar-thumb:hover { background: rgba(99,102,241,0.45); }
-
-        body {
-            background: #0a0f1e;
-            background-image:
-                radial-gradient(ellipse 80% 60% at 50% -10%, rgba(79,70,229,0.12) 0%, transparent 60%),
-                radial-gradient(ellipse 60% 40% at 0% 100%, rgba(16,185,129,0.06) 0%, transparent 60%);
-            background-attachment: fixed;
-            font-family: 'Inter', sans-serif;
-            color: #e2e8f0;
-            -webkit-font-smoothing: antialiased;
+        /* Status indicator dot */
+        .status-dot {
+            display: inline-block;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: var(--neon-green);
+            border: 2px solid #000;
+            box-shadow: 1px 1px 0 0 #000;
+            animation: none;
         }
 
-        /* ── Glassmorphism ── */
-        .glass {
-            background: rgba(15, 23, 55, 0.55);
-            backdrop-filter: blur(16px);
-            -webkit-backdrop-filter: blur(16px);
-            border: 1.5px solid rgba(99,102,241,0.15);
-        }
-        .glass-light {
-            background: rgba(30, 41, 80, 0.45);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            border: 1px solid rgba(148,163,184,0.08);
-        }
-
-        /* Overwrite style.css Login Wrapper */
-        .login-wrapper {
-            background: #0a0f1e !important;
-            background-image:
-                radial-gradient(ellipse 80% 60% at 50% -15%, rgba(79,70,229,0.15) 0%, transparent 60%),
-                radial-gradient(ellipse 60% 40% at 50% 110%, rgba(16,185,129,0.08) 0%, transparent 60%) !important;
-            background-attachment: fixed;
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 1.5rem;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .login-card {
-            background: rgba(15, 23, 55, 0.6) !important;
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border: 1.5px solid rgba(99,102,241,0.18) !important;
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5) !important;
-            padding: 2.75rem 2.5rem;
-            border-radius: 20px;
-            width: 100%;
-            max-width: 420px;
-            z-index: 1;
-        }
-
-        .logo-container img {
-            background: #1e1b4b !important;
-            border: 1.5px solid rgba(99, 102, 241, 0.25) !important;
-            box-shadow: 0 4px 12px rgba(99, 102, 241, 0.2);
-        }
-
-        .logo-container h1 {
-            color: #ffffff !important;
-            font-weight: 800 !important;
-            letter-spacing: -0.03em;
-        }
-
-        .logo-container .subtitle {
-            color: #94a3b8 !important;
-        }
-
-        /* ── Input Overrides ── */
-        .input-group label {
-            display: block;
-            font-size: 0.72rem !important;
-            font-weight: 600 !important;
-            color: #94a3b8 !important;
-            margin-bottom: 0.35rem !important;
-            letter-spacing: 0.03em !important;
+        /* Panel de Ventas button */
+        #btn-sales-dashboard {
+            background: var(--hot-pink) !important;
+            color: #fff !important;
+            border: var(--border-thick) !important;
+            border-radius: var(--radius) !important;
+            box-shadow: var(--shadow-hard) !important;
+            font-weight: 900 !important;
+            font-family: var(--font-comic) !important;
             text-transform: uppercase !important;
+            letter-spacing: 0.04em !important;
+            transition: box-shadow 0s, transform 0s !important;
         }
 
-        .input-group input,
-        .input-group select {
-            width: 100%;
-            background: rgba(2, 6, 30, 0.75) !important;
-            border: 1.5px solid rgba(51, 65, 100, 0.7) !important;
-            border-radius: 0.625rem !important;
-            padding: 0.625rem 0.875rem !important;
-            font-size: 0.875rem !important;
-            color: #e2e8f0 !important;
-            outline: none !important;
-            transition: border-color 0.18s, box-shadow 0.18s !important;
-            appearance: none;
-            -webkit-appearance: none;
+        #btn-sales-dashboard:hover {
+            box-shadow: 2px 2px 0 0 #000 !important;
+            transform: translate(2px, 2px) !important;
         }
 
-        .input-group input::placeholder {
-            color: rgba(148, 163, 184, 0.4) !important;
-        }
-
-        .input-group input:focus,
-        .input-group select:focus {
-            border-color: rgba(99, 102, 241, 0.65) !important;
-            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15) !important;
-            outline: none !important;
-        }
-
-        /* ── Buttons ── */
-        .btn-primary {
-            background: linear-gradient(135deg, #4f46e5 0%, #6366f1 100%) !important;
-            color: #fff !important;
-            border: 1px solid rgba(99,102,241,0.4) !important;
-            box-shadow: 0 4px 12px rgba(79,70,229,0.25) !important;
-            font-weight: 600 !important;
-            border-radius: 10px !important;
-        }
-
-        .btn-primary:hover {
-            background: linear-gradient(135deg, #4338ca 0%, #4f46e5 100%) !important;
-            box-shadow: 0 6px 16px rgba(79,70,229,0.4) !important;
-            transform: translateY(-1px) !important;
-        }
-
-        .btn-outline {
-            background: rgba(30, 41, 80, 0.3) !important;
-            border: 1.5px solid rgba(99, 102, 241, 0.25) !important;
-            color: #cbd5e1 !important;
-            font-weight: 500 !important;
-            border-radius: 10px !important;
-        }
-
-        .btn-outline:hover {
-            background: rgba(99, 102, 241, 0.12) !important;
-            color: #fff !important;
-            border-color: #6366f1 !important;
-        }
-
-        /* ── Dashboard Header ── */
-        .dashboard-header {
-            background: rgba(10, 15, 35, 0.8) !important;
-            backdrop-filter: blur(16px);
-            -webkit-backdrop-filter: blur(16px);
-            border-bottom: 1.5px solid rgba(99, 102, 241, 0.15) !important;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25) !important;
-        }
-
-        .logo-container-small img {
-            background: #1e1b4b !important;
-            border: 1.5px solid rgba(99, 102, 241, 0.25) !important;
-            border-radius: 8px;
-            padding: 4px;
-        }
-
-        .logo-wordmark strong {
-            color: #ffffff !important;
-            font-weight: 700 !important;
-        }
-
-        .logo-wordmark small {
-            color: #94a3b8 !important;
-        }
-
-        /* ── Dashboard Main & Layout ── */
-        .dashboard-main {
-            max-width: 1280px;
-            margin: 2rem auto;
-            padding: 0 1.5rem 3rem;
-        }
-
-        .dashboard-topbar h1 {
-            color: #ffffff !important;
+        /* Logout button */
+        #btn-logout {
+            font-family: var(--font-comic) !important;
             font-weight: 800 !important;
-            letter-spacing: -0.02em;
-        }
-
-        .dashboard-topbar p {
-            color: #94a3b8 !important;
-        }
-
-        /* ── Tabs Navigation ── */
-        .dashboard-tabs {
-            border-bottom: 1.5px solid rgba(99, 102, 241, 0.15) !important;
-            gap: 0.5rem !important;
-            margin-bottom: 2rem !important;
-        }
-
-        .tab-btn {
-            color: #94a3b8 !important;
-            border-bottom: 2.5px solid transparent !important;
-            padding: 0.75rem 1.25rem !important;
-            transition: all 0.2s ease !important;
-            font-weight: 500 !important;
-        }
-
-        .tab-btn:hover {
-            color: #6366f1 !important;
-            background: rgba(99, 102, 241, 0.06) !important;
-        }
-
-        .tab-btn.active {
-            color: #6366f1 !important;
-            border-bottom-color: #6366f1 !important;
-            font-weight: 600 !important;
+            font-size: 0.75rem !important;
+            text-transform: uppercase !important;
+            color: var(--ink) !important;
             background: transparent !important;
+            border: none !important;
+            cursor: pointer !important;
+            letter-spacing: 0.03em !important;
+            text-decoration: underline !important;
+            text-underline-offset: 3px !important;
         }
 
-        /* ── CRUD Card & Table Styles ── */
-        .card.table-card {
-            background: rgba(15, 23, 55, 0.55) !important;
-            backdrop-filter: blur(16px);
-            -webkit-backdrop-filter: blur(16px);
-            border: 1.5px solid rgba(99,102,241,0.15) !important;
-            border-radius: 16px !important;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3) !important;
+        #btn-logout:hover {
+            color: var(--punch-red) !important;
         }
 
-        table {
-            border-collapse: collapse !important;
+        /* Close modal button (×) */
+        #btn-close-modal,
+        #btn-close-product-modal,
+        #btn-close-client-modal,
+        #btn-close-entrega-modal {
+            font-size: 1.5rem !important;
+            font-weight: 900 !important;
+            color: var(--ink) !important;
+            background: var(--paper) !important;
+            border: var(--border-thick) !important;
+            border-radius: var(--radius-sm) !important;
+            width: 34px !important;
+            height: 34px !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            cursor: pointer !important;
+            box-shadow: var(--shadow-hard-sm) !important;
+            transition: box-shadow 0s, transform 0s !important;
+            line-height: 1 !important;
         }
 
-        thead tr {
-            background: rgba(30, 41, 80, 0.45) !important;
-            border-bottom: 1.5px solid rgba(99, 102, 241, 0.15) !important;
+        #btn-close-modal:hover,
+        #btn-close-product-modal:hover,
+        #btn-close-client-modal:hover,
+        #btn-close-entrega-modal:hover {
+            box-shadow: 1px 1px 0 0 #000 !important;
+            transform: translate(2px, 2px) !important;
         }
 
-        th {
-            color: #94a3b8 !important;
-            font-weight: 700 !important;
-            font-size: 0.7rem !important;
-            letter-spacing: 0.05em !important;
-            padding: 1rem 1.25rem !important;
+        /* Spinner for loading */
+        @keyframes comicSpin {
+            to {
+                transform: rotate(360deg);
+            }
         }
 
-        td {
-            border-bottom: 1px solid rgba(99, 102, 241, 0.08) !important;
-            color: #cbd5e1 !important;
-            padding: 1rem 1.25rem !important;
-            font-size: 0.8125rem !important;
+        .animate-spin {
+            animation: comicSpin 0.8s steps(8) infinite !important;
+            border-color: #000 transparent #000 transparent !important;
         }
 
-        tbody tr {
-            transition: background-color 0.15s !important;
-        }
-
-        tbody tr:hover {
-            background: rgba(99, 102, 241, 0.08) !important;
-        }
-
-        tbody tr:last-child td {
-            border-bottom: none !important;
-        }
-
-        .table-message {
-            color: #64748b !important;
-            font-size: 0.875rem !important;
-            padding: 4rem 1rem !important;
-        }
-
-        /* ── Modals Glassmorphism ── */
-        .modal-overlay {
-            background: rgba(5, 8, 20, 0.75) !important;
-            backdrop-filter: blur(8px) !important;
-            -webkit-backdrop-filter: blur(8px) !important;
-            z-index: 60 !important;
-        }
-
-        .modal-card {
-            background: rgba(15, 23, 55, 0.88) !important;
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border: 1.5px solid rgba(99,102,241,0.2) !important;
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.6) !important;
-            border-radius: 20px !important;
-            width: 100%;
-            max-width: 500px;
-        }
-
-        .modal-header {
-            background: rgba(30, 41, 80, 0.45) !important;
-            border-bottom: 1.5px solid rgba(99,102,241,0.15) !important;
-            padding: 1.25rem 1.5rem !important;
-        }
-
-        .modal-header h3 {
-            color: #ffffff !important;
-            font-weight: 700 !important;
-        }
-
-        .modal-body {
-            padding: 1.5rem !important;
-        }
-
-        .modal-footer {
-            border-top: 1px solid rgba(99, 102, 241, 0.12) !important;
-            margin-top: 1.75rem !important;
-            padding-top: 1.25rem !important;
-        }
-
-        .help-text {
-            color: #64748b !important;
-        }
-
-        /* ── Toasts ── */
-        .toast-container {
-            z-index: 100 !important;
-        }
-
-        .toast {
-            background: rgba(15, 23, 55, 0.95) !important;
-            backdrop-filter: blur(12px) !important;
-            -webkit-backdrop-filter: blur(12px) !important;
-            border: 1.5px solid rgba(99, 102, 241, 0.2) !important;
-            border-radius: 12px !important;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4) !important;
-            color: #f1f5f9 !important;
-            font-size: 0.8125rem !important;
-            border-left: 4px solid #6366f1 !important;
-        }
-
-        .toast.success { border-left-color: #34d399 !important; border-color: rgba(16,185,129,0.3) !important; }
-        .toast.error   { border-left-color: #f87171 !important; border-color: rgba(239,68,68,0.3) !important; }
-        .toast.warning { border-left-color: #fbbf24 !important; border-color: rgba(245,158,11,0.3) !important; }
-
-        /* Animation */
+        /* Fade-in animation alias */
         @keyframes fadeUp {
-            from { opacity: 0; transform: translateY(12px); }
-            to   { opacity: 1; transform: translateY(0); }
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
-        .anim-in { animation: fadeUp 0.35s ease forwards; }
+
+        .anim-in {
+            animation: fadeUp 0.3s ease forwards;
+        }
     </style>
 </head>
 
@@ -402,8 +161,9 @@
 
                 <!-- Logo & Brand -->
                 <div class="logo-container flex flex-col items-center mb-8">
-                    <img src="/logo.png" alt="TechStore Imports Logo" class="h-16 w-auto mb-4 rounded-xl p-1 bg-indigo-950 border border-indigo-800/40">
-                    <h1 class="text-2xl font-black text-white text-center">TechStore Imports</h1>
+                    <img src="logo.png" alt="TechStore Imports Logo"
+                        class="h-16 w-auto mb-4 rounded-xl p-1 bg-indigo-950 border border-indigo-800/40">
+                    <h1 class="text-2xl font-black text-white text-center">TechStore</h1>
                     <p class="subtitle text-sm mt-1 text-slate-400">Plataforma de Gestión de Importaciones</p>
                 </div>
 
@@ -411,13 +171,16 @@
                 <form id="login-form" class="space-y-4">
                     <div class="input-group">
                         <label for="login-email">Correo Electrónico</label>
-                        <input type="email" id="login-email" placeholder="usuario@techstore.com" required autocomplete="email">
+                        <input type="email" id="login-email" placeholder="Correo" required autocomplete="email">
                     </div>
                     <div class="input-group">
                         <label for="login-password">Contraseña</label>
-                        <input type="password" id="login-password" placeholder="••••••••" required autocomplete="current-password">
+                        <input type="password" id="login-password" placeholder="••••••••" required
+                            autocomplete="current-password">
                     </div>
-                    <button type="submit" class="btn btn-primary btn-block w-full py-3 mt-2 text-[0.9375rem] font-bold">Iniciar Sesión</button>
+                    <button type="submit"
+                        class="btn btn-primary btn-block w-full py-3 mt-2 text-[0.9375rem] font-bold">Iniciar
+                        Sesión</button>
                 </form>
 
             </div>
@@ -435,29 +198,32 @@
 
                 <!-- Logo + Wordmark -->
                 <div class="logo-container-small flex items-center gap-3">
-                    <img src="/logo.png" alt="TechStore" class="h-9 w-auto">
+                    <img src="logo.png" alt="TechStore" class="h-9 w-auto">
                     <div class="logo-wordmark flex flex-col leading-none">
-                        <strong class="text-sm font-bold text-white">TechStore Imports</strong>
+                        <strong class="text-sm font-bold text-white">TechStore</strong>
                         <small class="text-[0.7rem] text-slate-400">Panel de Administración</small>
                     </div>
                 </div>
 
                 <!-- User Info + Actions -->
                 <div class="user-info flex items-center gap-4">
-                    <div class="flex items-center gap-2 bg-slate-800/50 border border-slate-700/40 rounded-full px-3 py-1.5">
+                    <div
+                        class="flex items-center gap-2 bg-slate-800/50 border border-slate-700/40 rounded-full px-3 py-1.5">
                         <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
                         <span id="current-user-name" class="text-[0.78rem] font-bold text-slate-200">Admin</span>
                     </div>
-                    <span id="current-user-role" class="badge text-[0.72rem] font-semibold px-2.5 py-0.5 rounded-full">Administrador</span>
-                    
+                    <span id="current-user-role"
+                        class="badge text-[0.72rem] font-semibold px-2.5 py-0.5 rounded-full">Administrador</span>
+
                     <!-- BOTÓN CTA: PANEL DE VENTAS (Solo para Admin, visible via app.js) -->
                     <a href="agent_dashboard.html" id="btn-sales-dashboard"
-                       class="inline-flex items-center gap-1.5 px-4.5 py-2 text-[0.75rem] font-bold text-white bg-gradient-to-r from-indigo-600 to-emerald-500 hover:from-indigo-500 hover:to-emerald-400 rounded-lg shadow-lg hover:scale-105 transition-all duration-200 ease-in-out border border-indigo-400/20"
-                       style="display: none;">
-                        <span>💼 Panel de Ventas</span>
+                        class="inline-flex items-center gap-1.5 px-4.5 py-2 text-[0.75rem] font-bold text-white bg-gradient-to-r from-indigo-600 to-emerald-500 hover:from-indigo-500 hover:to-emerald-400 rounded-lg shadow-lg hover:scale-105 transition-all duration-200 ease-in-out border border-indigo-400/20"
+                        style="display: none;">
+                        <span>Panel de Ventas</span>
                     </a>
 
-                    <button id="btn-logout" class="text-[0.75rem] font-semibold text-slate-400 hover:text-red-400 transition-colors bg-transparent border-0 cursor-pointer">
+                    <button id="btn-logout"
+                        class="text-[0.75rem] font-semibold text-slate-400 hover:text-red-400 transition-colors bg-transparent border-0 cursor-pointer">
                         Cerrar Sesión
                     </button>
                 </div>
@@ -483,7 +249,8 @@
                         <h1 class="text-xl font-bold text-white">Gestión de Usuarios</h1>
                         <p class="text-sm text-slate-400">Administra los accesos al sistema de inventario y ventas.</p>
                     </div>
-                    <button id="btn-create-user" class="btn btn-primary btn-sm px-4 py-2 text-xs font-semibold">+ Nuevo Usuario</button>
+                    <button id="btn-create-user" class="btn btn-primary btn-sm px-4 py-2 text-xs font-semibold">+ Nuevo
+                        Usuario</button>
                 </div>
                 <div class="card table-card overflow-hidden">
                     <div class="table-responsive">
@@ -502,10 +269,13 @@
                         </table>
                     </div>
                     <div id="table-loading" class="table-message flex justify-center items-center gap-2">
-                        <div class="w-4 h-4 border-2 border-indigo-500/30 border-t-indigo-500 rounded-full animate-spin"></div>
+                        <div
+                            class="w-4 h-4 border-2 border-indigo-500/30 border-t-indigo-500 rounded-full animate-spin">
+                        </div>
                         Cargando usuarios...
                     </div>
-                    <div id="table-empty" class="table-message" style="display: none;">No hay usuarios para mostrar.</div>
+                    <div id="table-empty" class="table-message" style="display: none;">No hay usuarios para mostrar.
+                    </div>
                 </div>
             </div>
 
@@ -514,9 +284,11 @@
                 <div class="dashboard-topbar flex justify-between items-center">
                     <div>
                         <h1 class="text-xl font-bold text-white">Gestión de Equipos</h1>
-                        <p class="text-sm text-slate-400">Administra el inventario de tecnología y su stock disponible.</p>
+                        <p class="text-sm text-slate-400">Administra el inventario de tecnología y su stock disponible.
+                        </p>
                     </div>
-                    <button id="btn-create-product" class="btn btn-primary btn-sm px-4 py-2 text-xs font-semibold">+ Nuevo Producto</button>
+                    <button id="btn-create-product" class="btn btn-primary btn-sm px-4 py-2 text-xs font-semibold">+
+                        Nuevo Producto</button>
                 </div>
                 <div class="card table-card overflow-hidden">
                     <div class="table-responsive">
@@ -537,10 +309,13 @@
                         </table>
                     </div>
                     <div id="products-loading" class="table-message flex justify-center items-center gap-2">
-                        <div class="w-4 h-4 border-2 border-indigo-500/30 border-t-indigo-500 rounded-full animate-spin"></div>
+                        <div
+                            class="w-4 h-4 border-2 border-indigo-500/30 border-t-indigo-500 rounded-full animate-spin">
+                        </div>
                         Cargando productos...
                     </div>
-                    <div id="products-empty" class="table-message" style="display: none;">No hay productos para mostrar.</div>
+                    <div id="products-empty" class="table-message" style="display: none;">No hay productos para mostrar.
+                    </div>
                 </div>
             </div>
 
@@ -549,9 +324,11 @@
                 <div class="dashboard-topbar flex justify-between items-center">
                     <div>
                         <h1 class="text-xl font-bold text-white">Cartera de Clientes</h1>
-                        <p class="text-sm text-slate-400">Visualiza y administra la cartera de clientes de la agencia.</p>
+                        <p class="text-sm text-slate-400">Visualiza y administra la cartera de clientes de la agencia.
+                        </p>
                     </div>
-                    <button id="btn-create-client" class="btn btn-primary btn-sm px-4 py-2 text-xs font-semibold">+ Nuevo Cliente</button>
+                    <button id="btn-create-client" class="btn btn-primary btn-sm px-4 py-2 text-xs font-semibold">+
+                        Nuevo Cliente</button>
                 </div>
                 <div class="card table-card overflow-hidden">
                     <div class="table-responsive">
@@ -571,10 +348,13 @@
                         </table>
                     </div>
                     <div id="clients-loading" class="table-message flex justify-center items-center gap-2">
-                        <div class="w-4 h-4 border-2 border-indigo-500/30 border-t-indigo-500 rounded-full animate-spin"></div>
+                        <div
+                            class="w-4 h-4 border-2 border-indigo-500/30 border-t-indigo-500 rounded-full animate-spin">
+                        </div>
                         Cargando clientes...
                     </div>
-                    <div id="clients-empty" class="table-message" style="display: none;">No hay clientes para mostrar.</div>
+                    <div id="clients-empty" class="table-message" style="display: none;">No hay clientes para mostrar.
+                    </div>
                 </div>
             </div>
 
@@ -583,9 +363,11 @@
                 <div class="dashboard-topbar flex justify-between items-center">
                     <div>
                         <h1 class="text-xl font-bold text-white">Logística y Entregas</h1>
-                        <p class="text-sm text-slate-400">Monitorea y actualiza el estado de los envíos a tus clientes.</p>
+                        <p class="text-sm text-slate-400">Monitorea y actualiza el estado de los envíos a tus clientes.
+                        </p>
                     </div>
-                    <button id="btn-create-entrega" class="btn btn-primary btn-sm px-4 py-2 text-xs font-semibold">+ Nueva Entrega</button>
+                    <button id="btn-create-entrega" class="btn btn-primary btn-sm px-4 py-2 text-xs font-semibold">+
+                        Nueva Entrega</button>
                 </div>
                 <div class="card table-card overflow-hidden">
                     <div class="table-responsive">
@@ -605,10 +387,13 @@
                         </table>
                     </div>
                     <div id="entregas-loading" class="table-message flex justify-center items-center gap-2">
-                        <div class="w-4 h-4 border-2 border-indigo-500/30 border-t-indigo-500 rounded-full animate-spin"></div>
+                        <div
+                            class="w-4 h-4 border-2 border-indigo-500/30 border-t-indigo-500 rounded-full animate-spin">
+                        </div>
                         Cargando logística...
                     </div>
-                    <div id="entregas-empty" class="table-message" style="display: none;">No hay entregas para mostrar.</div>
+                    <div id="entregas-empty" class="table-message" style="display: none;">No hay entregas para mostrar.
+                    </div>
                 </div>
             </div>
 
@@ -622,7 +407,8 @@
         <div class="modal-card">
             <div class="modal-header">
                 <h3 id="modal-title">Nuevo Usuario</h3>
-                <button id="btn-close-modal" class="text-2xl font-semibold text-slate-400 hover:text-white transition-colors cursor-pointer">&times;</button>
+                <button id="btn-close-modal"
+                    class="text-2xl font-semibold text-slate-400 hover:text-white transition-colors cursor-pointer">&times;</button>
             </div>
             <div class="modal-body">
                 <form id="user-form" class="space-y-4">
@@ -638,7 +424,8 @@
                     <div class="input-group" id="password-group">
                         <label for="user-password">Contraseña</label>
                         <input type="password" id="user-password" placeholder="••••••••">
-                        <small class="help-text text-xs mt-1 block">Dejar en blanco para no cambiar (solo al editar).</small>
+                        <small class="help-text text-xs mt-1 block">Dejar en blanco para no cambiar (solo al
+                            editar).</small>
                     </div>
                     <div class="input-group">
                         <label for="user-role">Rol en el Sistema</label>
@@ -665,7 +452,8 @@
         <div class="modal-card">
             <div class="modal-header">
                 <h3 id="product-modal-title">Nuevo Producto</h3>
-                <button id="btn-close-product-modal" class="text-2xl font-semibold text-slate-400 hover:text-white transition-colors cursor-pointer">&times;</button>
+                <button id="btn-close-product-modal"
+                    class="text-2xl font-semibold text-slate-400 hover:text-white transition-colors cursor-pointer">&times;</button>
             </div>
             <div class="modal-body">
                 <form id="product-form" class="space-y-4">
@@ -695,7 +483,8 @@
                         <input type="url" id="product-img" placeholder="Ej. https://url-de-imagen.com/foto.jpg">
                     </div>
                     <div class="modal-footer flex justify-end gap-3 pt-4">
-                        <button type="button" id="btn-cancel-product-modal" class="btn btn-outline px-4 py-2">Cancelar</button>
+                        <button type="button" id="btn-cancel-product-modal"
+                            class="btn btn-outline px-4 py-2">Cancelar</button>
                         <button type="submit" class="btn btn-primary px-4 py-2">Guardar Producto</button>
                     </div>
                 </form>
@@ -710,7 +499,8 @@
         <div class="modal-card">
             <div class="modal-header">
                 <h3 id="client-modal-title">Nuevo Cliente</h3>
-                <button id="btn-close-client-modal" class="text-2xl font-semibold text-slate-400 hover:text-white transition-colors cursor-pointer">&times;</button>
+                <button id="btn-close-client-modal"
+                    class="text-2xl font-semibold text-slate-400 hover:text-white transition-colors cursor-pointer">&times;</button>
             </div>
             <div class="modal-body">
                 <form id="client-form" class="space-y-4">
@@ -732,7 +522,8 @@
                         <input type="text" id="client-address" placeholder="Ej. Av. Providencia 1234, Of. 501">
                     </div>
                     <div class="modal-footer flex justify-end gap-3 pt-4">
-                        <button type="button" id="btn-cancel-client-modal" class="btn btn-outline px-4 py-2">Cancelar</button>
+                        <button type="button" id="btn-cancel-client-modal"
+                            class="btn btn-outline px-4 py-2">Cancelar</button>
                         <button type="submit" class="btn btn-primary px-4 py-2">Guardar Cliente</button>
                     </div>
                 </form>
@@ -747,7 +538,8 @@
         <div class="modal-card">
             <div class="modal-header">
                 <h3 id="entrega-modal-title">Nueva Entrega Logística</h3>
-                <button id="btn-close-entrega-modal" class="text-2xl font-semibold text-slate-400 hover:text-white transition-colors cursor-pointer">&times;</button>
+                <button id="btn-close-entrega-modal"
+                    class="text-2xl font-semibold text-slate-400 hover:text-white transition-colors cursor-pointer">&times;</button>
             </div>
             <div class="modal-body">
                 <form id="entrega-form" class="space-y-4">
@@ -777,7 +569,8 @@
                         </select>
                     </div>
                     <div class="modal-footer flex justify-end gap-3 pt-4">
-                        <button type="button" id="btn-cancel-entrega-modal" class="btn btn-outline px-4 py-2">Cancelar</button>
+                        <button type="button" id="btn-cancel-entrega-modal"
+                            class="btn btn-outline px-4 py-2">Cancelar</button>
                         <button type="submit" class="btn btn-primary px-4 py-2">Guardar Registro</button>
                     </div>
                 </form>

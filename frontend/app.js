@@ -1,4 +1,4 @@
-const API_URL = '';
+const API_URL = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' ? `${window.location.protocol}//${window.location.hostname}:3000` : '';
 
 // Elementos del DOM - Autenticación y Layout
 const sections = {
@@ -80,12 +80,30 @@ function showToast(message, type = 'info') {
     const toast = document.createElement('div');
     toast.className = `toast ${type}`;
 
-    let icon = 'ℹ️';
-    if (type === 'success') icon = '✅';
-    if (type === 'error') icon = '❌';
-    if (type === 'warning') icon = '⚠️';
+    let iconText = '';
+    const textToCheck = (message || '').toLowerCase();
+    const isLogro = textToCheck.includes('éxito') || 
+                    textToCheck.includes('exito') || 
+                    textToCheck.includes('correctamente') || 
+                    textToCheck.includes('registrad') || 
+                    textToCheck.includes('enviad') || 
+                    textToCheck.includes('confirmad') || 
+                    textToCheck.includes('bienvenido') || 
+                    textToCheck.includes('creado') || 
+                    textToCheck.includes('actualizado') || 
+                    textToCheck.includes('eliminado');
+    const isCredenciales = textToCheck.includes('credenciales') || textToCheck.includes('incorrect');
 
-    toast.innerHTML = `<span style="font-size: 1.25rem;">${icon}</span> <span>${message}</span>`;
+    if (!isLogro && !isCredenciales) {
+        if (type === 'success') iconText = 'bien';
+        if (type === 'error') iconText = 'error';
+    }
+
+    const iconSpan = iconText 
+        ? `<span class="toast-label font-bold text-xs uppercase" style="background: rgba(0,0,0,0.15); padding: 2px 6px; border-radius: 3px; margin-right: 8px;">${iconText}</span>` 
+        : '';
+
+    toast.innerHTML = `${iconSpan}<span>${message}</span>`;
     container.appendChild(toast);
 
     setTimeout(() => {

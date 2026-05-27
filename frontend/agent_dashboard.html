@@ -1,13 +1,16 @@
 <!DOCTYPE html>
 <html lang="es" class="h-full bg-slate-950 text-slate-100">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>TechStore Imports — Panel del Agente de Ventas</title>
     <meta name="description" content="Panel interno de ventas y cotización aduanera para agentes de TechStore Imports.">
-    <link rel="icon" type="image/png" href="/logo.png">
-    <!-- Google Fonts: Inter -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="icon" type="image/png" href="logo.png">
+    <!-- Google Fonts: Poppins + Space Mono (Comic Style) -->
+    <link
+        href="https://fonts.googleapis.com/css2?family=Poppins:wght@700;800;900&family=Space+Mono:wght@400;700&display=swap"
+        rel="stylesheet">
     <!-- Tailwind CSS v3 CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
@@ -15,48 +18,309 @@
             theme: {
                 extend: {
                     fontFamily: {
-                        sans: ['Inter', 'sans-serif'],
+                        sans: ['Poppins', 'Arial Black', 'sans-serif'],
                     },
-                    colors: {
-                        brand: {
-                            50: '#eef2ff',
-                            100: '#e0e7ff',
-                            500: '#6366f1',
-                            600: '#4f46e5',
-                            700: '#4338ca',
-                            950: '#090d16',
-                        }
-                    }
                 }
             }
         }
     </script>
     <style>
-        /* Custom Scrollbar for premium feel */
+        /* ═══ COMIC / NEO-BRUTALIST — agent_dashboard.html ═══ */
+
+        /* CSS variables (mirrors style.css) */
+        :root {
+            --ink: #000000;
+            --paper: #FFFBF0;
+            --panel-bg: #FFF9E8;
+            --paper-aged: #F5EFD7;
+            --neon-green: #39FF14;
+            --neon-yellow: #FFE000;
+            --sky-blue: #C8E8FF;
+            --hot-pink: #FF2D78;
+            --punch-red: #E8001C;
+            --border-thick: 3px solid #000;
+            --shadow-hard: 4px 4px 0 0 #000;
+            --shadow-hard-sm: 3px 3px 0 0 #000;
+            --font-comic: 'Poppins', 'Arial Black', sans-serif;
+            --radius: 3px;
+            --radius-sm: 2px;
+        }
+
+        *,
+        *::before,
+        *::after {
+            box-sizing: border-box;
+        }
+
+        html,
+        body {
+            font-family: var(--font-comic) !important;
+            background: linear-gradient(160deg, #FFE0E9 0%, #E8D5FF 40%, #C8E8FF 100%) fixed !important;
+            color: var(--ink) !important;
+        }
+
+        /* Halftone overlay */
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background-image: radial-gradient(circle, rgba(0, 0, 0, 0.05) 1px, transparent 1px);
+            background-size: 20px 20px;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        /* Scrollbar */
         ::-webkit-scrollbar {
-            width: 6px;
-            height: 6px;
+            width: 7px;
+            height: 7px;
         }
+
         ::-webkit-scrollbar-track {
-            background: rgba(15, 23, 42, 0.3);
+            background: #F5EFD7;
+            border-left: 2px solid #000;
         }
+
         ::-webkit-scrollbar-thumb {
-            background: rgba(99, 102, 241, 0.2);
-            border-radius: 99px;
+            background: #000;
         }
-        ::-webkit-scrollbar-thumb:hover {
-            background: rgba(99, 102, 241, 0.4);
+
+        /* ── Header ── */
+        header {
+            background: #FFE000 !important;
+            border-bottom: 3px solid #000 !important;
+            box-shadow: 0 4px 0 0 #000 !important;
+            backdrop-filter: none !important;
+        }
+
+        /* ── Left/Center/Right panel columns ── */
+        section,
+        aside {
+            background: var(--panel-bg) !important;
+            border-color: #000 !important;
+            backdrop-filter: none !important;
+        }
+
+        /* All divs that look like cards / panels */
+        [class*="bg-slate"],
+        [class*="bg-gray"],
+        [class*="glass"],
+        [class*="backdrop"] {
+            backdrop-filter: none !important;
+            -webkit-backdrop-filter: none !important;
+        }
+
+        /* ── Inputs ── */
+        input,
+        select,
+        textarea {
+            background: #FEFAE8 !important;
+            border: 3px solid #000 !important;
+            border-radius: 3px !important;
+            color: #000 !important;
+            font-family: var(--font-comic) !important;
+            font-weight: 700 !important;
+            box-shadow: 2px 2px 0 0 rgba(0,0,0,0.08) !important;
+            outline: none !important;
+            transition: none !important;
+        }
+
+        input:focus,
+        select:focus,
+        textarea:focus {
+            background: #FFFCE0 !important;
+            box-shadow: 3px 3px 0 0 var(--neon-green) !important;
+        }
+
+        input::placeholder,
+        textarea::placeholder {
+            color: #888 !important;
+            font-weight: 400 !important;
+        }
+
+        /* ── URL Product Input — protagonista visual ── */
+        #inp-product-url {
+            background: #FDFFB6 !important;
+            padding: 15px 20px !important;
+            font-size: 1.1rem !important;
+            font-weight: 800 !important;
+            border: 3px solid #000 !important;
+            box-shadow: 3px 3px 0 0 rgba(0,0,0,0.1) !important;
+            letter-spacing: -0.01em !important;
+        }
+
+        #inp-product-url:focus {
+            background: #FFFFF0 !important;
+            box-shadow: 4px 4px 0 0 var(--neon-green) !important;
+        }
+
+        /* ── Lead Cards — sidebar list ── */
+        .lead-card {
+            transition: transform 0.12s ease, border-color 0.12s ease, background 0.12s ease !important;
+            box-shadow: none !important;
+        }
+
+        .lead-card:hover {
+            box-shadow: none !important;
+            border-left: 4px solid var(--neon-green) !important;
+            transform: translateX(2px) !important;
+        }
+
+        /* Active / selected lead card — light sky-blue, not dark */
+        .lead-card.active-lead,
+        .lead-card[class*="bg-indigo"] {
+            background: #EAF6FF !important;
+            border-color: #000 !important;
+            border-left: 4px solid var(--neon-green) !important;
+            box-shadow: none !important;
+        }
+
+        /* ── Buttons ── */
+        button,
+        [role="button"] {
+            font-family: var(--font-comic) !important;
+            font-weight: 800 !important;
+            text-transform: uppercase !important;
+            letter-spacing: 0.03em !important;
+            transition: box-shadow 0s, transform 0s !important;
+        }
+
+        /* Primary action buttons (indigo / brand coloured) */
+        .btn-comic-primary,
+        button[class*="bg-indigo"],
+        button[class*="from-indigo"],
+        a[class*="bg-indigo"],
+        a[class*="from-indigo"] {
+            background: var(--neon-green) !important;
+            color: #000 !important;
+            border: 3px solid #000 !important;
+            border-radius: 3px !important;
+            box-shadow: 4px 4px 0 0 #000 !important;
+        }
+
+        button[class*="bg-indigo"]:hover,
+        button[class*="from-indigo"]:hover,
+        a[class*="bg-indigo"]:hover {
+            box-shadow: 2px 2px 0 0 #000 !important;
+            transform: translate(2px, 2px) !important;
+        }
+
+        /* Danger / red buttons */
+        button[class*="bg-red"],
+        button[class*="text-red"] {
+            background: #FFCCCC !important;
+            color: var(--punch-red) !important;
+            border: 3px solid var(--punch-red) !important;
+            box-shadow: 3px 3px 0 0 var(--punch-red) !important;
+        }
+
+        /* ── Status pills / badges ── */
+        [class*="status-"],
+        [class*="badge"] {
+            border-radius: 3px !important;
+            font-weight: 900 !important;
+            font-family: var(--font-comic) !important;
+            text-transform: uppercase !important;
+            letter-spacing: 0.04em !important;
+        }
+
+        .status-cotizando,
+        [class*="cotizando"] {
+            background: #FFF3CC !important;
+            color: #7A4A00 !important;
+            border: 2px solid #7A4A00 !important;
+            box-shadow: 2px 2px 0 0 #7A4A00 !important;
+        }
+
+        .status-esperando_pago,
+        [class*="esperando_pago"] {
+            background: var(--sky-blue) !important;
+            color: #00296B !important;
+            border: 2px solid #00296B !important;
+            box-shadow: 2px 2px 0 0 #00296B !important;
+        }
+
+        .status-finalizado,
+        [class*="finalizado"] {
+            background: #CCFFCC !important;
+            color: #00500A !important;
+            border: 2px solid #00500A !important;
+            box-shadow: 2px 2px 0 0 #00500A !important;
+        }
+
+        /* ── Typography fixes ── */
+        h1,
+        h2,
+        h3,
+        h4,
+        h5 {
+            font-family: var(--font-comic) !important;
+            font-weight: 900 !important;
+            text-transform: uppercase !important;
+            color: var(--ink) !important;
+        }
+
+        /* ── Pulse animation (comic style — stepped) ── */
+        @keyframes comicPulse {
+
+            0%,
+            100% {
+                opacity: 1;
+            }
+
+            50% {
+                opacity: 0;
+            }
+        }
+
+        .animate-pulse {
+            animation: comicPulse 1s steps(2) infinite !important;
+        }
+
+        /* ── Spinner ── */
+        @keyframes comicSpin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        .animate-spin {
+            animation: comicSpin 0.6s steps(8) infinite !important;
+        }
+
+        /* ── Scrollable message lists / chat bubbles ── */
+        [class*="rounded-"] {
+            border-radius: 3px !important;
+        }
+
+        [class*="shadow"] {
+            box-shadow: 2px 2px 0 0 rgba(0,0,0,0.06) !important;
+        }
+
+        /* Fix overlay z-index for body::before */
+        header,
+        main,
+        section,
+        aside,
+        footer {
+            position: relative;
+            z-index: 1;
         }
     </style>
 </head>
-<body class="h-full flex flex-col font-sans overflow-hidden bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-slate-900 via-slate-950 to-brand-950">
+
+<body
+    class="h-full flex flex-col font-sans overflow-hidden bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-slate-900 via-slate-950 to-brand-950">
 
     <!-- CABECERA PRINCIPAL (HEADER) -->
-    <header class="h-[60px] flex items-center justify-between px-6 bg-slate-900/70 backdrop-blur-xl border-b border-slate-800/70 z-10 shadow-sm flex-shrink-0">
+    <header
+        class="h-[60px] flex items-center justify-between px-6 bg-slate-900/70 backdrop-blur-xl border-b border-slate-800/70 z-10 shadow-sm flex-shrink-0">
         <div class="flex items-center gap-3">
-            <img src="/logo.png" alt="TechStore" class="h-8 w-auto rounded-lg p-1 bg-indigo-950 border border-indigo-800/50">
+            <img src="logo.png" alt="TechStore"
+                class="h-8 w-auto rounded-lg p-1 bg-indigo-950 border border-indigo-800/50">
             <div class="flex flex-col">
-                <span class="text-[0.8125rem] font-bold tracking-tight text-slate-100 leading-tight">TechStore Imports</span>
+                <span class="text-[0.8125rem] font-bold tracking-tight text-slate-100 leading-tight">TechStore
+                    Imports</span>
                 <span class="text-[0.65rem] text-indigo-400/80 leading-tight">Panel del Agente de Ventas</span>
             </div>
         </div>
@@ -67,8 +331,12 @@
                 <span class="text-[0.75rem] font-semibold text-slate-300" id="agent-name-display">Agente</span>
             </div>
             <div class="flex items-center gap-3">
-                <a id="btn-back" href="index.html" class="text-[0.75rem] font-medium text-slate-500 hover:text-slate-200 transition-colors hidden">← Volver al Panel</a>
-                <button onclick="handleLogout()" class="text-[0.75rem] font-medium text-slate-500 hover:text-red-400 transition-colors">Cerrar Sesión</button>
+                <a id="btn-back" href="index.html"
+                    class="text-[0.75rem] font-medium text-slate-500 hover:text-slate-200 transition-colors hidden">←
+                    Volver al Panel</a>
+                <button onclick="handleLogout()"
+                    class="text-[0.75rem] font-medium text-slate-500 hover:text-red-400 transition-colors">Cerrar
+                    Sesión</button>
             </div>
         </div>
     </header>
@@ -81,11 +349,13 @@
             <!-- Header del Panel -->
             <div class="px-4 pt-4 pb-3 border-b border-slate-800/50">
                 <div class="flex items-center justify-between mb-3">
-                    <span class="text-[0.65rem] font-bold text-slate-500 uppercase tracking-wider">Solicitudes Activas</span>
+                    <span class="text-[0.65rem] font-bold text-slate-500 uppercase tracking-wider">Solicitudes
+                        Activas</span>
                     <span class="text-[0.65rem] text-indigo-400 font-semibold" id="leads-counter">—</span>
                 </div>
                 <div class="relative">
-                    <input type="text" placeholder="Buscar solicitud..." class="w-full bg-slate-950/80 border border-slate-800/80 rounded-lg py-2 pl-8 pr-3 text-[0.75rem] focus:outline-none focus:border-indigo-500/70 focus:ring-1 focus:ring-indigo-500/20 transition-all placeholder-slate-600 text-slate-200">
+                    <input type="text" placeholder="Buscar solicitud..."
+                        class="w-full bg-slate-950/80 border border-slate-800/80 rounded-lg py-2 pl-8 pr-3 text-[0.75rem] focus:outline-none focus:border-indigo-500/70 focus:ring-1 focus:ring-indigo-500/20 transition-all placeholder-slate-600 text-slate-200">
                     <span class="absolute left-2.5 top-2.5 text-slate-600 text-[0.7rem]">🔍</span>
                 </div>
             </div>
@@ -94,7 +364,9 @@
             <div class="flex-1 overflow-y-auto p-3 space-y-2" id="leads-list">
                 <div class="flex justify-center items-center py-10">
                     <div class="flex items-center gap-2 text-[0.75rem] text-slate-500">
-                        <div class="w-4 h-4 border-2 border-indigo-500/30 border-t-indigo-500 rounded-full animate-spin"></div>
+                        <div
+                            class="w-4 h-4 border-2 border-indigo-500/30 border-t-indigo-500 rounded-full animate-spin">
+                        </div>
                         Conectando...
                     </div>
                 </div>
@@ -102,7 +374,8 @@
 
             <!-- Footer -->
             <div class="px-4 py-2.5 border-t border-slate-800/40 flex items-center justify-between bg-slate-950/30">
-                <button id="btn-reload-leads" class="text-[0.7rem] text-indigo-400 font-semibold hover:text-indigo-300 transition-colors flex items-center gap-1">
+                <button id="btn-reload-leads"
+                    class="text-[0.7rem] text-indigo-400 font-semibold hover:text-indigo-300 transition-colors flex items-center gap-1">
                     ↺ Recargar leads
                 </button>
             </div>
@@ -111,9 +384,11 @@
         <!-- ================= COLUMNA CENTRAL (50%): ÁREA DE CHAT ================= -->
         <section class="flex-1 flex flex-col h-full bg-slate-950/10">
             <!-- Encabezado del Chat -->
-            <div class="h-[60px] border-b border-slate-800/50 flex items-center justify-between px-6 bg-slate-900/10 flex-shrink-0">
+            <div
+                class="h-[60px] border-b border-slate-800/50 flex items-center justify-between px-6 bg-slate-900/10 flex-shrink-0">
                 <div>
-                    <h2 class="text-[0.875rem] font-bold text-slate-100 leading-tight" id="chat-client-name">Selecciona un lead</h2>
+                    <h2 class="text-[0.875rem] font-bold text-slate-100 leading-tight" id="chat-client-name">Selecciona
+                        un lead</h2>
                     <p class="text-[0.7rem] text-indigo-400/80 flex items-center gap-1.5 mt-0.5">
                         <span class="w-1.5 h-1.5 rounded-full bg-indigo-500/80"></span>
                         Cotización: <span id="chat-product-name" class="text-indigo-300">—</span>
@@ -131,17 +406,18 @@
             <!-- Entrada de Texto / Envío de Mensaje -->
             <div class="p-4 border-t border-slate-800/50 bg-slate-900/10 flex-shrink-0">
                 <form id="chat-form" onsubmit="sendChatMessage(event)" class="flex gap-2">
-                    <input type="text" id="chat-input" placeholder="Escribe tu respuesta al cliente..." autocomplete="off"
-                           class="flex-1 bg-slate-950 border border-slate-800/80 text-[0.8125rem] rounded-xl px-4 py-2.5
+                    <input type="text" id="chat-input" placeholder="Escribe tu respuesta al cliente..."
+                        autocomplete="off" class="flex-1 bg-slate-950 border border-slate-800/80 text-[0.8125rem] rounded-xl px-4 py-2.5
                                   focus:outline-none focus:border-indigo-500/70 focus:ring-1 focus:ring-indigo-500/15
                                   placeholder-slate-600 text-slate-100 transition-all">
-                    <button type="submit"
-                            class="bg-indigo-600 hover:bg-indigo-500 active:bg-indigo-700 text-white rounded-xl px-5 py-2.5
+                    <button type="submit" class="bg-indigo-600 hover:bg-indigo-500 active:bg-indigo-700 text-white rounded-xl px-5 py-2.5
                                    transition-all text-[0.8125rem] font-semibold shadow-md shadow-indigo-600/20
                                    flex items-center gap-1.5">
                         <span>Enviar</span>
-                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-3.5 h-3.5">
-                            <path d="M3.105 2.289a.75.75 0 00-.826.95l1.414 4.925A1.5 1.5 0 005.135 9.25h6.115a.75.75 0 010 1.5H5.135a1.5 1.5 0 00-1.442 1.086l-1.414 4.926a.75.75 0 00.826.95 28.896 28.896 0 0015.293-7.154.75.75 0 000-1.115A28.897 28.897 0 003.105 2.289z"/>
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"
+                            class="w-3.5 h-3.5">
+                            <path
+                                d="M3.105 2.289a.75.75 0 00-.826.95l1.414 4.925A1.5 1.5 0 005.135 9.25h6.115a.75.75 0 010 1.5H5.135a1.5 1.5 0 00-1.442 1.086l-1.414 4.926a.75.75 0 00.826.95 28.896 28.896 0 0015.293-7.154.75.75 0 000-1.115A28.897 28.897 0 003.105 2.289z" />
                         </svg>
                     </button>
                 </form>
@@ -149,8 +425,9 @@
         </section>
 
         <!-- ================= COLUMNA DERECHA (30%): FORMULARIO DE COTIZACIÓN ================= -->
-        <section class="w-[30%] min-w-[340px] border-l border-slate-800/50 bg-slate-900/20 flex flex-col h-full overflow-y-auto">
-            
+        <section
+            class="w-[30%] min-w-[340px] border-l border-slate-800/50 bg-slate-900/20 flex flex-col h-full overflow-y-auto">
+
             <!-- Título de Sección -->
             <div class="h-[60px] border-b border-slate-800/50 flex items-center px-5 bg-slate-900/10 flex-shrink-0">
                 <div class="flex items-center gap-2.5">
@@ -164,17 +441,21 @@
 
             <!-- Formulario del Cálculo -->
             <form id="quote-form" onsubmit="submitQuote(event)" class="p-6 space-y-5 flex-1">
-                
+
                 <!-- Sección 1: Costos de Origen -->
                 <div class="space-y-3">
-                    <h3 class="text-[10px] font-bold text-indigo-400 uppercase tracking-widest border-b border-slate-800/50 pb-1">1. Costos de Origen</h3>
-                    
+                    <h3
+                        class="text-[10px] font-bold text-indigo-400 uppercase tracking-widest border-b border-slate-800/50 pb-1">
+                        1. Costos de Origen</h3>
+
                     <div class="grid grid-cols-2 gap-3">
                         <div class="space-y-1">
                             <label class="block text-[10px] font-semibold text-slate-400">Precio Producto (USD)</label>
                             <div class="relative">
                                 <span class="absolute left-3 top-2.5 text-slate-500 text-[11px]">$</span>
-                                <input type="number" id="inp-price" value="1499.00" step="0.01" oninput="calculateAduana()" class="w-full bg-slate-950 border border-slate-800 rounded-lg py-2 pl-6 pr-3 text-xs text-slate-100 font-semibold focus:outline-none focus:border-indigo-500 transition-colors">
+                                <input type="number" id="inp-price" value="1499.00" step="0.01"
+                                    oninput="calculateAduana()"
+                                    class="w-full bg-slate-950 border border-slate-800 rounded-lg py-2 pl-6 pr-3 text-xs text-slate-100 font-semibold focus:outline-none focus:border-indigo-500 transition-colors">
                             </div>
                         </div>
 
@@ -182,7 +463,9 @@
                             <label class="block text-[10px] font-semibold text-slate-400">Flete Int. (USD)</label>
                             <div class="relative">
                                 <span class="absolute left-3 top-2.5 text-slate-500 text-[11px]">$</span>
-                                <input type="number" id="inp-freight" value="85.00" step="0.01" oninput="calculateAduana()" class="w-full bg-slate-950 border border-slate-800 rounded-lg py-2 pl-6 pr-3 text-xs text-slate-100 font-semibold focus:outline-none focus:border-indigo-500 transition-colors">
+                                <input type="number" id="inp-freight" value="85.00" step="0.01"
+                                    oninput="calculateAduana()"
+                                    class="w-full bg-slate-950 border border-slate-800 rounded-lg py-2 pl-6 pr-3 text-xs text-slate-100 font-semibold focus:outline-none focus:border-indigo-500 transition-colors">
                             </div>
                         </div>
                     </div>
@@ -192,12 +475,15 @@
                             <label class="block text-[10px] font-semibold text-slate-400">Costo Seguro (USD)</label>
                             <div class="relative">
                                 <span class="absolute left-3 top-2.5 text-slate-500 text-[11px]">$</span>
-                                <input type="number" id="inp-insurance" value="25.00" step="0.01" oninput="calculateAduana()" class="w-full bg-slate-950 border border-slate-800 rounded-lg py-2 pl-6 pr-3 text-xs text-slate-100 font-semibold focus:outline-none focus:border-indigo-500 transition-colors">
+                                <input type="number" id="inp-insurance" value="25.00" step="0.01"
+                                    oninput="calculateAduana()"
+                                    class="w-full bg-slate-950 border border-slate-800 rounded-lg py-2 pl-6 pr-3 text-xs text-slate-100 font-semibold focus:outline-none focus:border-indigo-500 transition-colors">
                             </div>
                         </div>
                         <div class="space-y-1">
                             <label class="block text-[10px] font-semibold text-slate-400">Valor CIF (Calculado)</label>
-                            <div class="relative bg-slate-900 border border-slate-800/80 rounded-lg py-2 px-3 text-xs text-slate-400 font-bold" id="val-cif">
+                            <div class="relative bg-slate-900 border border-slate-800/80 rounded-lg py-2 px-3 text-xs text-slate-400 font-bold"
+                                id="val-cif">
                                 $1,609.00
                             </div>
                         </div>
@@ -206,13 +492,17 @@
 
                 <!-- Sección 2: Gravámenes e Impuestos -->
                 <div class="space-y-3 pt-2">
-                    <h3 class="text-[10px] font-bold text-indigo-400 uppercase tracking-widest border-b border-slate-800/50 pb-1">2. Impuestos & Aduana</h3>
-                    
+                    <h3
+                        class="text-[10px] font-bold text-indigo-400 uppercase tracking-widest border-b border-slate-800/50 pb-1">
+                        2. Impuestos & Aduana</h3>
+
                     <div class="grid grid-cols-2 gap-3">
                         <div class="space-y-1">
                             <label class="block text-[10px] font-semibold text-slate-400">Arancel Ad-Valorem (%)</label>
                             <div class="relative">
-                                <input type="number" id="inp-tariff-pct" value="6.0" step="0.1" oninput="calculateAduana()" class="w-full bg-slate-950 border border-slate-800 rounded-lg py-2 px-3 text-xs text-slate-100 font-semibold focus:outline-none focus:border-indigo-500 transition-colors">
+                                <input type="number" id="inp-tariff-pct" value="6.0" step="0.1"
+                                    oninput="calculateAduana()"
+                                    class="w-full bg-slate-950 border border-slate-800 rounded-lg py-2 px-3 text-xs text-slate-100 font-semibold focus:outline-none focus:border-indigo-500 transition-colors">
                                 <span class="absolute right-3 top-2.5 text-slate-500 text-[11px]">%</span>
                             </div>
                         </div>
@@ -220,7 +510,9 @@
                         <div class="space-y-1">
                             <label class="block text-[10px] font-semibold text-slate-400">Impuesto IVA (%)</label>
                             <div class="relative">
-                                <input type="number" id="inp-vat-pct" value="19.0" step="0.1" oninput="calculateAduana()" class="w-full bg-slate-950 border border-slate-800 rounded-lg py-2 px-3 text-xs text-slate-100 font-semibold focus:outline-none focus:border-indigo-500 transition-colors">
+                                <input type="number" id="inp-vat-pct" value="19.0" step="0.1"
+                                    oninput="calculateAduana()"
+                                    class="w-full bg-slate-950 border border-slate-800 rounded-lg py-2 px-3 text-xs text-slate-100 font-semibold focus:outline-none focus:border-indigo-500 transition-colors">
                                 <span class="absolute right-3 top-2.5 text-slate-500 text-[11px]">%</span>
                             </div>
                         </div>
@@ -240,7 +532,8 @@
                             <span>Gastos Operacionales:</span>
                             <span class="font-bold text-slate-200">$45.00</span>
                         </div>
-                        <div class="border-t border-slate-800/80 my-2 pt-2 flex items-center justify-between text-xs font-semibold text-indigo-400">
+                        <div
+                            class="border-t border-slate-800/80 my-2 pt-2 flex items-center justify-between text-xs font-semibold text-indigo-400">
                             <span>Total Impuestos:</span>
                             <span class="font-bold" id="res-total-taxes">$465.59</span>
                         </div>
@@ -249,27 +542,40 @@
 
                 <!-- Sección 3: Resumen de Pago -->
                 <div class="space-y-3 pt-2">
-                    <h3 class="text-[10px] font-bold text-indigo-400 uppercase tracking-widest border-b border-slate-800/50 pb-1">3. Resumen Final a Cobrar</h3>
-                    
-                    <div class="bg-gradient-to-br from-indigo-950/50 to-indigo-900/20 border border-indigo-500/20 rounded-xl p-4 flex flex-col items-center justify-center text-center">
-                        <span class="text-[10px] font-bold uppercase tracking-wider text-indigo-400">Total a Pagar por Cliente</span>
-                        <span class="text-3xl font-extrabold text-white mt-1 tracking-tight" id="res-total-pay">$2,074.59</span>
-                        <span class="text-[9px] text-slate-500 mt-1">Valores expresados en USD (dólares americanos)</span>
+                    <h3
+                        class="text-[10px] font-bold text-indigo-400 uppercase tracking-widest border-b border-slate-800/50 pb-1">
+                        3. Resumen Final a Cobrar</h3>
+
+                    <div
+                        class="bg-gradient-to-br from-indigo-950/50 to-indigo-900/20 border border-indigo-500/20 rounded-xl p-4 flex flex-col items-center justify-center text-center">
+                        <span class="text-[10px] font-bold uppercase tracking-wider text-indigo-400">Total a Pagar por
+                            Cliente</span>
+                        <span class="text-3xl font-extrabold text-white mt-1 tracking-tight"
+                            id="res-total-pay">$2,074.59</span>
+                        <span class="text-[9px] text-slate-500 mt-1">Valores expresados en USD (dólares
+                            americanos)</span>
                     </div>
                 </div>
 
                 <!-- Panel QR: aparece tras cotizar exitosamente -->
                 <div id="qr-panel" class="hidden space-y-3 pt-1">
-                    <h3 class="text-[10px] font-bold text-emerald-400 uppercase tracking-widest border-b border-slate-800/50 pb-1">4. Código QR de Pago</h3>
-                    <div class="bg-slate-950/80 border border-emerald-500/20 rounded-xl p-4 flex flex-col items-center gap-3">
-                        <img id="qr-image" src="" alt="QR de pago" class="w-32 h-32 rounded-lg border border-slate-700/40 shadow-md bg-white p-1">
+                    <h3
+                        class="text-[10px] font-bold text-emerald-400 uppercase tracking-widest border-b border-slate-800/50 pb-1">
+                        4. Código QR de Pago</h3>
+                    <div
+                        class="bg-slate-950/80 border border-emerald-500/20 rounded-xl p-4 flex flex-col items-center gap-3">
+                        <img id="qr-image" src="" alt="QR de pago"
+                            class="w-32 h-32 rounded-lg border border-slate-700/40 shadow-md bg-white p-1">
                         <div class="text-center">
                             <p class="text-[10px] text-emerald-400 font-semibold">QR generado y enviado al chat</p>
-                            <p class="text-[9px] text-slate-500 mt-0.5">El cliente debe escanear este código para pagar</p>
+                            <p class="text-[9px] text-slate-500 mt-0.5">El cliente debe escanear este código para pagar
+                            </p>
                         </div>
-                        <div class="w-full flex items-center gap-2 bg-slate-900/60 border border-slate-800/50 rounded-lg px-3 py-2">
+                        <div
+                            class="w-full flex items-center gap-2 bg-slate-900/60 border border-slate-800/50 rounded-lg px-3 py-2">
                             <span class="w-2 h-2 rounded-full bg-blue-400 animate-pulse flex-shrink-0"></span>
-                            <span class="text-[10px] text-blue-400 font-semibold">Esperando confirmación de pago...</span>
+                            <span class="text-[10px] text-blue-400 font-semibold">Esperando confirmación de
+                                pago...</span>
                         </div>
                     </div>
                 </div>
@@ -279,14 +585,13 @@
                     <!-- Botón principal: Enviar Cotización -->
                     <button type="submit" id="btn-submit-quote"
                         class="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-3 px-4 rounded-xl text-xs transition-all shadow-lg shadow-indigo-600/20 hover:shadow-indigo-500/35 border border-indigo-500/40 hover:-translate-y-0.5 active:translate-y-0 flex items-center justify-center gap-2">
-                        <span>Enviar Cotización Final</span> ⚡
+                        <span>Enviar Cotización Final</span>
                     </button>
 
                     <!-- Botón dev: Simular Pago (solo visible en estado 'esperando_pago') -->
-                    <button type="button" id="btn-simular-pago"
-                        onclick="simularPago()"
+                    <button type="button" id="btn-simular-pago" onclick="simularPago()"
                         class="hidden w-full bg-emerald-600/10 hover:bg-emerald-600/20 text-emerald-400 font-bold py-3 px-4 rounded-xl text-xs transition-all border border-emerald-500/30 hover:border-emerald-500/50 flex items-center justify-center gap-2">
-                        <span>🧪 Simular Pago Cliente (Dev)</span>
+                        <span>Pago Cliente</span>
                     </button>
                 </div>
 
@@ -302,15 +607,15 @@
         // ============================================================
         // CONFIGURACIÓN GLOBAL
         // ============================================================
-        const API_URL = '';
+        const API_URL = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' ? `${window.location.protocol}//${window.location.hostname}:3000` : '';
 
         // Estado de la aplicación
-        let currentUser         = null;   // Usuario autenticado
-        let currentPedidoId     = null;   // ID del pedido/lead activo
+        let currentUser = null;   // Usuario autenticado
+        let currentPedidoId = null;   // ID del pedido/lead activo
         let currentPedidoEstado = null;   // Estado actual del pedido seleccionado
-        let lastMessageId       = 0;      // Para dedup en el short polling
-        let pollingIntervalId   = null;   // Referencia al setInterval del short polling
-        let isSending           = false;  // Guard para evitar doble envío
+        let lastMessageId = 0;      // Para dedup en el short polling
+        let pollingIntervalId = null;   // Referencia al setInterval del short polling
+        let isSending = false;  // Guard para evitar doble envío
 
         // ============================================================
         // HELPERS DE AUTENTICACIÓN
@@ -336,13 +641,34 @@
         function showToast(title, desc = '', type = 'success') {
             const container = document.getElementById('toast-container');
             const toast = document.createElement('div');
-            const icons = { success: '✅', error: '❌', warning: '⚠️', info: '⚡' };
-            const icon  = icons[type] || icons.info;
+            
+            let iconText = '';
+            const textToCheck = ((title || '') + ' ' + (desc || '')).toLowerCase();
+            const isLogro = textToCheck.includes('éxito') || 
+                            textToCheck.includes('exito') || 
+                            textToCheck.includes('correctamente') || 
+                            textToCheck.includes('registrad') || 
+                            textToCheck.includes('enviad') || 
+                            textToCheck.includes('confirmad') || 
+                            textToCheck.includes('bienvenido') || 
+                            textToCheck.includes('creado') || 
+                            textToCheck.includes('actualizado') || 
+                            textToCheck.includes('eliminado');
+            const isCredenciales = textToCheck.includes('credenciales') || textToCheck.includes('incorrect');
+
+            if (!isLogro && !isCredenciales) {
+                if (type === 'success') iconText = 'bien';
+                if (type === 'error') iconText = 'error';
+            }
+
+            const iconBadge = iconText 
+                ? `<span class="px-1.5 py-0.5 text-[9px] font-bold uppercase rounded bg-black/40 text-slate-100 border border-slate-700/50 mt-0.5 flex-shrink-0">${iconText}</span>` 
+                : '';
 
             toast.className = 'flex items-start gap-3.5 p-4 rounded-xl border bg-slate-900 text-slate-100 shadow-xl pointer-events-auto min-w-[300px] transition-all duration-300';
             toast.style.borderColor = type === 'error' ? 'rgba(239,68,68,0.3)' : 'rgba(99,102,241,0.3)';
             toast.innerHTML = `
-                <div class="text-base mt-0.5">${icon}</div>
+                ${iconBadge}
                 <div class="flex-1">
                     <h4 class="text-xs font-bold text-slate-200">${title}</h4>
                     ${desc ? `<p class="text-[10px] text-slate-400 mt-0.5">${desc}</p>` : ''}
@@ -371,11 +697,11 @@
         /** Formatea una fecha ISO como texto relativo legible */
         function timeAgo(isoString) {
             if (!isoString) return '';
-            const now  = Date.now();
+            const now = Date.now();
             const then = new Date(isoString).getTime();
             const diff = Math.floor((now - then) / 1000); // segundos
 
-            if (diff < 60)   return 'Ahora mismo';
+            if (diff < 60) return 'Ahora mismo';
             if (diff < 3600) return `Hace ${Math.floor(diff / 60)} min`;
             if (diff < 86400) return `Hace ${Math.floor(diff / 3600)} h`;
             return new Date(isoString).toLocaleDateString('es-CL', { day: '2-digit', month: 'short' });
@@ -384,9 +710,9 @@
         /** Badge de estado con colores semánticos */
         function estadoBadgeHTML(estado) {
             const map = {
-                cotizando:      'bg-amber-500/10 text-amber-400 border-amber-500/20',
+                cotizando: 'bg-amber-500/10 text-amber-400 border-amber-500/20',
                 esperando_pago: 'bg-blue-500/10 text-blue-400 border-blue-500/20',
-                finalizado:     'bg-emerald-500/10 text-emerald-400 border-emerald-500/20',
+                finalizado: 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20',
             };
             const labels = {
                 cotizando: 'Cotizando', esperando_pago: 'Esp. Pago', finalizado: 'Finalizado'
@@ -426,7 +752,7 @@
             if (!pedidos.length) {
                 list.innerHTML = `
                     <div class="flex flex-col items-center justify-center py-10 text-center">
-                        <span class="text-2xl mb-2">📭</span>
+                        <span class="text-2xl mb-2"></span>
                         <p class="text-xs text-slate-500">Sin pedidos activos aún.</p>
                     </div>`;
                 return;
@@ -435,8 +761,8 @@
             list.innerHTML = pedidos.map(pedido => {
                 const isActive = pedido.id === currentPedidoId;
                 const activeClasses = isActive
-                    ? 'border-indigo-500/30 bg-indigo-500/5'
-                    : 'border-slate-800 bg-slate-900/40 hover:border-slate-700/80 hover:bg-slate-900/60';
+                    ? 'active-lead border-black'
+                    : 'border-slate-800 bg-[#FEFAE8] hover:border-black';
                 const urlShort = pedido.url_producto.replace(/^https?:\/\/[^/]+/, '').substring(0, 30) + '…';
                 const initials = getInitials(pedido.cliente_nombre);
 
@@ -445,19 +771,19 @@
                      id="lead-card-${pedido.id}"
                      class="lead-card group cursor-pointer p-3.5 rounded-xl border ${activeClasses} transition-all duration-300">
                     <div class="flex items-center justify-between mb-1.5">
-                        <span class="text-[10px] font-bold ${isActive ? 'text-indigo-400' : 'text-slate-500'} tracking-wide uppercase">
+                        <span class="text-[10px] font-bold ${isActive ? 'text-black' : 'text-slate-600'} tracking-wide uppercase">
                             PED-#${String(pedido.id).padStart(4, '0')}
                         </span>
                         ${estadoBadgeHTML(pedido.estado)}
                     </div>
-                    <h3 class="text-xs font-semibold ${isActive ? 'text-slate-100' : 'text-slate-200'} group-hover:text-indigo-300 transition-colors">
+                    <h3 class="text-xs font-semibold text-black">
                         ${pedido.cliente_nombre}
                     </h3>
-                    <p class="text-[11px] text-slate-400 mt-1 truncate" title="${pedido.url_producto}">${urlShort}</p>
-                    <div class="flex items-center justify-between mt-2.5 text-[10px] text-slate-500">
+                    <p class="text-[11px] text-slate-600 mt-1 truncate" title="${pedido.url_producto}">${urlShort}</p>
+                    <div class="flex items-center justify-between mt-2.5 text-[10px] text-slate-600">
                         <span>${timeAgo(pedido.fecha_creacion)}</span>
                         <span class="flex items-center gap-1">
-                            <span class="w-1.5 h-1.5 rounded-full ${isActive ? 'bg-indigo-400' : 'bg-slate-600'}"></span>
+                            <span class="w-1.5 h-1.5 rounded-full ${isActive ? 'bg-black' : 'bg-slate-500'}"></span>
                             $${Number(pedido.total_a_pagar).toFixed(2)}
                         </span>
                     </div>
@@ -479,35 +805,41 @@
         }
 
         function selectLead(pedidoId, pedidoData) {
-            currentPedidoId     = pedidoId;
+            currentPedidoId = pedidoId;
             currentPedidoEstado = pedidoData.estado;
-            lastMessageId       = 0; // Resetear tracking de mensajes
+            lastMessageId = 0; // Resetear tracking de mensajes
 
             // Actualizar UI de tarjetas
             document.querySelectorAll('.lead-card').forEach(card => {
-                card.classList.remove('border-indigo-500/30', 'bg-indigo-500/5');
-                card.classList.add('border-slate-800', 'bg-slate-900/40');
+                card.classList.remove('active-lead', 'border-black');
+                card.classList.add('border-slate-800', 'bg-[#FEFAE8]');
                 const label = card.querySelector('span.font-bold');
-                if (label) label.classList.replace('text-indigo-400', 'text-slate-500');
+                if (label) {
+                    label.classList.remove('text-black');
+                    label.classList.add('text-slate-600');
+                }
             });
             const activeCard = document.getElementById(`lead-card-${pedidoId}`);
             if (activeCard) {
-                activeCard.classList.add('border-indigo-500/30', 'bg-indigo-500/5');
-                activeCard.classList.remove('border-slate-800', 'bg-slate-900/40');
+                activeCard.classList.add('active-lead', 'border-black');
+                activeCard.classList.remove('border-slate-800', 'bg-[#FEFAE8]');
                 const label = activeCard.querySelector('span.font-bold');
-                if (label) label.classList.replace('text-slate-500', 'text-indigo-400');
+                if (label) {
+                    label.classList.remove('text-slate-600');
+                    label.classList.add('text-black');
+                }
             }
 
             // Actualizar cabecera del chat
             document.getElementById('chat-client-name').textContent = pedidoData.cliente_nombre || `Pedido #${pedidoId}`;
             const productEl = document.getElementById('chat-product-name');
-            const urlShort  = (pedidoData.url_producto || '').replace(/^https?:\/\/[^/]+/, '').substring(0, 50);
+            const urlShort = (pedidoData.url_producto || '').replace(/^https?:\/\/[^/]+/, '').substring(0, 50);
             productEl.textContent = urlShort || pedidoData.url_producto;
 
             // Prellenar calculadora con datos del pedido
             const precio = Number(pedidoData.precio_origen) || 0;
-            document.getElementById('inp-price').value     = precio.toFixed(2);
-            document.getElementById('inp-freight').value   = (85).toFixed(2);
+            document.getElementById('inp-price').value = precio.toFixed(2);
+            document.getElementById('inp-freight').value = (85).toFixed(2);
             document.getElementById('inp-insurance').value = (25).toFixed(2);
             calculateAduana();
 
@@ -530,13 +862,13 @@
          */
         function actualizarUIEstado(estado) {
             const btnSimular = document.getElementById('btn-simular-pago');
-            const qrPanel    = document.getElementById('qr-panel');
+            const qrPanel = document.getElementById('qr-panel');
 
             if (estado === 'esperando_pago') {
                 if (btnSimular) btnSimular.classList.remove('hidden');
             } else {
                 if (btnSimular) btnSimular.classList.add('hidden');
-                if (qrPanel)    qrPanel.classList.add('hidden');
+                if (qrPanel) qrPanel.classList.add('hidden');
             }
         }
 
@@ -546,16 +878,16 @@
 
         /** Renderiza una sola burbuja de mensaje en el DOM */
         function renderMessageBubble(msg, appendTo) {
-            const isAgent    = (msg.usuario_rol === 'agente' || msg.usuario_rol === 'admin');
-            const initials   = getInitials(msg.usuario_nombre);
-            const avatarBg   = isAgent
-                ? 'bg-indigo-600 text-white shadow-md shadow-indigo-600/20'
-                : 'bg-indigo-500/10 text-indigo-400 border border-indigo-500/20';
-            const msgBg      = isAgent
-                ? 'bg-indigo-600 text-white rounded-tr-none'
-                : 'bg-slate-900/80 border border-slate-800/60 text-slate-200 rounded-tl-none';
-            const align      = isAgent ? 'ml-auto flex-row-reverse' : '';
-            const timeAlign  = isAgent ? 'text-right' : '';
+            const isAgent = (msg.usuario_rol === 'agente' || msg.usuario_rol === 'admin');
+            const initials = getInitials(msg.usuario_nombre);
+            const avatarBg = isAgent
+                ? 'bg-[#FFE000] text-black border-2 border-black'
+                : 'bg-[#FF2D78] text-white border-2 border-black';
+            const msgBg = isAgent
+                ? 'bg-[#C8E8FF] text-black border-2 border-black rounded-tr-none shadow-sm'
+                : 'bg-[#FFF9E8] text-black border-2 border-black rounded-tl-none shadow-sm';
+            const align = isAgent ? 'ml-auto flex-row-reverse' : '';
+            const timeAlign = isAgent ? 'text-right' : '';
 
             const bubble = document.createElement('div');
             bubble.className = `flex items-start gap-3 max-w-[80%] ${align}`;
@@ -676,12 +1008,12 @@
             if (isSending || !currentPedidoId) return;
 
             const input = document.getElementById('chat-input');
-            const text  = input.value.trim();
+            const text = input.value.trim();
             if (!text) return;
 
             const submitBtn = e.target.querySelector('button[type="submit"]');
             isSending = true;
-            submitBtn.disabled  = true;
+            submitBtn.disabled = true;
             submitBtn.innerHTML = '<span class="w-3.5 h-3.5 border-2 border-white/40 border-t-white rounded-full animate-spin"></span>';
 
             try {
@@ -715,8 +1047,8 @@
                 showToast('Error al enviar', err.message, 'error');
             } finally {
                 isSending = false;
-                submitBtn.disabled  = false;
-                submitBtn.innerHTML = '<span>Enviar</span> 🚀';
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = '<span>Enviar</span>';
             }
         }
 
@@ -744,15 +1076,15 @@
         // COLUMNA DERECHA: CALCULADORA ADUANERA REACTIVA
         // ============================================================
         function calculateAduana() {
-            const price      = parseFloat(document.getElementById('inp-price').value)      || 0;
-            const freight    = parseFloat(document.getElementById('inp-freight').value)    || 0;
-            const insurance  = parseFloat(document.getElementById('inp-insurance').value)  || 0;
-            const tariffPct  = parseFloat(document.getElementById('inp-tariff-pct').value) || 0;
-            const vatPct     = parseFloat(document.getElementById('inp-vat-pct').value)    || 0;
+            const price = parseFloat(document.getElementById('inp-price').value) || 0;
+            const freight = parseFloat(document.getElementById('inp-freight').value) || 0;
+            const insurance = parseFloat(document.getElementById('inp-insurance').value) || 0;
+            const tariffPct = parseFloat(document.getElementById('inp-tariff-pct').value) || 0;
+            const vatPct = parseFloat(document.getElementById('inp-vat-pct').value) || 0;
 
             const fmt = n => `$${n.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
 
-            const cif   = price + freight + insurance;
+            const cif = price + freight + insurance;
             document.getElementById('val-cif').textContent = fmt(cif);
 
             const tariff = cif * (tariffPct / 100);
@@ -761,7 +1093,7 @@
             const vat = (cif + tariff) * (vatPct / 100);
             document.getElementById('res-vat').textContent = fmt(vat);
 
-            const opex       = 45.00;
+            const opex = 45.00;
             const totalTaxes = tariff + vat + opex;
             document.getElementById('res-total-taxes').textContent = fmt(totalTaxes);
 
@@ -782,23 +1114,23 @@
             }
 
             // Capturar valores de la calculadora
-            const precioOrigen = parseFloat(document.getElementById('inp-price').value)    || 0;
-            const freight      = parseFloat(document.getElementById('inp-freight').value)   || 0;
-            const insurance    = parseFloat(document.getElementById('inp-insurance').value)  || 0;
-            const tariffPct    = parseFloat(document.getElementById('inp-tariff-pct').value) || 0;
-            const vatPct       = parseFloat(document.getElementById('inp-vat-pct').value)    || 0;
+            const precioOrigen = parseFloat(document.getElementById('inp-price').value) || 0;
+            const freight = parseFloat(document.getElementById('inp-freight').value) || 0;
+            const insurance = parseFloat(document.getElementById('inp-insurance').value) || 0;
+            const tariffPct = parseFloat(document.getElementById('inp-tariff-pct').value) || 0;
+            const vatPct = parseFloat(document.getElementById('inp-vat-pct').value) || 0;
 
-            const cif       = precioOrigen + freight + insurance;
-            const arancel   = cif * (tariffPct / 100);
-            const vat       = (cif + arancel) * (vatPct / 100);
+            const cif = precioOrigen + freight + insurance;
+            const arancel = cif * (tariffPct / 100);
+            const vat = (cif + arancel) * (vatPct / 100);
             const totalAPagar = cif + arancel + vat + 45.00; // +opex
 
-            const clientName   = document.getElementById('chat-client-name').textContent;
+            const clientName = document.getElementById('chat-client-name').textContent;
             const totalDisplay = document.getElementById('res-total-pay').textContent;
 
-            const submitBtn    = document.getElementById('btn-submit-quote');
+            const submitBtn = document.getElementById('btn-submit-quote');
             const originalHTML = submitBtn.innerHTML;
-            submitBtn.disabled  = true;
+            submitBtn.disabled = true;
             submitBtn.innerHTML = '<span class="w-3.5 h-3.5 border-2 border-white/40 border-t-white rounded-full animate-spin"></span><span>Procesando...</span>';
 
             try {
@@ -806,9 +1138,9 @@
                     method: 'POST',
                     headers: getAuthHeaders(),
                     body: JSON.stringify({
-                        precio_origen:     parseFloat(precioOrigen.toFixed(2)),
+                        precio_origen: parseFloat(precioOrigen.toFixed(2)),
                         arancel_calculado: parseFloat(arancel.toFixed(2)),
-                        total_a_pagar:     parseFloat(totalAPagar.toFixed(2))
+                        total_a_pagar: parseFloat(totalAPagar.toFixed(2))
                     })
                 });
 
@@ -818,13 +1150,13 @@
                     throw new Error(errData.mensaje || 'HTTP ' + res.status);
                 }
 
-                const data  = await res.json();
+                const data = await res.json();
                 const qrUrl = data.qr_url;
 
                 // 1. Mostrar QR en el panel lateral derecho
                 const qrPanel = document.getElementById('qr-panel');
-                const qrImg   = document.getElementById('qr-image');
-                qrImg.src     = qrUrl;
+                const qrImg = document.getElementById('qr-image');
+                qrImg.src = qrUrl;
                 qrPanel.classList.remove('hidden');
 
                 // 2. Actualizar estado interno y UI
@@ -833,7 +1165,7 @@
                 updateLeadBadge(currentPedidoId, 'esperando_pago');
 
                 // 3. Componer mensaje formal de cotizacion (texto plano, sin emoji para el body)
-                const pedidoNum  = String(currentPedidoId).padStart(4, '0');
+                const pedidoNum = String(currentPedidoId).padStart(4, '0');
                 const mensajeTxt = 'Cotizacion Oficial - Pedido #' + pedidoNum + '\n\n'
                     + 'Estimado/a ' + clientName + ',\n\n'
                     + 'Se ha generado su cotizacion aduanera final:\n'
@@ -867,7 +1199,7 @@
                 console.error('[submitQuote]', err);
                 showToast('Error al cotizar', err.message, 'error');
             } finally {
-                submitBtn.disabled  = false;
+                submitBtn.disabled = false;
                 submitBtn.innerHTML = originalHTML;
             }
         }
@@ -879,8 +1211,8 @@
          */
         function renderQRBubble(qrUrl, totalDisplay, appendTo) {
             const initials = currentUser ? getInitials(currentUser.nombre) : 'AG';
-            const bubble   = document.createElement('div');
-            bubble.className    = 'flex items-start gap-3 max-w-[80%] ml-auto flex-row-reverse';
+            const bubble = document.createElement('div');
+            bubble.className = 'flex items-start gap-3 max-w-[80%] ml-auto flex-row-reverse';
             bubble.dataset.qrBubble = 'true';
             bubble.innerHTML = `
                 <div class="w-8 h-8 rounded-full bg-indigo-600 text-white shadow-md shadow-indigo-600/20 flex items-center justify-center font-bold text-xs flex-shrink-0">
@@ -909,16 +1241,16 @@
             const card = document.getElementById('lead-card-' + pedidoId);
             if (!card) return;
             const badges = card.querySelectorAll('span.rounded-full');
-            const badge  = Array.from(badges).find(el => !el.classList.contains('w-1'));
+            const badge = Array.from(badges).find(el => !el.classList.contains('w-1'));
             if (!badge) return;
 
             const map = {
-                cotizando:      'bg-amber-500/10 text-amber-400 border-amber-500/20',
+                cotizando: 'bg-amber-500/10 text-amber-400 border-amber-500/20',
                 esperando_pago: 'bg-blue-500/10 text-blue-400 border-blue-500/20',
-                finalizado:     'bg-emerald-500/10 text-emerald-400 border-emerald-500/20',
+                finalizado: 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20',
             };
             const labels = { cotizando: 'Cotizando', esperando_pago: 'Esp. Pago', finalizado: 'Finalizado' };
-            badge.className   = 'px-2 py-0.5 text-[9px] rounded-full font-medium border ' + (map[nuevoEstado] || '');
+            badge.className = 'px-2 py-0.5 text-[9px] rounded-full font-medium border ' + (map[nuevoEstado] || '');
             badge.textContent = labels[nuevoEstado] || nuevoEstado;
         }
 
@@ -931,7 +1263,7 @@
             if (!currentPedidoId) return;
 
             const btn = document.getElementById('btn-simular-pago');
-            btn.disabled  = true;
+            btn.disabled = true;
             btn.innerHTML = '<span class="w-3.5 h-3.5 border-2 border-emerald-500/40 border-t-emerald-400 rounded-full animate-spin"></span><span>Procesando pago...</span>';
 
             try {
@@ -980,7 +1312,7 @@
                 console.error('[simularPago]', err);
                 showToast('Error', err.message, 'error');
             } finally {
-                btn.disabled  = false;
+                btn.disabled = false;
                 btn.innerHTML = '<span>Simular Pago Cliente (Dev)</span>';
             }
         }
@@ -990,8 +1322,8 @@
         // ============================================================
         document.addEventListener('DOMContentLoaded', () => {
             // 1. Validar sesión
-            const token       = localStorage.getItem('token');
-            const storedUser  = localStorage.getItem('currentUser');
+            const token = localStorage.getItem('token');
+            const storedUser = localStorage.getItem('currentUser');
 
             if (!token || !storedUser) {
                 window.location.href = 'index.html';
@@ -1062,4 +1394,5 @@
         });
     </script>
 </body>
+
 </html>

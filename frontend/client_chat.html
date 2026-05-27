@@ -1,64 +1,280 @@
 <!DOCTYPE html>
 <html lang="es" class="h-full bg-slate-950 text-slate-100">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>TechStore Imports — Asesoría de Importación</title>
-    <meta name="description" content="Conversa en tiempo real con tu agente asignado y realiza el pago de tus aranceles.">
-    <link rel="icon" type="image/png" href="/logo.png">
-    <!-- Google Fonts: Inter -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <meta name="description"
+        content="Conversa en tiempo real con tu agente asignado y realiza el pago de tus aranceles.">
+    <link rel="icon" type="image/png" href="logo.png">
+    <!-- Google Fonts: Poppins + Space Mono (Comic Style) -->
+    <link
+        href="https://fonts.googleapis.com/css2?family=Poppins:wght@700;800;900&family=Space+Mono:wght@400;700&display=swap"
+        rel="stylesheet">
     <!-- Tailwind CSS v3 CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
             theme: {
                 extend: {
-                    fontFamily: { sans: ['Inter', 'sans-serif'] },
-                    colors: {
-                        brand: {
-                            50: '#eef2ff', 100: '#e0e7ff',
-                            500: '#6366f1', 600: '#4f46e5',
-                            700: '#4338ca', 950: '#090d16',
-                        }
-                    }
+                    fontFamily: { sans: ['Poppins', 'Arial Black', 'sans-serif'] },
                 }
             }
         }
     </script>
     <style>
-        ::-webkit-scrollbar { width: 6px; height: 6px; }
-        ::-webkit-scrollbar-track { background: rgba(15,23,42,0.3); }
-        ::-webkit-scrollbar-thumb { background: rgba(99,102,241,0.2); border-radius: 99px; }
-        ::-webkit-scrollbar-thumb:hover { background: rgba(99,102,241,0.4); }
+        /* ═══ COMIC / NEO-BRUTALIST — client_chat.html ═══ */
+        :root {
+            --ink: #000000;
+            --paper: #FFFBF0;
+            --panel-bg: #FFF9E8;
+            --paper-aged: #F5EFD7;
+            --neon-green: #39FF14;
+            --neon-yellow: #FFE000;
+            --sky-blue: #C8E8FF;
+            --punch-red: #E8001C;
+            --font-comic: 'Poppins', 'Arial Black', sans-serif;
+            --radius: 3px;
+        }
 
+        *,
+        *::before,
+        *::after {
+            box-sizing: border-box;
+        }
+
+        html,
+        body {
+            font-family: var(--font-comic) !important;
+            background: linear-gradient(160deg, #FFE0E9 0%, #E8D5FF 40%, #C8E8FF 100%) fixed !important;
+            color: var(--ink) !important;
+            overflow: hidden;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background-image: radial-gradient(circle, rgba(0, 0, 0, 0.05) 1px, transparent 1px);
+            background-size: 20px 20px;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        header,
+        main,
+        section,
+        aside,
+        footer {
+            position: relative;
+            z-index: 1;
+        }
+
+        ::-webkit-scrollbar {
+            width: 7px;
+            height: 7px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #F5EFD7;
+            border-left: 2px solid #000;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #000;
+        }
+
+        /* ── Header ── */
+        header {
+            background: #FFE000 !important;
+            border-bottom: 3px solid #000 !important;
+            box-shadow: 0 4px 0 0 #000 !important;
+            backdrop-filter: none !important;
+        }
+
+        /* ── Glass card → comic panel ── */
         .glass-card {
-            background: rgba(15, 23, 42, 0.6);
-            backdrop-filter: blur(12px);
-            border: 1px solid rgba(99, 102, 241, 0.12);
+            background: var(--panel-bg) !important;
+            backdrop-filter: none !important;
+            border: 3px solid #000 !important;
+            box-shadow: 4px 4px 0 0 #000 !important;
+            border-radius: 3px !important;
         }
-        
-        .status-badge-cotizando      { background: rgba(245,158,11,0.1); color: #fbbf24; border: 1px solid rgba(245,158,11,0.25); }
-        .status-badge-esperando_pago { background: rgba(59,130,246,0.1); color: #60a5fa; border: 1px solid rgba(59,130,246,0.25); }
-        .status-badge-finalizado     { background: rgba(16,185,129,0.1); color: #34d399; border: 1px solid rgba(16,185,129,0.25); }
-        
+
+        /* ── Status badges ── */
+        .status-badge-cotizando {
+            background: #FFF3CC !important;
+            color: #7A4A00 !important;
+            border: 2px solid #7A4A00 !important;
+            border-radius: 3px !important;
+            box-shadow: 2px 2px 0 0 #7A4A00 !important;
+        }
+
+        .status-badge-esperando_pago {
+            background: #C8E8FF !important;
+            color: #00296B !important;
+            border: 2px solid #00296B !important;
+            border-radius: 3px !important;
+            box-shadow: 2px 2px 0 0 #00296B !important;
+        }
+
+        .status-badge-finalizado {
+            background: #CCFFCC !important;
+            color: #00500A !important;
+            border: 2px solid #00500A !important;
+            border-radius: 3px !important;
+            box-shadow: 2px 2px 0 0 #00500A !important;
+        }
+
+        /* Pulse → comic stepped blink */
         @keyframes pulseBorder {
-            0%, 100% { border-color: rgba(99, 102, 241, 0.2); }
-            50% { border-color: rgba(99, 102, 241, 0.6); }
+
+            0%,
+            100% {
+                border-color: #000;
+            }
+
+            50% {
+                border-color: var(--neon-green);
+            }
         }
+
         .pulse-border {
-            animation: pulseBorder 2s infinite ease-in-out;
+            animation: pulseBorder 1.5s steps(2) infinite;
+        }
+
+        /* ── Inputs & textarea ── */
+        input,
+        select,
+        textarea {
+            background: #FEFAE8 !important;
+            border: 3px solid #000 !important;
+            border-radius: 3px !important;
+            color: #000 !important;
+            font-family: var(--font-comic) !important;
+            font-weight: 700 !important;
+            box-shadow: 3px 3px 0 0 #000 !important;
+            outline: none !important;
+        }
+
+        input:focus,
+        select:focus,
+        textarea:focus {
+            background: #FFFCE0 !important;
+            box-shadow: 4px 4px 0 0 var(--neon-green) !important;
+        }
+
+        input::placeholder,
+        textarea::placeholder {
+            color: #888 !important;
+            font-weight: 400 !important;
+        }
+
+        /* ── Buttons ── */
+        button,
+        [role="button"] {
+            font-family: var(--font-comic) !important;
+            font-weight: 800 !important;
+            text-transform: uppercase !important;
+            letter-spacing: 0.03em !important;
+            transition: box-shadow 0s, transform 0s !important;
+        }
+
+        button[class*="bg-indigo"],
+        button[class*="from-indigo"],
+        a[class*="bg-indigo"] {
+            background: var(--neon-green) !important;
+            color: #000 !important;
+            border: 3px solid #000 !important;
+            border-radius: 3px !important;
+            box-shadow: 4px 4px 0 0 #000 !important;
+        }
+
+        button[class*="bg-indigo"]:hover,
+        button[class*="from-indigo"]:hover {
+            box-shadow: 2px 2px 0 0 #000 !important;
+            transform: translate(2px, 2px) !important;
+        }
+
+        /* Payment / action button variants */
+        button[class*="bg-emerald"],
+        button[class*="bg-green"] {
+            background: var(--neon-green) !important;
+            color: #000 !important;
+            border: 3px solid #000 !important;
+            border-radius: 3px !important;
+            box-shadow: 4px 4px 0 0 #000 !important;
+        }
+
+        /* ── Chat bubble sizing ── */
+        [class*="rounded-"] {
+            border-radius: 3px !important;
+        }
+
+        [class*="shadow"] {
+            box-shadow: 2px 2px 0 0 rgba(0,0,0,0.06) !important;
+        }
+
+        /* ── Typography ── */
+        h1,
+        h2,
+        h3,
+        h4,
+        h5 {
+            font-family: var(--font-comic) !important;
+            font-weight: 900 !important;
+            text-transform: uppercase !important;
+            color: var(--ink) !important;
+        }
+
+        /* ── Animations ── */
+        @keyframes comicPulse {
+
+            0%,
+            100% {
+                opacity: 1;
+            }
+
+            50% {
+                opacity: 0;
+            }
+        }
+
+        .animate-pulse {
+            animation: comicPulse 1s steps(2) infinite !important;
+        }
+
+        @keyframes comicSpin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        .animate-spin {
+            animation: comicSpin 0.6s steps(8) infinite !important;
+        }
+
+        /* Slate/gray backgrounds → comic cream */
+        [class*="bg-slate-9"],
+        [class*="bg-slate-8"] {
+            background: var(--panel-bg) !important;
         }
     </style>
 </head>
-<body class="h-full flex flex-col font-sans overflow-hidden bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-slate-900 via-slate-950 to-brand-950">
+
+<body
+    class="h-full flex flex-col font-sans overflow-hidden bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-slate-900 via-slate-950 to-brand-950">
 
     <!-- ===== HEADER ===== -->
-    <header class="h-[60px] flex items-center justify-between px-6 bg-slate-900/70 backdrop-blur-xl border-b border-slate-800/70 z-10 flex-shrink-0 shadow-sm">
+    <header
+        class="h-[60px] flex items-center justify-between px-6 bg-slate-900/70 backdrop-blur-xl border-b border-slate-800/70 z-10 flex-shrink-0 shadow-sm">
         <div class="flex items-center gap-3">
-            <img src="/logo.png" alt="TechStore" class="h-8 w-auto rounded-lg p-1 bg-indigo-950 border border-indigo-800/50">
+            <img src="logo.png" alt="TechStore"
+                class="h-8 w-auto rounded-lg p-1 bg-indigo-950 border border-indigo-800/50">
             <div class="flex flex-col">
-                <span class="text-[0.8125rem] font-bold tracking-tight text-slate-100 leading-tight">TechStore Imports</span>
+                <span class="text-[0.8125rem] font-bold tracking-tight text-slate-100 leading-tight">TechStore
+                    Imports</span>
                 <span class="text-[0.65rem] text-emerald-400/80 leading-tight">Asesoría de Importación</span>
             </div>
         </div>
@@ -69,21 +285,27 @@
                 <span class="text-[0.75rem] font-semibold text-slate-300" id="client-name-display">Cliente</span>
             </div>
             <div class="flex items-center gap-3">
-                <a href="client_dashboard.html" class="text-[0.75rem] font-medium text-slate-500 hover:text-slate-200 transition-colors">← Mis Solicitudes</a>
-                <button onclick="handleLogout()" class="text-[0.75rem] font-medium text-slate-500 hover:text-red-400 transition-colors">Cerrar Sesión</button>
+                <a href="client_dashboard.html"
+                    class="text-[0.75rem] font-medium text-slate-500 hover:text-slate-200 transition-colors">← Mis
+                    Solicitudes</a>
+                <button onclick="handleLogout()"
+                    class="text-[0.75rem] font-medium text-slate-500 hover:text-red-400 transition-colors">Cerrar
+                    Sesión</button>
             </div>
         </div>
     </header>
 
     <!-- ===== MAIN CONTENT ===== -->
     <main class="flex-1 flex overflow-hidden max-w-[1600px] w-full mx-auto">
-        
+
         <!-- ===== LEFT COLUMN (35%): DETAILS & BILLING ===== -->
-        <section class="w-[35%] min-w-[360px] max-w-[480px] border-r border-slate-800/50 bg-slate-900/15 flex flex-col h-full overflow-y-auto p-5 space-y-5">
-            
+        <section
+            class="w-[35%] min-w-[360px] max-w-[480px] border-r border-slate-800/50 bg-slate-900/15 flex flex-col h-full overflow-y-auto p-5 space-y-5">
+
             <!-- Volver button -->
             <div>
-                <a href="client_dashboard.html" class="inline-flex items-center gap-1.5 text-[0.75rem] text-indigo-400 hover:text-indigo-300 transition-colors font-medium">
+                <a href="client_dashboard.html"
+                    class="inline-flex items-center gap-1.5 text-[0.75rem] text-indigo-400 hover:text-indigo-300 transition-colors font-medium">
                     ← Volver a Mis Solicitudes
                 </a>
             </div>
@@ -92,26 +314,31 @@
             <div class="glass-card rounded-2xl p-5 space-y-4">
                 <div class="flex items-center justify-between border-b border-slate-800/60 pb-3">
                     <div>
-                        <span class="text-[10px] font-bold text-slate-500 tracking-wider uppercase block">SOLICITUD</span>
+                        <span
+                            class="text-[10px] font-bold text-slate-500 tracking-wider uppercase block">SOLICITUD</span>
                         <h2 class="text-base font-bold text-white" id="detail-ticket-id">PED-#0000</h2>
                     </div>
                     <div id="detail-status-badge">
-                        <span class="px-2 py-0.5 text-[10px] rounded-full font-medium border border-slate-700 text-slate-400 bg-slate-850">Cargando...</span>
+                        <span
+                            class="px-2 py-0.5 text-[10px] rounded-full font-medium border border-slate-700 text-slate-400 bg-slate-850">Cargando...</span>
                     </div>
                 </div>
 
                 <div class="space-y-3.5 text-xs">
                     <!-- URL Producto -->
                     <div>
-                        <span class="text-slate-500 font-semibold block text-[10px] uppercase">Producto Solicitado</span>
-                        <a id="detail-product-url" href="#" target="_blank" class="text-indigo-400 hover:underline block truncate mt-0.5 pr-2 font-medium">
+                        <span class="text-slate-500 font-semibold block text-[10px] uppercase">Producto
+                            Solicitado</span>
+                        <a id="detail-product-url" href="#" target="_blank"
+                            class="text-indigo-400 hover:underline block truncate mt-0.5 pr-2 font-medium">
                             Cargando enlace...
                         </a>
                     </div>
 
                     <!-- Agente Asignado -->
                     <div>
-                        <span class="text-slate-500 font-semibold block text-[10px] uppercase">Asesor de Importación</span>
+                        <span class="text-slate-500 font-semibold block text-[10px] uppercase">Asesor de
+                            Importación</span>
                         <p class="text-slate-200 font-bold mt-0.5 flex items-center gap-2" id="detail-agent-name">
                             <span class="w-1.5 h-1.5 rounded-full bg-slate-500"></span> Cargando...
                         </p>
@@ -127,10 +354,11 @@
 
             <!-- Resumen de Costos / Cotización -->
             <div class="glass-card rounded-2xl p-5 space-y-4" id="cost-summary-card">
-                <h3 class="text-xs font-bold text-indigo-400 uppercase tracking-widest border-b border-slate-800/60 pb-2">
+                <h3
+                    class="text-xs font-bold text-indigo-400 uppercase tracking-widest border-b border-slate-800/60 pb-2">
                     Resumen de Costos (USD)
                 </h3>
-                
+
                 <div class="space-y-2.5 text-xs">
                     <div class="flex justify-between">
                         <span class="text-slate-400">Valor FOB del Producto:</span>
@@ -156,11 +384,13 @@
 
         <!-- ===== RIGHT COLUMN (65%): CHAT CONTROLLER ===== -->
         <section class="flex-1 flex flex-col h-full bg-slate-950/10">
-            
+
             <!-- Chat Header -->
-            <div class="h-[60px] border-b border-slate-800/50 flex items-center justify-between px-6 bg-slate-900/10 flex-shrink-0">
+            <div
+                class="h-[60px] border-b border-slate-800/50 flex items-center justify-between px-6 bg-slate-900/10 flex-shrink-0">
                 <div>
-                    <h2 class="text-[0.875rem] font-bold text-slate-100 leading-tight" id="chat-header-title">Chat de Asesoría</h2>
+                    <h2 class="text-[0.875rem] font-bold text-slate-100 leading-tight" id="chat-header-title">Chat de
+                        Asesoría</h2>
                     <p class="text-[0.7rem] text-slate-500 flex items-center gap-1.5 mt-0.5" id="chat-header-subtitle">
                         <span class="w-1.5 h-1.5 rounded-full bg-slate-600"></span>
                         Cargando información del pedido...
@@ -172,7 +402,9 @@
             <div class="flex-1 overflow-y-auto p-5 space-y-4" id="chat-messages-container">
                 <div class="flex justify-center items-center h-full">
                     <div class="flex items-center gap-2 text-[0.8125rem] text-slate-500">
-                        <div class="w-4 h-4 border-2 border-indigo-500/30 border-t-indigo-500 rounded-full animate-spin"></div>
+                        <div
+                            class="w-4 h-4 border-2 border-indigo-500/30 border-t-indigo-500 rounded-full animate-spin">
+                        </div>
                         Cargando chat...
                     </div>
                 </div>
@@ -182,21 +414,22 @@
             <div class="p-4 border-t border-slate-800/50 bg-slate-900/10 flex-shrink-0">
                 <form id="chat-form" onsubmit="sendChatMessage(event)" class="flex gap-2">
                     <input type="text" id="chat-input" placeholder="Escribe tu mensaje aquí..." autocomplete="off"
-                           class="flex-1 bg-slate-950 border border-slate-800/80 text-[0.8125rem] rounded-xl px-4 py-2.5
+                        class="flex-1 bg-slate-950 border border-slate-800/80 text-[0.8125rem] rounded-xl px-4 py-2.5
                                   focus:outline-none focus:border-indigo-500/70 focus:ring-1 focus:ring-indigo-500/15
                                   placeholder-slate-600 text-slate-100 transition-all">
-                    <button type="submit" id="btn-chat-submit"
-                            class="bg-indigo-600 hover:bg-indigo-500 active:bg-indigo-700 text-white rounded-xl px-5 py-2.5
+                    <button type="submit" id="btn-chat-submit" class="bg-indigo-600 hover:bg-indigo-500 active:bg-indigo-700 text-white rounded-xl px-5 py-2.5
                                    transition-all text-[0.8125rem] font-semibold shadow-md shadow-indigo-600/20
                                    flex items-center gap-1.5">
                         <span>Enviar</span>
-                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-3.5 h-3.5">
-                            <path d="M3.105 2.289a.75.75 0 00-.826.95l1.414 4.925A1.5 1.5 0 005.135 9.25h6.115a.75.75 0 010 1.5H5.135a1.5 1.5 0 00-1.442 1.086l-1.414 4.926a.75.75 0 00.826.95 28.896 28.896 0 0015.293-7.154.75.75 0 000-1.115A28.897 28.897 0 003.105 2.289z"/>
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"
+                            class="w-3.5 h-3.5">
+                            <path
+                                d="M3.105 2.289a.75.75 0 00-.826.95l1.414 4.925A1.5 1.5 0 005.135 9.25h6.115a.75.75 0 010 1.5H5.135a1.5 1.5 0 00-1.442 1.086l-1.414 4.926a.75.75 0 00.826.95 28.896 28.896 0 0015.293-7.154.75.75 0 000-1.115A28.897 28.897 0 003.105 2.289z" />
                         </svg>
                     </button>
                 </form>
             </div>
-            
+
         </section>
 
     </main>
@@ -221,18 +454,35 @@
             animation: toast-in 0.3s ease-out forwards;
             max-width: 320px;
         }
-        .toast.success { border-color: rgba(16, 185, 129, 0.3); }
-        .toast.error   { border-color: rgba(239, 68, 68, 0.3); }
-        .toast.warning { border-color: rgba(245, 158, 11, 0.3); }
+
+        .toast.success {
+            border-color: rgba(16, 185, 129, 0.3);
+        }
+
+        .toast.error {
+            border-color: rgba(239, 68, 68, 0.3);
+        }
+
+        .toast.warning {
+            border-color: rgba(245, 158, 11, 0.3);
+        }
+
         @keyframes toast-in {
-            from { transform: translateY(1rem) scale(0.95); opacity: 0; }
-            to   { transform: translateY(0) scale(1); opacity: 1; }
+            from {
+                transform: translateY(1rem) scale(0.95);
+                opacity: 0;
+            }
+
+            to {
+                transform: translateY(0) scale(1);
+                opacity: 1;
+            }
         }
     </style>
 
     <script>
-        const API_URL = '';
-        
+        const API_URL = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' ? `${window.location.protocol}//${window.location.hostname}:3000` : '';
+
         let currentUser = null;
         let currentPedidoId = null;
         let currentPedidoEstado = null;
@@ -255,22 +505,40 @@
         function showToast(title, message, type = 'info') {
             const container = document.getElementById('toast-container');
             const toast = document.createElement('div');
-            toast.className = `toast ${type}`;
-            
-            let icon = 'ℹ️';
-            if (type === 'success') icon = '✅';
-            if (type === 'error') icon = '❌';
-            if (type === 'warning') icon = '⚠️';
+            toast.className = `toast ${type} flex items-start gap-2.5`;
+
+            let iconText = '';
+            const textToCheck = ((title || '') + ' ' + (message || '')).toLowerCase();
+            const isLogro = textToCheck.includes('éxito') || 
+                            textToCheck.includes('exito') || 
+                            textToCheck.includes('correctamente') || 
+                            textToCheck.includes('registrad') || 
+                            textToCheck.includes('enviad') || 
+                            textToCheck.includes('confirmad') || 
+                            textToCheck.includes('bienvenido') || 
+                            textToCheck.includes('creado') || 
+                            textToCheck.includes('actualizado') || 
+                            textToCheck.includes('eliminado');
+            const isCredenciales = textToCheck.includes('credenciales') || textToCheck.includes('incorrect');
+
+            if (!isLogro && !isCredenciales) {
+                if (type === 'success') iconText = 'bien';
+                if (type === 'error') iconText = 'error';
+            }
+
+            const iconBadge = iconText 
+                ? `<span class="px-1.5 py-0.5 text-[9px] font-bold uppercase rounded bg-black/40 text-slate-100 border border-slate-700/50 mt-0.5 flex-shrink-0">${iconText}</span>` 
+                : '';
 
             toast.innerHTML = `
-                <span class="text-base">${icon}</span>
+                ${iconBadge}
                 <div class="flex flex-col gap-0.5">
                     <span class="font-bold text-slate-100">${title}</span>
                     <span class="text-slate-400 text-[10px] leading-snug">${message}</span>
                 </div>
             `;
             container.appendChild(toast);
-            setTimeout(() => { if(toast.parentNode) toast.remove(); }, 4000);
+            setTimeout(() => { if (toast.parentNode) toast.remove(); }, 4000);
         }
 
         // --- TIMING HELPER ---
@@ -280,13 +548,13 @@
             const now = new Date();
             const diffMs = now - date;
             const diffMins = Math.floor(diffMs / 60000);
-            
+
             if (diffMins < 1) return 'Hace un momento';
             if (diffMins < 60) return `Hace ${diffMins} min`;
-            
+
             const diffHours = Math.floor(diffMins / 60);
             if (diffHours < 24) return `Hace ${diffHours} hr`;
-            
+
             return date.toLocaleDateString('es-ES', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' });
         }
 
@@ -335,7 +603,7 @@
                     throw new Error(`HTTP ${res.status}`);
                 }
                 const pedido = await res.json();
-                
+
                 // Seguridad: Validar que el pedido pertenezca a este cliente
                 if (pedido.cliente_id !== currentUser.id && currentUser.rol !== 'admin' && currentUser.rol !== 'agente') {
                     showToast('Acceso Denegado', 'No tienes permiso para ver esta solicitud.', 'error');
@@ -351,21 +619,21 @@
                         'info'
                     );
                 }
-                
+
                 currentPedidoEstado = pedido.estado;
 
                 // Actualizar UI de Ficha
                 document.getElementById('detail-ticket-id').textContent = `PED-#${String(pedido.id).padStart(4, '0')}`;
                 document.getElementById('detail-status-badge').innerHTML = estadoBadgeHTML(pedido.estado);
-                
+
                 const prodLink = document.getElementById('detail-product-url');
                 prodLink.href = pedido.url_producto;
                 prodLink.textContent = pedido.url_producto;
-                
+
                 document.getElementById('detail-agent-name').innerHTML = pedido.agente_nombre
                     ? `<span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span> ${pedido.agente_nombre}`
                     : `<span class="w-1.5 h-1.5 rounded-full bg-slate-500"></span> Esperando asignación...`;
-                
+
                 document.getElementById('detail-date').textContent = new Date(pedido.fecha_creacion).toLocaleString('es-ES');
 
                 // Actualizar Resumen Financiero
@@ -396,7 +664,7 @@
         // ============================================================
         function renderizarPanelPago(pedido) {
             const panel = document.getElementById('payment-panel');
-            
+
             if (pedido.estado === 'cotizando') {
                 panel.className = "glass-card rounded-2xl p-5 border-amber-500/10 bg-amber-500/5 space-y-2.5";
                 panel.classList.remove('hidden');
@@ -415,12 +683,12 @@
             } else if (pedido.estado === 'esperando_pago') {
                 panel.className = "glass-card rounded-2xl p-5 border-indigo-500/20 bg-indigo-950/20 space-y-4 pulse-border";
                 panel.classList.remove('hidden');
-                
+
                 const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=Pago_Pedido_${pedido.id}_Total_${pedido.total_a_pagar}`;
-                
+
                 panel.innerHTML = `
                     <div class="flex items-start gap-2 text-indigo-400 border-b border-slate-800/60 pb-3">
-                        <span class="text-base">⚡</span>
+                        <span class="text-base">pay</span>
                         <div class="flex flex-col gap-0.5">
                             <h4 class="font-bold text-xs">¡Tu Cotización está Lista!</h4>
                             <p class="text-[10px] text-slate-400">Escanea el código QR para realizar tu pago bancario.</p>
@@ -447,7 +715,7 @@
                 panel.classList.remove('hidden');
                 panel.innerHTML = `
                     <div class="flex items-start gap-2.5 text-emerald-400">
-                        <span class="text-base mt-0.5">✅</span>
+                        <span class="text-base mt-0.5">pagado</span>
                         <div class="flex flex-col gap-0.5">
                             <h4 class="font-bold text-xs">Importación Pagada</h4>
                             <p class="text-[10px] text-slate-400 leading-snug">
@@ -471,7 +739,7 @@
         async function simularPago(pedidoId) {
             if (isSimulatingPayment) return;
             const btn = document.getElementById('btn-simular-pago-client');
-            
+
             isSimulatingPayment = true;
             btn.disabled = true;
             btn.innerHTML = `
@@ -492,11 +760,11 @@
                 }
 
                 const data = await res.json();
-                
+
                 // Recargar detalles y chat
                 await cargarDetallesPedido(true);
                 await cargarMensajes(pedidoId);
-                
+
                 showToast('Pago Exitoso', 'El pago fue procesado. Tu pedido está en tránsito.', 'success');
 
             } catch (err) {
@@ -558,7 +826,7 @@
                 if (lastMessageId === 0) {
                     container.innerHTML = `
                         <div class="flex flex-col items-center justify-center h-full text-center">
-                            <span class="text-3xl mb-3">⚠️</span>
+                            <span class="text-3xl mb-3">error</span>
                             <p class="text-xs text-red-400 font-semibold">Error al cargar chat</p>
                             <button onclick="cargarMensajes(${pedidoId})" class="mt-3 text-[10px] text-indigo-400 hover:underline">Reintentar</button>
                         </div>`;
@@ -569,16 +837,16 @@
         function renderMessageBubble(msg, appendTo) {
             const isOwnMessage = (msg.usuario_id === currentUser.id);
             const initials = getInitials(msg.usuario_nombre);
-            
+
             const avatarBg = isOwnMessage
-                ? 'bg-indigo-500/10 text-indigo-400 border border-indigo-500/20'
-                : 'bg-indigo-600 text-white shadow-md shadow-indigo-600/20';
-            
+                ? 'bg-[#FF2D78] text-white border-2 border-black'
+                : 'bg-[#FFE000] text-black border-2 border-black';
+
             const msgBg = isOwnMessage
-                ? 'bg-indigo-600 text-white rounded-tr-none'
-                : 'bg-slate-900/80 border border-slate-800/60 text-slate-200 rounded-tl-none';
-            
-            const align     = isOwnMessage ? 'ml-auto flex-row-reverse' : '';
+                ? 'bg-[#C8E8FF] text-black border-2 border-black rounded-tr-none shadow-sm'
+                : 'bg-[#FFF9E8] text-black border-2 border-black rounded-tl-none shadow-sm';
+
+            const align = isOwnMessage ? 'ml-auto flex-row-reverse' : '';
             const timeAlign = isOwnMessage ? 'text-right' : '';
             const roleLabel = (msg.usuario_rol === 'agente' || msg.usuario_rol === 'admin') ? 'Agente' : 'Tú';
 
@@ -615,7 +883,7 @@
             if (isSending || !currentPedidoId) return;
 
             const input = document.getElementById('chat-input');
-            const text  = input.value.trim();
+            const text = input.value.trim();
             if (!text) return;
 
             const btn = document.getElementById('btn-chat-submit');
@@ -654,7 +922,7 @@
             } finally {
                 isSending = false;
                 btn.disabled = false;
-                btn.innerHTML = '<span>Enviar</span> 🚀';
+                btn.innerHTML = '<span>Enviar</span>';
             }
         }
 
@@ -663,7 +931,7 @@
         // ============================================================
         function startPolling(pedidoId) {
             stopPolling();
-            
+
             // Polling de mensajes cada 3.5 segundos
             pollingIntervalId = setInterval(async () => {
                 if (currentPedidoId && !isSending) {
@@ -704,13 +972,13 @@
 
             try {
                 currentUser = JSON.parse(storedUser);
-                
+
                 // Permitir usuario, agente y admin
                 if (currentUser.rol !== 'usuario' && currentUser.rol !== 'agente' && currentUser.rol !== 'admin') {
                     window.location.href = 'index.html';
                     return;
                 }
-                
+
                 document.getElementById('client-name-display').textContent = currentUser.nombre || 'Cliente';
             } catch (err) {
                 console.error('[init] Error parsing current user:', err);
@@ -721,7 +989,7 @@
             // Obtener el pedidoId de la URL
             const params = new URLSearchParams(window.location.search);
             const pedidoIdStr = params.get('pedidoId');
-            
+
             if (!pedidoIdStr) {
                 showToast('Pedido no especificado', 'Redireccionando al portal...', 'warning');
                 setTimeout(() => { window.location.href = 'client_dashboard.html'; }, 1500);
@@ -753,4 +1021,5 @@
         });
     </script>
 </body>
+
 </html>

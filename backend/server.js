@@ -18,6 +18,9 @@ const ROLES_VALIDOS = ['admin', 'usuario', 'vendedor', 'agente', 'transportista'
 app.use(cors());
 app.use(express.json());
 
+// Servir archivos estáticos del frontend
+app.use(express.static(path.join(__dirname, '../frontend')));
+
 // ==========================================
 // MIDDLEWARE DE AUTENTICACIÓN
 // ==========================================

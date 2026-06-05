@@ -25,8 +25,6 @@
 
     <style>
         /* ═══════════════ COMIC / NEO-BRUTALIST OVERRIDES for index.html ═══════════════ */
-
-        /* Halftone dot pattern on body */
         body::before {
             content: '';
             position: fixed;
@@ -237,9 +235,10 @@
             <!-- PESTAÑAS (solo admin) -->
             <nav id="dashboard-tabs" class="dashboard-tabs" style="display: none;" aria-label="Secciones del panel">
                 <button class="tab-btn active" data-tab="usuarios-tab">Usuarios</button>
-                <button class="tab-btn" data-tab="productos-tab">Inventario</button>
-                <button class="tab-btn" data-tab="clientes-tab">Clientes</button>
-                <button class="tab-btn" data-tab="entregas-tab">Logística</button>
+                <button class="tab-btn" data-tab="productos-tab">📦 Inventario</button>
+                <button class="tab-btn" data-tab="clientes-tab">🤝 CRM Clientes</button>
+                <button class="tab-btn" data-tab="cotizaciones-tab">📋 Cotizaciones</button>
+                <button class="tab-btn" data-tab="calculadora-tab">🧮 Calculadora</button>
             </nav>
 
             <!-- ── USUARIOS ── -->
@@ -319,12 +318,12 @@
                 </div>
             </div>
 
-            <!-- ── CLIENTES ── -->
+            <!-- ── CLIENTES CRM ── -->
             <div id="clientes-tab" class="tab-content space-y-4">
                 <div class="dashboard-topbar flex justify-between items-center">
                     <div>
-                        <h1 class="text-xl font-bold text-white">Cartera de Clientes</h1>
-                        <p class="text-sm text-slate-400">Visualiza y administra la cartera de clientes de la agencia.
+                        <h1 class="text-xl font-bold text-white">CRM — Cartera de Clientes</h1>
+                        <p class="text-sm text-slate-400">Gestiona el estado de atención y seguimiento de cada cliente.
                         </p>
                     </div>
                     <button id="btn-create-client" class="btn btn-primary btn-sm px-4 py-2 text-xs font-semibold">+
@@ -339,8 +338,9 @@
                                     <th>Nombre</th>
                                     <th>Correo</th>
                                     <th>Teléfono</th>
-                                    <th>Dirección</th>
-                                    <th>Fecha Registro</th>
+                                    <th>Estado</th>
+                                    <th>Cotiz. Activas</th>
+                                    <th>Cotiz. Pagadas</th>
                                     <th>Acciones</th>
                                 </tr>
                             </thead>
@@ -358,41 +358,105 @@
                 </div>
             </div>
 
-            <!-- ── ENTREGAS ── -->
-            <div id="entregas-tab" class="tab-content space-y-4">
+            <!-- ── COTIZACIONES ── -->
+            <div id="cotizaciones-tab" class="tab-content space-y-4">
                 <div class="dashboard-topbar flex justify-between items-center">
                     <div>
-                        <h1 class="text-xl font-bold text-white">Logística y Entregas</h1>
-                        <p class="text-sm text-slate-400">Monitorea y actualiza el estado de los envíos a tus clientes.
-                        </p>
+                        <h1 class="text-xl font-bold text-white">Cotizaciones</h1>
+                        <p class="text-sm text-slate-400">Seguimiento de cotizaciones activas y pagadas por cliente.</p>
                     </div>
-                    <button id="btn-create-entrega" class="btn btn-primary btn-sm px-4 py-2 text-xs font-semibold">+
-                        Nueva Entrega</button>
+                    <button id="btn-create-cotizacion" class="btn btn-primary btn-sm px-4 py-2 text-xs font-semibold">+
+                        Nueva Cotización</button>
                 </div>
                 <div class="card table-card overflow-hidden">
                     <div class="table-responsive">
-                        <table id="entregas-table" class="min-w-full">
+                        <table id="cotizaciones-table" class="min-w-full">
                             <thead>
                                 <tr>
                                     <th>ID</th>
                                     <th>Cliente</th>
-                                    <th>Producto</th>
-                                    <th>Cantidad</th>
+                                    <th>URL Producto</th>
+                                    <th>Valor CIF</th>
+                                    <th>Total Aduana</th>
+                                    <th>Estado</th>
+                                    <th>Estado Logístico</th>
                                     <th>Fecha</th>
-                                    <th>Estado de Entrega</th>
                                     <th>Acciones</th>
                                 </tr>
                             </thead>
-                            <tbody id="entregas-tbody"></tbody>
+                            <tbody id="cotizaciones-tbody"></tbody>
                         </table>
                     </div>
-                    <div id="entregas-loading" class="table-message flex justify-center items-center gap-2">
+                    <div id="cotizaciones-loading" class="table-message flex justify-center items-center gap-2">
                         <div
                             class="w-4 h-4 border-2 border-indigo-500/30 border-t-indigo-500 rounded-full animate-spin">
                         </div>
-                        Cargando logística...
+                        Cargando cotizaciones...
                     </div>
-                    <div id="entregas-empty" class="table-message" style="display: none;">No hay entregas para mostrar.
+                    <div id="cotizaciones-empty" class="table-message" style="display: none;">No hay cotizaciones para
+                        mostrar.
+                    </div>
+                </div>
+            </div>
+
+            <!-- ── CALCULADORA ── -->
+            <div id="calculadora-tab" class="tab-content space-y-4">
+                <div class="dashboard-topbar">
+                    <h1 class="text-xl font-bold text-white">Calculadora de Importaciones</h1>
+                    <p class="text-sm text-slate-400">Calcula de manera exacta los costos de importación y aranceles
+                        para Bolivia.</p>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <!-- Tarjeta del Formulario -->
+                    <div class="card p-6">
+                        <form id="calculadora-form" class="space-y-4">
+                            <div class="input-group">
+                                <label for="calc-url-producto">Enlace del producto (URL)</label>
+                                <input type="text" id="calc-url-producto" required
+                                    placeholder="Ingrese la URL del producto (ej: https://tienda.com/item)">
+                            </div>
+                            <div class="input-group">
+                                <label for="calc-precio-fob">Precio FOB (USD)</label>
+                                <input type="number" id="calc-precio-fob" step="0.01" min="0"
+                                    placeholder="Ej. 150.00 (Opcional)">
+                            </div>
+                            <div class="input-group">
+                                <label for="calc-costo-envio">Costo de Envío (USD)</label>
+                                <input type="number" id="calc-costo-envio" step="0.01" min="0" disabled
+                                    placeholder="Ej. 25.00 (Deshabilitado por defecto)">
+                            </div>
+                            <button type="submit" class="btn btn-primary btn-block py-3">Calcular Costos</button>
+                        </form>
+                    </div>
+
+                    <!-- Tarjeta de Resultados (Read-only) -->
+                    <div class="card p-6 flex flex-col justify-between">
+                        <div>
+                            <h2 class="text-lg font-bold mb-4" style="text-transform: uppercase;">Resultados</h2>
+                            <div id="calc-resultados-container" class="space-y-4">
+                                <div class="input-group">
+                                    <label>Valor CIF (USD)</label>
+                                    <input type="text" id="calc-res-cif" readonly placeholder="Esperando cálculo..."
+                                        style="background: #F0EDE0; cursor: not-allowed;">
+                                </div>
+                                <div class="input-group">
+                                    <label>IVA (14.94% efectivo) (USD)</label>
+                                    <input type="text" id="calc-res-iva" readonly placeholder="Esperando cálculo..."
+                                        style="background: #F0EDE0; cursor: not-allowed;">
+                                </div>
+                                <div class="input-group">
+                                    <label>Costo Total a Pagar (USD)</label>
+                                    <input type="text" id="calc-res-total" readonly placeholder="Esperando cálculo..."
+                                        style="background: #F0EDE0; cursor: not-allowed; font-weight: 900; border-color: var(--ink);">
+                                </div>
+                            </div>
+                            <!-- Para mensajes de revisión o errores -->
+                            <div id="calc-mensaje-container" class="mt-4 p-4 rounded border-2 border-black"
+                                style="display: none; background: var(--sky-blue); font-weight: 700;">
+                                <p id="calc-mensaje-texto" class="text-sm"></p>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -493,7 +557,7 @@
     </div>
 
     <!-- ════════════════════════════════════════════════
-         MODAL: CLIENTE
+         MODAL: CLIENTE (CRM)
     ════════════════════════════════════════════════ -->
     <div id="client-modal" class="modal-overlay">
         <div class="modal-card">
@@ -515,11 +579,18 @@
                     </div>
                     <div class="input-group">
                         <label for="client-phone">Teléfono</label>
-                        <input type="text" id="client-phone" placeholder="Ej. +56 9 8765 4321">
+                        <input type="text" id="client-phone" placeholder="Ej. +591 7 123 4567">
                     </div>
                     <div class="input-group">
-                        <label for="client-address">Dirección de Despacho</label>
-                        <input type="text" id="client-address" placeholder="Ej. Av. Providencia 1234, Of. 501">
+                        <label for="client-address">Dirección</label>
+                        <input type="text" id="client-address" placeholder="Ej. Av. Arce 2345, La Paz">
+                    </div>
+                    <div class="input-group">
+                        <label for="client-estado">Estado de Atención</label>
+                        <select id="client-estado">
+                            <option value="en_atencion">🟡 En Atención</option>
+                            <option value="atendido">🟢 Atendido</option>
+                        </select>
                     </div>
                     <div class="modal-footer flex justify-end gap-3 pt-4">
                         <button type="button" id="btn-cancel-client-modal"
@@ -532,46 +603,47 @@
     </div>
 
     <!-- ════════════════════════════════════════════════
-         MODAL: ENTREGA
+         MODAL: COTIZACIÓN
     ════════════════════════════════════════════════ -->
-    <div id="entrega-modal" class="modal-overlay">
+    <div id="cotizacion-modal" class="modal-overlay">
         <div class="modal-card">
             <div class="modal-header">
-                <h3 id="entrega-modal-title">Nueva Entrega Logística</h3>
-                <button id="btn-close-entrega-modal"
+                <h3 id="cotizacion-modal-title">Nueva Cotización</h3>
+                <button id="btn-close-cotizacion-modal"
                     class="text-2xl font-semibold text-slate-400 hover:text-white transition-colors cursor-pointer">&times;</button>
             </div>
             <div class="modal-body">
-                <form id="entrega-form" class="space-y-4">
-                    <input type="hidden" id="entrega-id">
+                <form id="cotizacion-form" class="space-y-4">
+                    <input type="hidden" id="cotizacion-id">
                     <div class="input-group">
-                        <label for="entrega-client">Seleccionar Cliente</label>
-                        <select id="entrega-client" required>
-                            <option value="">— Cargar Clientes —</option>
+                        <label for="cotizacion-client">Cliente</label>
+                        <select id="cotizacion-client" required>
+                            <option value="">— Seleccionar Cliente —</option>
                         </select>
                     </div>
                     <div class="input-group">
-                        <label for="entrega-product">Seleccionar Producto</label>
-                        <select id="entrega-product" required>
-                            <option value="">— Cargar Productos —</option>
-                        </select>
+                        <label for="cotizacion-url">URL del Producto</label>
+                        <input type="text" id="cotizacion-url" required placeholder="Ej. https://amazon.com/producto">
                     </div>
                     <div class="input-group">
-                        <label for="entrega-qty">Cantidad</label>
-                        <input type="number" id="entrega-qty" required min="1" value="1">
+                        <label for="cotizacion-cif">Valor CIF (USD)</label>
+                        <input type="number" id="cotizacion-cif" step="0.01" min="0" placeholder="Ej. 200.00">
                     </div>
                     <div class="input-group">
-                        <label for="entrega-status">Estado de Entrega</label>
-                        <select id="entrega-status" required>
-                            <option value="pendiente">Pendiente</option>
-                            <option value="en_camino">En Camino</option>
-                            <option value="entregado">Entregado</option>
+                        <label for="cotizacion-total">Costo Total Aduana (USD)</label>
+                        <input type="number" id="cotizacion-total" step="0.01" min="0" placeholder="Ej. 230.00">
+                    </div>
+                    <div class="input-group">
+                        <label for="cotizacion-estado">Estado</label>
+                        <select id="cotizacion-estado">
+                            <option value="activa">🟡 Activa</option>
+                            <option value="pagada">🟢 Pagada</option>
                         </select>
                     </div>
                     <div class="modal-footer flex justify-end gap-3 pt-4">
-                        <button type="button" id="btn-cancel-entrega-modal"
+                        <button type="button" id="btn-cancel-cotizacion-modal"
                             class="btn btn-outline px-4 py-2">Cancelar</button>
-                        <button type="submit" class="btn btn-primary px-4 py-2">Guardar Registro</button>
+                        <button type="submit" class="btn btn-primary px-4 py-2">Guardar Cotización</button>
                     </div>
                 </form>
             </div>

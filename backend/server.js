@@ -268,10 +268,20 @@ app.delete('/productos/:id', verificarToken, soloAdmin, async (req, res) => {
 // RUTAS CRUD DE CLIENTES (FASE 1)
 // ==========================================
 
-// GET /clientes - Listar clientes (protegido: todos los usuarios autenticados)
+// GET /clientes - Listar clientes con conteo de cotizaciones (CRM)
 app.get('/clientes', verificarToken, async (req, res) => {
     try {
-        const [clientes] = await db.query('SELECT * FROM clientes');
+        const [clientes] = await db.query(`
+            SELECT
+                c.id, c.nombre, c.email, c.telefono, c.direccion,
+                c.estado, c.fecha_creacion,
+                COUNT(CASE WHEN cot.estado = 'activa' THEN 1 END)  AS cotizaciones_activas,
+                COUNT(CASE WHEN cot.estado = 'pagada' THEN 1 END)  AS cotizaciones_pagadas
+            FROM clientes c
+            LEFT JOIN cotizaciones cot ON cot.cliente_id = c.id
+            GROUP BY c.id
+            ORDER BY c.fecha_creacion DESC
+        `);
         res.json(clientes);
     } catch (error) {
         console.error(error);
@@ -281,18 +291,20 @@ app.get('/clientes', verificarToken, async (req, res) => {
 
 // POST /clientes - Crear un cliente (protegido: solo admin)
 app.post('/clientes', verificarToken, soloAdmin, async (req, res) => {
-    const { nombre, email, telefono, direccion } = req.body;
+    const { nombre, email, telefono, direccion, estado } = req.body;
     if (!nombre || !email) {
         return res.status(400).json({ mensaje: 'Nombre y email son obligatorios' });
     }
+    const estadosValidos = ['en_atencion', 'atendido'];
+    const estadoFinal = estadosValidos.includes(estado) ? estado : 'en_atencion';
     try {
         const [existentes] = await db.query('SELECT id FROM clientes WHERE email = ?', [email]);
         if (existentes.length > 0) {
             return res.status(400).json({ mensaje: 'El email ya está registrado para otro cliente' });
         }
         const [resultado] = await db.query(
-            'INSERT INTO clientes (nombre, email, telefono, direccion) VALUES (?, ?, ?, ?)',
-            [nombre, email, telefono || '', direccion || '']
+            'INSERT INTO clientes (nombre, email, telefono, direccion, estado) VALUES (?, ?, ?, ?, ?)',
+            [nombre, email, telefono || '', direccion || '', estadoFinal]
         );
         res.status(201).json({ mensaje: 'Cliente creado exitosamente', clienteId: resultado.insertId });
     } catch (error) {
@@ -301,21 +313,23 @@ app.post('/clientes', verificarToken, soloAdmin, async (req, res) => {
     }
 });
 
-// PUT /clientes/:id - Actualizar un cliente (protegido: solo admin)
+// PUT /clientes/:id - Actualizar un cliente incluyendo estado (protegido: solo admin)
 app.put('/clientes/:id', verificarToken, soloAdmin, async (req, res) => {
     const { id } = req.params;
-    const { nombre, email, telefono, direccion } = req.body;
+    const { nombre, email, telefono, direccion, estado } = req.body;
     if (!nombre || !email) {
         return res.status(400).json({ mensaje: 'Nombre y email son obligatorios' });
     }
+    const estadosValidos = ['en_atencion', 'atendido'];
+    const estadoFinal = estadosValidos.includes(estado) ? estado : 'en_atencion';
     try {
         const [existentes] = await db.query('SELECT id FROM clientes WHERE email = ? AND id != ?', [email, id]);
         if (existentes.length > 0) {
             return res.status(400).json({ mensaje: 'El email ya está registrado para otro cliente' });
         }
         const [resultado] = await db.query(
-            'UPDATE clientes SET nombre = ?, email = ?, telefono = ?, direccion = ? WHERE id = ?',
-            [nombre, email, telefono || '', direccion || '', id]
+            'UPDATE clientes SET nombre = ?, email = ?, telefono = ?, direccion = ?, estado = ? WHERE id = ?',
+            [nombre, email, telefono || '', direccion || '', estadoFinal, id]
         );
         if (resultado.affectedRows === 0) return res.status(404).json({ mensaje: 'Cliente no encontrado' });
         res.json({ mensaje: 'Cliente actualizado correctamente' });
@@ -339,76 +353,172 @@ app.delete('/clientes/:id', verificarToken, soloAdmin, async (req, res) => {
 });
 
 // ==========================================
-// RUTAS CRUD DE ENTREGAS / LOGÍSTICA (FASE 1)
+// RUTAS CRUD DE COTIZACIONES (CRM)
 // ==========================================
 
-// GET /entregas - Listar entregas con JOIN (protegido: todos los usuarios autenticados)
-app.get('/entregas', verificarToken, async (req, res) => {
+// GET /cotizaciones - Listar todas las cotizaciones con datos del cliente (admin)
+app.get('/cotizaciones', verificarToken, soloAdmin, async (req, res) => {
     try {
-        const [entregas] = await db.query(`
-            SELECT e.id, e.cliente_id, e.producto_id, e.cantidad, e.estado_entrega, e.fecha,
-                   c.nombre AS cliente_nombre, c.email AS cliente_email,
-                   p.nombre AS producto_nombre, p.precio AS producto_precio
-            FROM entregas e
-            JOIN clientes c ON e.cliente_id = c.id
-            JOIN productos p ON e.producto_id = p.id
-            ORDER BY e.fecha DESC
+        const [cotizaciones] = await db.query(`
+            SELECT cot.id, cot.cliente_id, cot.url_producto, cot.valor_cif,
+                   cot.costo_total_aduana, cot.estado, cot.estado_logistico, cot.fecha_creacion,
+                   c.nombre AS cliente_nombre, c.email AS cliente_email
+            FROM cotizaciones cot
+            JOIN clientes c ON cot.cliente_id = c.id
+            ORDER BY cot.fecha_creacion DESC
         `);
-        res.json(entregas);
+        res.json(cotizaciones);
     } catch (error) {
         console.error(error);
-        res.status(500).json({ mensaje: 'Error al obtener las entregas' });
+        res.status(500).json({ mensaje: 'Error al obtener las cotizaciones' });
     }
 });
 
-// POST /entregas - Crear una entrega (protegido: solo admin)
-app.post('/entregas', verificarToken, soloAdmin, async (req, res) => {
-    const { cliente_id, producto_id, cantidad, estado_entrega } = req.body;
-    if (!cliente_id || !producto_id || !cantidad) {
-        return res.status(400).json({ mensaje: 'Cliente, producto y cantidad son obligatorios' });
+/**
+ * GET /todas-cotizaciones
+ * Lista todas las cotizaciones. Acceso: admin y agente.
+ */
+app.get('/todas-cotizaciones', verificarToken, async (req, res) => {
+    const rolesPermitidos = ['admin', 'agente'];
+    if (!rolesPermitidos.includes(req.usuarioRol)) {
+        return res.status(403).json({ mensaje: 'Acceso denegado' });
+    }
+    try {
+        const [cotizaciones] = await db.query(`
+            SELECT cot.id, cot.cliente_id, cot.url_producto, cot.valor_cif,
+                   cot.costo_total_aduana, cot.estado, cot.estado_logistico, cot.fecha_creacion,
+                   c.nombre AS cliente_nombre, c.email AS cliente_email
+            FROM cotizaciones cot
+            JOIN clientes c ON cot.cliente_id = c.id
+            ORDER BY cot.fecha_creacion DESC
+        `);
+        res.json(cotizaciones);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ mensaje: 'Error al obtener las cotizaciones' });
+    }
+});
+
+/**
+ * GET /mis-cotizaciones
+ * Devuelve las cotizaciones del cliente autenticado, identificado por su email.
+ * Acceso: cualquier usuario autenticado.
+ */
+app.get('/mis-cotizaciones', verificarToken, async (req, res) => {
+    try {
+        // El usuario autenticado es un cliente registrado en la tabla clientes por email
+        const [usuarios] = await db.query('SELECT email FROM usuarios WHERE id = ?', [req.usuarioId]);
+        if (!usuarios.length) return res.status(404).json({ mensaje: 'Usuario no encontrado' });
+        const email = usuarios[0].email;
+
+        const [cotizaciones] = await db.query(`
+            SELECT cot.id, cot.url_producto, cot.valor_cif,
+                   cot.costo_total_aduana, cot.estado, cot.estado_logistico, cot.fecha_creacion,
+                   c.nombre AS cliente_nombre
+            FROM cotizaciones cot
+            JOIN clientes c ON cot.cliente_id = c.id
+            WHERE c.email = ?
+            ORDER BY cot.fecha_creacion DESC
+        `, [email]);
+        res.json(cotizaciones);
+    } catch (error) {
+        console.error('[GET /mis-cotizaciones]', error);
+        res.status(500).json({ mensaje: 'Error al obtener tus cotizaciones' });
+    }
+});
+
+// GET /cotizaciones/cliente/:id - Cotizaciones de un cliente específico
+app.get('/cotizaciones/cliente/:id', verificarToken, soloAdmin, async (req, res) => {
+    const { id } = req.params;
+    try {
+        const [cotizaciones] = await db.query(
+            'SELECT * FROM cotizaciones WHERE cliente_id = ? ORDER BY fecha_creacion DESC',
+            [id]
+        );
+        res.json(cotizaciones);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ mensaje: 'Error al obtener las cotizaciones del cliente' });
+    }
+});
+
+// POST /cotizaciones - Crear una cotización (protegido: solo admin)
+app.post('/cotizaciones', verificarToken, soloAdmin, async (req, res) => {
+    const { cliente_id, url_producto, valor_cif, costo_total_aduana, estado } = req.body;
+    if (!cliente_id || !url_producto) {
+        return res.status(400).json({ mensaje: 'El cliente y la URL del producto son obligatorios' });
+    }
+    const estadosValidos = ['activa', 'pagada'];
+    const estadoFinal = estadosValidos.includes(estado) ? estado : 'activa';
+    try {
+        const [resultado] = await db.query(
+            'INSERT INTO cotizaciones (cliente_id, url_producto, valor_cif, costo_total_aduana, estado) VALUES (?, ?, ?, ?, ?)',
+            [cliente_id, url_producto, valor_cif || null, costo_total_aduana || null, estadoFinal]
+        );
+        res.status(201).json({ mensaje: 'Cotización creada exitosamente', cotizacionId: resultado.insertId });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ mensaje: 'Error al crear la cotización' });
+    }
+});
+
+// PUT /cotizaciones/:id - Actualizar estado de una cotización (protegido: solo admin)
+app.put('/cotizaciones/:id', verificarToken, soloAdmin, async (req, res) => {
+    const { id } = req.params;
+    const { estado } = req.body;
+    const estadosValidos = ['activa', 'pagada'];
+    if (!estadosValidos.includes(estado)) {
+        return res.status(400).json({ mensaje: `Estado inválido. Use: ${estadosValidos.join(', ')}` });
+    }
+    try {
+        const [resultado] = await db.query('UPDATE cotizaciones SET estado = ? WHERE id = ?', [estado, id]);
+        if (resultado.affectedRows === 0) return res.status(404).json({ mensaje: 'Cotización no encontrada' });
+        res.json({ mensaje: 'Cotización actualizada correctamente' });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ mensaje: 'Error al actualizar la cotización' });
+    }
+});
+
+/**
+ * PUT /cotizaciones/:id/estado-logistico
+ * Actualiza el estado logístico de una cotización.
+ * Acceso: admin y agente.
+ */
+app.put('/cotizaciones/:id/estado-logistico', verificarToken, async (req, res) => {
+    const rolesPermitidos = ['admin', 'agente'];
+    if (!rolesPermitidos.includes(req.usuarioRol)) {
+        return res.status(403).json({ mensaje: 'Acceso denegado: se requiere rol admin o agente' });
+    }
+    const { id } = req.params;
+    const { estado_logistico } = req.body;
+    const estadosValidos = ['pendiente', 'comprado', 'en_camino', 'en_aduana', 'listo_para_recoger'];
+    if (!estadosValidos.includes(estado_logistico)) {
+        return res.status(400).json({ mensaje: `Estado logístico inválido. Use: ${estadosValidos.join(', ')}` });
     }
     try {
         const [resultado] = await db.query(
-            'INSERT INTO entregas (cliente_id, producto_id, cantidad, estado_entrega) VALUES (?, ?, ?, ?)',
-            [cliente_id, producto_id, cantidad, estado_entrega || 'pendiente']
+            'UPDATE cotizaciones SET estado_logistico = ? WHERE id = ?',
+            [estado_logistico, id]
         );
-        res.status(201).json({ mensaje: 'Entrega creada exitosamente', entregaId: resultado.insertId });
+        if (resultado.affectedRows === 0) return res.status(404).json({ mensaje: 'Cotización no encontrada' });
+        res.json({ mensaje: 'Estado logístico actualizado correctamente', estado_logistico });
     } catch (error) {
-        console.error(error);
-        res.status(500).json({ mensaje: 'Error al crear la entrega' });
+        console.error('[PUT /cotizaciones/:id/estado-logistico]', error);
+        res.status(500).json({ mensaje: 'Error al actualizar el estado logístico' });
     }
 });
 
-// PUT /entregas/:id - Actualizar una entrega (protegido: solo admin)
-app.put('/entregas/:id', verificarToken, soloAdmin, async (req, res) => {
-    const { id } = req.params;
-    const { cliente_id, producto_id, cantidad, estado_entrega } = req.body;
-    if (!cliente_id || !producto_id || !cantidad || !estado_entrega) {
-        return res.status(400).json({ mensaje: 'Todos los campos son obligatorios' });
-    }
-    try {
-        const [resultado] = await db.query(
-            'UPDATE entregas SET cliente_id = ?, producto_id = ?, cantidad = ?, estado_entrega = ? WHERE id = ?',
-            [cliente_id, producto_id, cantidad, estado_entrega, id]
-        );
-        if (resultado.affectedRows === 0) return res.status(404).json({ mensaje: 'Entrega no encontrada' });
-        res.json({ mensaje: 'Entrega actualizada correctamente' });
-    } catch (error) {
-        console.error(error);
-        res.status(500).json({ mensaje: 'Error al actualizar la entrega' });
-    }
-});
-
-// DELETE /entregas/:id - Eliminar una entrega (protegido: solo admin)
-app.delete('/entregas/:id', verificarToken, soloAdmin, async (req, res) => {
+// DELETE /cotizaciones/:id - Eliminar una cotización (protegido: solo admin)
+app.delete('/cotizaciones/:id', verificarToken, soloAdmin, async (req, res) => {
     const { id } = req.params;
     try {
-        const [resultado] = await db.query('DELETE FROM entregas WHERE id = ?', [id]);
-        if (resultado.affectedRows === 0) return res.status(404).json({ mensaje: 'Entrega no encontrada' });
-        res.json({ mensaje: 'Entrega eliminada correctamente' });
+        const [resultado] = await db.query('DELETE FROM cotizaciones WHERE id = ?', [id]);
+        if (resultado.affectedRows === 0) return res.status(404).json({ mensaje: 'Cotización no encontrada' });
+        res.json({ mensaje: 'Cotización eliminada correctamente' });
     } catch (error) {
         console.error(error);
-        res.status(500).json({ mensaje: 'Error al eliminar la entrega' });
+        res.status(500).json({ mensaje: 'Error al eliminar la cotización' });
     }
 });
 
@@ -759,7 +869,7 @@ app.post('/api/pedidos/:id/simular-pago', verificarToken, async (req, res) => {
         );
 
         // 2. Insertar mensaje automático del sistema
-        const mensajeAutomatico = `✅ Pago confirmado exitosamente. Factura N°${facturaNum} emitida. Iniciando proceso logístico.`;
+        const mensajeAutomatico = ` Pago confirmado exitosamente. Factura N°${facturaNum} emitida. Iniciando proceso logístico.`;
         const [insertResult] = await db.query(
             'INSERT INTO mensajes_chat (pedido_id, usuario_id, contenido_mensaje) VALUES (?, ?, ?)',
             [id, emisorId, mensajeAutomatico]
@@ -789,7 +899,41 @@ app.post('/api/pedidos/:id/simular-pago', verificarToken, async (req, res) => {
     }
 });
 
+
+
+// 30. POST /calcular-importacion - Calculadora de Importaciones para Bolivia (protegido: todos los roles)
+app.post('/calcular-importacion', verificarToken, async (req, res) => {
+    const { url_producto, precio_fob, costo_envio } = req.body;
+
+    if (!url_producto || typeof url_producto !== 'string' || url_producto.trim() === '') {
+        return res.status(400).json({ mensaje: 'El enlace del producto (url_producto) es obligatorio.' });
+    }
+
+    const fPrecioFob = (precio_fob !== undefined && precio_fob !== null && precio_fob !== '') ? Number(precio_fob) : NaN;
+    const tienePrecio = !isNaN(fPrecioFob) && fPrecioFob > 0;
+
+    if (tienePrecio) {
+        const fCostoEnvio = (costo_envio !== undefined && costo_envio !== null && costo_envio !== '') ? Number(costo_envio) : NaN;
+        if (isNaN(fCostoEnvio) || fCostoEnvio < 0) {
+            return res.status(400).json({ mensaje: 'El costo de envío es obligatorio y debe ser mayor o igual a 0.' });
+        }
+
+        const valor_cif = parseFloat((fPrecioFob + fCostoEnvio).toFixed(2));
+        const iva_importacion = parseFloat((valor_cif * (13 / 87)).toFixed(2));
+        const costo_total_aduana = parseFloat((valor_cif + iva_importacion).toFixed(2));
+
+        return res.json({
+            valor_cif,
+            iva_importacion,
+            costo_total_aduana
+        });
+    } else {
+        return res.json({ mensaje: 'Cotización pendiente de revisión mediante el enlace.' });
+    }
+});
+
 // Iniciar servidor
 app.listen(PORT, () => {
     console.log(`Servidor backend corriendo en http://localhost:${PORT}`);
 });
+

@@ -1,4 +1,6 @@
-const API_URL = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' ? `${window.location.protocol}//${window.location.hostname}:3000` : '';
+const API_URL = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' 
+    ? 'http://localhost:3000' 
+    : 'https://TU_URL_DE_RENDER.onrender.com'; // Nota para mí: cambiar esta URL después
 
 // Elementos del DOM - Autenticación y Layout
 const sections = {
@@ -47,18 +49,28 @@ const btnCloseClientModal = document.getElementById('btn-close-client-modal');
 const btnCancelClientModal = document.getElementById('btn-cancel-client-modal');
 const btnCreateClient = document.getElementById('btn-create-client');
 
-// Elementos del DOM - Gestión de Logística / Entregas
-const entregasTableBody = document.getElementById('entregas-tbody');
-const entregasLoading = document.getElementById('entregas-loading');
-const entregasEmpty = document.getElementById('entregas-empty');
-const entregaModal = document.getElementById('entrega-modal');
-const entregaModalTitle = document.getElementById('entrega-modal-title');
-const entregaForm = document.getElementById('entrega-form');
-const btnCloseEntregaModal = document.getElementById('btn-close-entrega-modal');
-const btnCancelEntregaModal = document.getElementById('btn-cancel-entrega-modal');
-const btnCreateEntrega = document.getElementById('btn-create-entrega');
-const entregaClientSelect = document.getElementById('entrega-client');
-const entregaProductSelect = document.getElementById('entrega-product');
+// Elementos del DOM - Gestión de Cotizaciones (CRM)
+const cotizacionesTableBody = document.getElementById('cotizaciones-tbody');
+const cotizacionesLoading = document.getElementById('cotizaciones-loading');
+const cotizacionesEmpty = document.getElementById('cotizaciones-empty');
+const cotizacionModal = document.getElementById('cotizacion-modal');
+const cotizacionModalTitle = document.getElementById('cotizacion-modal-title');
+const cotizacionForm = document.getElementById('cotizacion-form');
+const btnCloseCotizacionModal = document.getElementById('btn-close-cotizacion-modal');
+const btnCancelCotizacionModal = document.getElementById('btn-cancel-cotizacion-modal');
+const btnCreateCotizacion = document.getElementById('btn-create-cotizacion');
+const cotizacionClientSelect = document.getElementById('cotizacion-client');
+
+// Elementos del DOM - Calculadora de Importaciones
+const calculadoraForm = document.getElementById('calculadora-form');
+const calcUrlProducto = document.getElementById('calc-url-producto');
+const calcPrecioFob = document.getElementById('calc-precio-fob');
+const calcCostoEnvio = document.getElementById('calc-costo-envio');
+const calcResCif = document.getElementById('calc-res-cif');
+const calcResIva = document.getElementById('calc-res-iva');
+const calcResTotal = document.getElementById('calc-res-total');
+const calcMensajeContainer = document.getElementById('calc-mensaje-container');
+const calcMensajeTexto = document.getElementById('calc-mensaje-texto');
 
 // Estado
 let currentUser = null;
@@ -82,16 +94,16 @@ function showToast(message, type = 'info') {
 
     let iconText = '';
     const textToCheck = (message || '').toLowerCase();
-    const isLogro = textToCheck.includes('éxito') || 
-                    textToCheck.includes('exito') || 
-                    textToCheck.includes('correctamente') || 
-                    textToCheck.includes('registrad') || 
-                    textToCheck.includes('enviad') || 
-                    textToCheck.includes('confirmad') || 
-                    textToCheck.includes('bienvenido') || 
-                    textToCheck.includes('creado') || 
-                    textToCheck.includes('actualizado') || 
-                    textToCheck.includes('eliminado');
+    const isLogro = textToCheck.includes('éxito') ||
+        textToCheck.includes('exito') ||
+        textToCheck.includes('correctamente') ||
+        textToCheck.includes('registrad') ||
+        textToCheck.includes('enviad') ||
+        textToCheck.includes('confirmad') ||
+        textToCheck.includes('bienvenido') ||
+        textToCheck.includes('creado') ||
+        textToCheck.includes('actualizado') ||
+        textToCheck.includes('eliminado');
     const isCredenciales = textToCheck.includes('credenciales') || textToCheck.includes('incorrect');
 
     if (!isLogro && !isCredenciales) {
@@ -99,8 +111,8 @@ function showToast(message, type = 'info') {
         if (type === 'error') iconText = 'error';
     }
 
-    const iconSpan = iconText 
-        ? `<span class="toast-label font-bold text-xs uppercase" style="background: rgba(0,0,0,0.15); padding: 2px 6px; border-radius: 3px; margin-right: 8px;">${iconText}</span>` 
+    const iconSpan = iconText
+        ? `<span class="toast-label font-bold text-xs uppercase" style="background: rgba(0,0,0,0.15); padding: 2px 6px; border-radius: 3px; margin-right: 8px;">${iconText}</span>`
         : '';
 
     toast.innerHTML = `${iconSpan}<span>${message}</span>`;
@@ -154,8 +166,8 @@ function switchTab(tabId) {
         fetchProducts();
     } else if (tabId === 'clientes-tab') {
         fetchClients();
-    } else if (tabId === 'entregas-tab') {
-        fetchDeliveries();
+    } else if (tabId === 'cotizaciones-tab') {
+        fetchCotizaciones();
     }
 }
 
@@ -628,19 +640,24 @@ function renderClients(clients) {
     clients.forEach(c => {
         const tr = document.createElement('tr');
 
-        const fecha = c.fecha_creacion
-            ? new Date(c.fecha_creacion).toLocaleDateString('es-ES', { year: 'numeric', month: 'short', day: 'numeric' })
-            : 'N/A';
+        // Badge de estado CRM
+        const estadoBadge = c.estado === 'atendido'
+            ? `<span class="badge" style="background:#dcfce7; color:#166534;">🟢 Atendido</span>`
+            : `<span class="badge" style="background:#fef9c3; color:#854d0e;">🟡 En Atención</span>`;
+
+        const activas = c.cotizaciones_activas || 0;
+        const pagadas = c.cotizaciones_pagadas || 0;
 
         tr.innerHTML = `
             <td><span style="color:var(--text-muted)">#${c.id}</span></td>
             <td style="font-weight: 500; color:var(--text-main);">${c.nombre}</td>
             <td>${c.email}</td>
             <td>${c.telefono || '<span class="help-text">Sin teléfono</span>'}</td>
-            <td>${c.direccion || '<span class="help-text">Sin dirección</span>'}</td>
-            <td>${fecha}</td>
+            <td>${estadoBadge}</td>
+            <td style="text-align:center; font-weight:600; color: ${activas > 0 ? 'var(--warning, #b45309)' : 'var(--text-muted)'}">${activas}</td>
+            <td style="text-align:center; font-weight:600; color: ${pagadas > 0 ? 'var(--success)' : 'var(--text-muted)'}">${pagadas}</td>
             <td class="actions-cell">
-                <button class="btn btn-outline btn-sm" onclick="editClient(${c.id}, '${c.nombre.replace(/'/g, "\\'")}', '${c.email}', '${(c.telefono || '').replace(/'/g, "\\'")}', '${(c.direccion || '').replace(/'/g, "\\'")}')">Editar</button>
+                <button class="btn btn-outline btn-sm" onclick="editClient(${c.id}, '${c.nombre.replace(/'/g, "\\'")}',' ${c.email}', '${(c.telefono || '').replace(/'/g, "\\'")}',' ${(c.direccion || '').replace(/'/g, "\\'")}',' ${c.estado}')">Editar</button>
                 <button class="btn btn-danger btn-sm" onclick="deleteClient(${c.id})">Eliminar</button>
             </td>
         `;
@@ -657,6 +674,7 @@ function openClientModal(mode = 'create', client = null) {
     document.getElementById('client-email').value = client ? client.email : '';
     document.getElementById('client-phone').value = client ? client.telefono : '';
     document.getElementById('client-address').value = client ? client.direccion : '';
+    document.getElementById('client-estado').value = client ? client.estado : 'en_atencion';
 
     clientModal.classList.add('active');
 }
@@ -673,6 +691,7 @@ async function handleClientSubmit(e) {
     const email = document.getElementById('client-email').value;
     const telefono = document.getElementById('client-phone').value;
     const direccion = document.getElementById('client-address').value;
+    const estado = document.getElementById('client-estado').value;
 
     const isEdit = id !== '';
     const endpoint = isEdit ? `${API_URL}/clientes/${id}` : `${API_URL}/clientes`;
@@ -687,7 +706,7 @@ async function handleClientSubmit(e) {
         const response = await fetch(endpoint, {
             method,
             headers: getAuthHeaders(),
-            body: JSON.stringify({ nombre, email, telefono, direccion })
+            body: JSON.stringify({ nombre, email, telefono, direccion, estado })
         });
 
         const data = await response.json();
@@ -705,12 +724,12 @@ async function handleClientSubmit(e) {
     }
 }
 
-window.editClient = function (id, nombre, email, telefono, direccion) {
-    openClientModal('edit', { id, nombre, email, telefono, direccion });
+window.editClient = function (id, nombre, email, telefono, direccion, estado) {
+    openClientModal('edit', { id, nombre: nombre.trim(), email: email.trim(), telefono: telefono.trim(), direccion: direccion.trim(), estado });
 };
 
 window.deleteClient = async function (id) {
-    if (!confirm('¿Estás seguro de que deseas eliminar este cliente? Se borrarán sus entregas asociadas.')) return;
+    if (!confirm('¿Estás seguro de que deseas eliminar este cliente? Se borrarán sus cotizaciones asociadas.')) return;
     try {
         const response = await fetch(`${API_URL}/clientes/${id}`, {
             method: 'DELETE',
@@ -724,6 +743,223 @@ window.deleteClient = async function (id) {
         fetchClients();
     } catch (error) {
         console.error('[DeleteClient Error]', error);
+        showToast(error.message, 'error');
+    }
+};
+
+// --- CRUD: GESTIÓN DE COTIZACIONES (CRM) ---
+
+async function fetchCotizaciones() {
+    cotizacionesLoading.style.display = 'block';
+    cotizacionesEmpty.style.display = 'none';
+    cotizacionesTableBody.innerHTML = '';
+
+    try {
+        const response = await fetch(`${API_URL}/cotizaciones`, {
+            method: 'GET',
+            headers: getAuthHeaders()
+        });
+
+        const data = await response.json();
+        if (!response.ok) throw new Error(data.mensaje || 'Error al obtener cotizaciones');
+
+        cotizacionesLoading.style.display = 'none';
+
+        if (data.length === 0) {
+            cotizacionesEmpty.style.display = 'block';
+        } else {
+            renderCotizaciones(data);
+        }
+    } catch (error) {
+        console.error('[FetchCotizaciones Error]', error);
+        cotizacionesLoading.style.display = 'none';
+        cotizacionesEmpty.style.display = 'block';
+        cotizacionesEmpty.textContent = 'Error al cargar cotizaciones.';
+        showToast(error.message, 'error');
+    }
+}
+
+function renderCotizaciones(cotizaciones) {
+    cotizacionesTableBody.innerHTML = '';
+    cotizaciones.forEach(cot => {
+        const tr = document.createElement('tr');
+
+        const fecha = cot.fecha_creacion
+            ? new Date(cot.fecha_creacion).toLocaleDateString('es-ES', { year: 'numeric', month: 'short', day: 'numeric' })
+            : 'N/A';
+
+        const estadoBadge = cot.estado === 'pagada'
+            ? `<span class="badge" style="background:#dcfce7; color:#166534;">🟢 Pagada</span>`
+            : `<span class="badge" style="background:#fef9c3; color:#854d0e;">🟡 Activa</span>`;
+
+        const urlCorta = cot.url_producto.length > 35
+            ? `<a href="${cot.url_producto}" target="_blank" title="${cot.url_producto}" style="color:var(--accent);">${cot.url_producto.substring(0, 35)}…</a>`
+            : `<a href="${cot.url_producto}" target="_blank" style="color:var(--accent);">${cot.url_producto}</a>`;
+
+        // Mapa de etiquetas para el select logístico
+        const logisticoOpts = [
+            { val: 'pendiente',          label: '⏳ Pendiente' },
+            { val: 'comprado',           label: '🛏 Comprado' },
+            { val: 'en_camino',          label: '🚚 En Camino' },
+            { val: 'en_aduana',          label: '🏦 En Aduana' },
+            { val: 'listo_para_recoger', label: '✅ Listo para Recoger' }
+        ];
+        const selectOpts = logisticoOpts
+            .map(o => `<option value="${o.val}" ${cot.estado_logistico === o.val ? 'selected' : ''}>${o.label}</option>`)
+            .join('');
+
+        tr.innerHTML = `
+            <td><span style="color:var(--text-muted)">#${cot.id}</span></td>
+            <td>
+                <div style="font-weight:500; color:var(--text-main);">${cot.cliente_nombre}</div>
+                <div class="help-text" style="font-size:0.75rem;">${cot.cliente_email}</div>
+            </td>
+            <td>${urlCorta}</td>
+            <td style="font-weight:600;">${cot.valor_cif ? '$' + parseFloat(cot.valor_cif).toFixed(2) : '<span class="help-text">—</span>'}</td>
+            <td style="font-weight:600;">${cot.costo_total_aduana ? '$' + parseFloat(cot.costo_total_aduana).toFixed(2) : '<span class="help-text">—</span>'}</td>
+            <td>${estadoBadge}</td>
+            <td>
+                <select
+                    id="logistico-select-${cot.id}"
+                    onchange="cambiarEstadoLogistico(${cot.id}, this.value)"
+                    style="font-size:0.72rem; padding:4px 6px; border:2px solid #000;
+                           border-radius:4px; background:#fff; cursor:pointer; font-weight:700;">
+                    ${selectOpts}
+                </select>
+            </td>
+            <td><small>${fecha}</small></td>
+            <td class="actions-cell">
+                <button class="btn btn-outline btn-sm" onclick="marcarCotizacionPagada(${cot.id}, '${cot.estado}')">Cambiar Estado</button>
+                <button class="btn btn-danger btn-sm" onclick="deleteCotizacion(${cot.id})">Eliminar</button>
+            </td>
+        `;
+        cotizacionesTableBody.appendChild(tr);
+    });
+}
+
+window.cambiarEstadoLogistico = async function (id, estado_logistico) {
+    try {
+        const response = await fetch(`${API_URL}/cotizaciones/${id}/estado-logistico`, {
+            method: 'PUT',
+            headers: getAuthHeaders(),
+            body: JSON.stringify({ estado_logistico })
+        });
+        const data = await response.json();
+        if (!response.ok) throw new Error(data.mensaje || 'Error al actualizar');
+        showToast('Estado logístico actualizado correctamente', 'success');
+    } catch (error) {
+        console.error('[CambiarEstadoLogistico Error]', error);
+        showToast(error.message, 'error');
+        // Revertir el select si falla
+        fetchCotizaciones();
+    }
+};
+
+async function populateCotizacionClientSelect() {
+    cotizacionClientSelect.innerHTML = '<option value="">— Seleccionar Cliente —</option>';
+    try {
+        const res = await fetch(`${API_URL}/clientes`, { headers: getAuthHeaders() });
+        const clientes = await res.json();
+        clientes.forEach(c => {
+            const opt = document.createElement('option');
+            opt.value = c.id;
+            opt.textContent = `${c.nombre} (${c.email})`;
+            cotizacionClientSelect.appendChild(opt);
+        });
+    } catch (error) {
+        console.error('[PopulateCotizacionSelect Error]', error);
+    }
+}
+
+async function openCotizacionModal() {
+    cotizacionModalTitle.textContent = 'Nueva Cotización';
+    document.getElementById('cotizacion-id').value = '';
+    cotizacionForm.reset();
+    await populateCotizacionClientSelect();
+    cotizacionModal.classList.add('active');
+}
+
+function closeCotizacionModal() {
+    cotizacionModal.classList.remove('active');
+    cotizacionForm.reset();
+}
+
+async function handleCotizacionSubmit(e) {
+    e.preventDefault();
+    const cliente_id = parseInt(document.getElementById('cotizacion-client').value);
+    const url_producto = document.getElementById('cotizacion-url').value;
+    const valor_cif = parseFloat(document.getElementById('cotizacion-cif').value) || null;
+    const costo_total_aduana = parseFloat(document.getElementById('cotizacion-total').value) || null;
+    const estado = document.getElementById('cotizacion-estado').value;
+
+    if (!cliente_id) {
+        showToast('Debes seleccionar un cliente.', 'warning');
+        return;
+    }
+
+    const btn = e.target.querySelector('button[type="submit"]');
+    const originalText = btn.textContent;
+    btn.textContent = 'Guardando...';
+    btn.disabled = true;
+
+    try {
+        const response = await fetch(`${API_URL}/cotizaciones`, {
+            method: 'POST',
+            headers: getAuthHeaders(),
+            body: JSON.stringify({ cliente_id, url_producto, valor_cif, costo_total_aduana, estado })
+        });
+
+        const data = await response.json();
+        if (!response.ok) throw new Error(data.mensaje || 'Error al guardar la cotización');
+
+        showToast('Cotización creada con éxito', 'success');
+        closeCotizacionModal();
+        fetchCotizaciones();
+        fetchClients(); // Actualizar contadores en la pestaña clientes
+    } catch (error) {
+        console.error('[SaveCotizacion Error]', error);
+        showToast(error.message, 'error');
+    } finally {
+        btn.textContent = originalText;
+        btn.disabled = false;
+    }
+}
+
+window.marcarCotizacionPagada = async function (id, estadoActual) {
+    const nuevoEstado = estadoActual === 'pagada' ? 'activa' : 'pagada';
+    const accion = nuevoEstado === 'pagada' ? 'marcar como PAGADA' : 'reactivar';
+    if (!confirm(`¿Deseas ${accion} esta cotización?`)) return;
+    try {
+        const response = await fetch(`${API_URL}/cotizaciones/${id}`, {
+            method: 'PUT',
+            headers: getAuthHeaders(),
+            body: JSON.stringify({ estado: nuevoEstado })
+        });
+        const data = await response.json();
+        if (!response.ok) throw new Error(data.mensaje || 'Error al actualizar');
+        showToast(`Cotización marcada como ${nuevoEstado}`, 'success');
+        fetchCotizaciones();
+        fetchClients();
+    } catch (error) {
+        console.error('[MarcarCotizacion Error]', error);
+        showToast(error.message, 'error');
+    }
+};
+
+window.deleteCotizacion = async function (id) {
+    if (!confirm('¿Estás seguro de que deseas eliminar esta cotización?')) return;
+    try {
+        const response = await fetch(`${API_URL}/cotizaciones/${id}`, {
+            method: 'DELETE',
+            headers: getAuthHeaders()
+        });
+        const data = await response.json();
+        if (!response.ok) throw new Error(data.mensaje || 'Error al eliminar cotización');
+        showToast('Cotización eliminada correctamente', 'success');
+        fetchCotizaciones();
+        fetchClients();
+    } catch (error) {
+        console.error('[DeleteCotizacion Error]', error);
         showToast(error.message, 'error');
     }
 };
@@ -922,6 +1158,75 @@ window.deleteEntrega = async function (id) {
     }
 };
 
+// --- Lógica de la Calculadora de Importaciones ---
+
+function handlePrecioFobInput() {
+    const val = parseFloat(calcPrecioFob.value);
+    if (!isNaN(val) && val > 0) {
+        calcCostoEnvio.disabled = false;
+        calcCostoEnvio.required = true;
+    } else {
+        calcCostoEnvio.disabled = true;
+        calcCostoEnvio.required = false;
+        calcCostoEnvio.value = '';
+    }
+}
+
+async function handleCalculadoraSubmit(e) {
+    e.preventDefault();
+
+    const url_producto = calcUrlProducto.value;
+    const precio_fob = calcPrecioFob.value;
+    const costo_envio = calcCostoEnvio.value;
+
+    // Reiniciar resultados y contenedor de mensajes
+    calcResCif.value = '';
+    calcResIva.value = '';
+    calcResTotal.value = '';
+    calcMensajeContainer.style.display = 'none';
+    calcMensajeTexto.textContent = '';
+
+    try {
+        const payload = {
+            url_producto,
+            precio_fob: precio_fob !== '' ? parseFloat(precio_fob) : null,
+            costo_envio: costo_envio !== '' ? parseFloat(costo_envio) : null
+        };
+
+        const response = await fetch(`${API_URL}/calcular-importacion`, {
+            method: 'POST',
+            headers: getAuthHeaders(),
+            body: JSON.stringify(payload)
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+            throw new Error(data.mensaje || 'Error al realizar el cálculo');
+        }
+
+        if (data.mensaje) {
+            // Muestra mensaje de pendiente de revisión
+            calcMensajeTexto.textContent = data.mensaje;
+            calcMensajeContainer.style.display = 'block';
+            calcMensajeContainer.style.background = 'var(--sky-blue)';
+            calcMensajeContainer.style.borderColor = 'var(--ink)';
+
+            calcResCif.placeholder = 'Pendiente';
+            calcResIva.placeholder = 'Pendiente';
+            calcResTotal.placeholder = 'Pendiente';
+        } else {
+            // Muestra los resultados matemáticos
+            calcResCif.value = data.valor_cif.toFixed(2);
+            calcResIva.value = data.iva_importacion.toFixed(2);
+            calcResTotal.value = data.costo_total_aduana.toFixed(2);
+        }
+
+    } catch (error) {
+        console.error('[Calculadora Submit Error]', error);
+        showToast(error.message, 'error');
+    }
+}
 
 // --- Inicialización ---
 
@@ -957,14 +1262,22 @@ function init() {
         if (e.target === clientModal) closeClientModal();
     });
 
-    // Event Listeners: MODAL ENTREGAS
-    btnCreateEntrega.addEventListener('click', () => openEntregaModal('create'));
-    btnCloseEntregaModal.addEventListener('click', closeEntregaModal);
-    btnCancelEntregaModal.addEventListener('click', closeEntregaModal);
-    entregaForm.addEventListener('submit', handleEntregaSubmit);
-    entregaModal.addEventListener('click', (e) => {
-        if (e.target === entregaModal) closeEntregaModal();
+    // Event Listeners: MODAL COTIZACIONES
+    if (btnCreateCotizacion) btnCreateCotizacion.addEventListener('click', () => openCotizacionModal());
+    if (btnCloseCotizacionModal) btnCloseCotizacionModal.addEventListener('click', closeCotizacionModal);
+    if (btnCancelCotizacionModal) btnCancelCotizacionModal.addEventListener('click', closeCotizacionModal);
+    if (cotizacionForm) cotizacionForm.addEventListener('submit', handleCotizacionSubmit);
+    if (cotizacionModal) cotizacionModal.addEventListener('click', (e) => {
+        if (e.target === cotizacionModal) closeCotizacionModal();
     });
+
+    // Event Listeners: CALCULADORA
+    if (calcPrecioFob) {
+        calcPrecioFob.addEventListener('input', handlePrecioFobInput);
+    }
+    if (calculadoraForm) {
+        calculadoraForm.addEventListener('submit', handleCalculadoraSubmit);
+    }
 
     // Event Listeners: NAVEGACIÓN POR PESTAÑAS (TABS)
     document.querySelectorAll('.tab-btn').forEach(btn => {

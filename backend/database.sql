@@ -45,7 +45,7 @@ ON DUPLICATE KEY UPDATE
     id = id;
 
 -- ============================================================
--- NUEVAS TABLAS (FASE 1: VENTAS Y LOGÍSTICA)
+-- TABLAS DEL SISTEMA
 -- ============================================================
 
 -- Tabla de productos (inventario de tecnología)
@@ -77,37 +77,39 @@ VALUES (
         10,
         'Electronica',
         'https://www.amazon.com/-/es/Lenovo-premium-i7-13620H-i7-1355U-pulgadas/dp/B0GX66CNNJ/ref=sr_1_4?__mk_es_US=%C3%85M%C3%85%C5%BD%C3%95%C3%91&sr=8-4'
-    );
+    )
+ON DUPLICATE KEY UPDATE id = id;
 
-create table clientes (
+-- ============================================================
+-- TABLA CLIENTES (CRM) — con columna de estado de atención
+-- ============================================================
+CREATE TABLE IF NOT EXISTS clientes (
     id INT AUTO_INCREMENT PRIMARY KEY,
     nombre VARCHAR(100) NOT NULL,
     email VARCHAR(100) NOT NULL UNIQUE,
     telefono VARCHAR(20),
     direccion VARCHAR(255),
+    estado ENUM('en_atencion', 'atendido') NOT NULL DEFAULT 'en_atencion',
     fecha_creacion TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
-CREATE TABLE IF NOT EXISTS entregas (
+-- ============================================================
+-- TABLA COTIZACIONES — vinculada a clientes (CRM)
+-- ============================================================
+CREATE TABLE IF NOT EXISTS cotizaciones (
     id INT AUTO_INCREMENT PRIMARY KEY,
     cliente_id INT NOT NULL,
-    producto_id INT NOT NULL,
-    cantidad INT NOT NULL DEFAULT 1,
-    estado_entrega ENUM(
-        'pendiente',
-        'en_camino',
-        'entregado'
-    ) NOT NULL DEFAULT 'pendiente',
-    fecha TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (cliente_id) REFERENCES clientes (id) ON DELETE CASCADE,
-    FOREIGN KEY (producto_id) REFERENCES productos (id) ON DELETE CASCADE
+    url_producto VARCHAR(500) NOT NULL,
+    valor_cif DECIMAL(10, 2),
+    costo_total_aduana DECIMAL(10, 2),
+    estado ENUM('activa', 'pagada') NOT NULL DEFAULT 'activa',
+    estado_logistico ENUM('pendiente','comprado','en_camino','en_aduana','listo_para_recoger') NOT NULL DEFAULT 'pendiente',
+    fecha_creacion TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (cliente_id) REFERENCES clientes (id) ON DELETE CASCADE
 );
 
-insert into
-    entregas (
-        cliente_id,
-        producto_id,
-        cantidad,
-        estado_entrega
-    )
-values (1, 1, 1, 'pendiente');
+-- ============================================================
+-- MIGRACIONES PARA BD EXISTENTE (ejecutar si la BD ya existe)
+-- ============================================================
+-- ALTER TABLE clientes ADD COLUMN IF NOT EXISTS estado ENUM('en_atencion', 'atendido') NOT NULL DEFAULT 'en_atencion';
+-- DROP TABLE IF EXISTS entregas;

@@ -801,3 +801,19 @@ tbody tr:hover {
         padding: 2rem 1.25rem;
     }
 }
+
+/* ── CALCULATOR / READONLY & DISABLED STYLES ── */
+.input-group input:disabled {
+    background: #E8E5D5 !important;
+    color: #777;
+    cursor: not-allowed;
+    box-shadow: none;
+    border-color: #555;
+}
+
+.input-group input[readonly] {
+    background: #F0EDE0;
+    color: var(--ink);
+    cursor: not-allowed;
+    box-shadow: var(--shadow-hard-sm);
+}

@@ -38,7 +38,7 @@ async function initDatabaseTables() {
                 imagen_url VARCHAR(255)
             )
         `);
-        // Crear tabla clientes
+        // Crear tabla clientes (CRM)
         await pool.query(`
             CREATE TABLE IF NOT EXISTS clientes (
                 id INT AUTO_INCREMENT PRIMARY KEY,
@@ -46,22 +46,33 @@ async function initDatabaseTables() {
                 email VARCHAR(150) NOT NULL UNIQUE,
                 telefono VARCHAR(20),
                 direccion VARCHAR(255),
+                estado ENUM('en_atencion', 'atendido') NOT NULL DEFAULT 'en_atencion',
                 fecha_creacion TIMESTAMP DEFAULT CURRENT_TIMESTAMP
             )
         `);
-        // Crear tabla entregas
+        // Agregar columna estado si migrando desde BD anterior
+        try {
+            await pool.query("ALTER TABLE clientes ADD COLUMN estado ENUM('en_atencion', 'atendido') NOT NULL DEFAULT 'en_atencion'");
+        } catch (e) { /* Columna ya existe, ignorar */ }
+
+        // Crear tabla cotizaciones (CRM)
         await pool.query(`
-            CREATE TABLE IF NOT EXISTS entregas (
+            CREATE TABLE IF NOT EXISTS cotizaciones (
                 id INT AUTO_INCREMENT PRIMARY KEY,
                 cliente_id INT NOT NULL,
-                producto_id INT NOT NULL,
-                cantidad INT NOT NULL DEFAULT 1,
-                estado_entrega ENUM('pendiente', 'en_camino', 'entregado') NOT NULL DEFAULT 'pendiente',
-                fecha TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                FOREIGN KEY (cliente_id) REFERENCES clientes(id) ON DELETE CASCADE,
-                FOREIGN KEY (producto_id) REFERENCES productos(id) ON DELETE CASCADE
+                url_producto VARCHAR(500) NOT NULL,
+                valor_cif DECIMAL(10, 2),
+                costo_total_aduana DECIMAL(10, 2),
+                estado ENUM('activa', 'pagada') NOT NULL DEFAULT 'activa',
+                estado_logistico ENUM('pendiente','comprado','en_camino','en_aduana','listo_para_recoger') NOT NULL DEFAULT 'pendiente',
+                fecha_creacion TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                FOREIGN KEY (cliente_id) REFERENCES clientes(id) ON DELETE CASCADE
             )
         `);
+        // Agregar estado_logistico si migrando desde BD anterior
+        try {
+            await pool.query("ALTER TABLE cotizaciones ADD COLUMN estado_logistico ENUM('pendiente','comprado','en_camino','en_aduana','listo_para_recoger') NOT NULL DEFAULT 'pendiente'");
+        } catch (e) { /* Columna ya existe, ignorar */ }
         // Crear tabla pedidos_importacion
         await pool.query(`
             CREATE TABLE IF NOT EXISTS pedidos_importacion (
@@ -90,7 +101,7 @@ async function initDatabaseTables() {
                 FOREIGN KEY (usuario_id) REFERENCES usuarios(id) ON DELETE CASCADE
             )
         `);
-        console.log('Tablas de la base de datos (usuarios, productos, clientes, entregas, pedidos_importacion, mensajes_chat) inicializadas correctamente.');
+        console.log('Tablas inicializadas: usuarios, productos, clientes (CRM), cotizaciones, pedidos_importacion, mensajes_chat.');
     } catch (error) {
         console.error('Error al inicializar tablas de la base de datos:', error);
     }

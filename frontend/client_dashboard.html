@@ -8,7 +8,8 @@
     <meta name="description"
         content="Calcula el costo de importación de tus productos favoritos y solicita asesoría personalizada de nuestros agentes.">
     <link rel="icon" type="image/png" href="logo.png">
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@700;800;900&family=Space+Mono:wght@400;700&display=swap"
+    <link
+        href="https://fonts.googleapis.com/css2?family=Poppins:wght@700;800;900&family=Space+Mono:wght@400;700&display=swap"
         rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
@@ -23,25 +24,30 @@
     <style>
         /* ═══ COMIC / NEO-BRUTALIST — client_dashboard.html ═══ */
         :root {
-            --ink:          #000000;
-            --paper:        #FFFBF0;
-            --panel-bg:     #FFF9E8;
-            --paper-aged:   #F5EFD7;
-            --neon-green:   #39FF14;
-            --neon-yellow:  #FFE000;
-            --sky-blue:     #C8E8FF;
-            --punch-red:    #E8001C;
+            --ink: #000000;
+            --paper: #FFFBF0;
+            --panel-bg: #FFF9E8;
+            --paper-aged: #F5EFD7;
+            --neon-green: #39FF14;
+            --neon-yellow: #FFE000;
+            --sky-blue: #C8E8FF;
+            --punch-red: #E8001C;
             --border-thick: 3px solid #000;
-            --shadow-hard:  3px 3px 0 0 rgba(0,0,0,0.06);
-            --shadow-hard-sm: 2px 2px 0 0 rgba(0,0,0,0.04);
-            --font-comic:   'Poppins', 'Arial Black', sans-serif;
-            --radius:       3px;
-            --radius-sm:    2px;
+            --shadow-hard: 3px 3px 0 0 rgba(0, 0, 0, 0.06);
+            --shadow-hard-sm: 2px 2px 0 0 rgba(0, 0, 0, 0.04);
+            --font-comic: 'Poppins', 'Arial Black', sans-serif;
+            --radius: 3px;
+            --radius-sm: 2px;
         }
 
-        *, *::before, *::after { box-sizing: border-box; }
+        *,
+        *::before,
+        *::after {
+            box-sizing: border-box;
+        }
 
-        html, body {
+        html,
+        body {
             font-family: var(--font-comic) !important;
             background: linear-gradient(160deg, #FFE0E9 0%, #E8D5FF 40%, #C8E8FF 100%) fixed !important;
             color: var(--ink) !important;
@@ -55,13 +61,20 @@
             content: '';
             position: fixed;
             inset: 0;
-            background-image: radial-gradient(circle, rgba(0,0,0,0.05) 1px, transparent 1px);
+            background-image: radial-gradient(circle, rgba(0, 0, 0, 0.05) 1px, transparent 1px);
             background-size: 20px 20px;
             pointer-events: none;
             z-index: 0;
         }
 
-        header, main, section, aside, footer { position: relative; z-index: 1; }
+        header,
+        main,
+        section,
+        aside,
+        footer {
+            position: relative;
+            z-index: 1;
+        }
 
         ::-webkit-scrollbar {
             width: 7px;
@@ -81,11 +94,12 @@
         header {
             background: var(--panel-bg) !important;
             border-bottom: 3px solid #000 !important;
-            box-shadow: 0 4px 0 0 rgba(0,0,0,0.05) !important;
+            box-shadow: 0 4px 0 0 rgba(0, 0, 0, 0.05) !important;
             color: var(--ink) !important;
         }
 
-        header [class*="bg-slate-"], header [class*="bg-slate-"] {
+        header [class*="bg-slate-"],
+        header [class*="bg-slate-"] {
             background: var(--paper-aged) !important;
             border: 2px solid #000 !important;
             border-radius: var(--radius-sm) !important;
@@ -109,7 +123,8 @@
         }
 
         /* ── Glass Containers ── */
-        .glass, .glass-card {
+        .glass,
+        .glass-card {
             background: var(--panel-bg) !important;
             border: var(--border-thick) !important;
             border-radius: var(--radius) !important;
@@ -135,7 +150,7 @@
             font-size: 1.05rem !important;
             font-weight: 800 !important;
             letter-spacing: -0.01em !important;
-            box-shadow: 3px 3px 0 0 rgba(0,0,0,0.08) !important;
+            box-shadow: 3px 3px 0 0 rgba(0, 0, 0, 0.08) !important;
         }
 
         #inp-url:focus {
@@ -150,7 +165,10 @@
         }
 
         /* ── Inputs ── */
-        .inp, input, select, textarea {
+        .inp,
+        input,
+        select,
+        textarea {
             background: #FEFAE8 !important;
             border: 3px solid #000 !important;
             border-radius: var(--radius) !important;
@@ -161,7 +179,9 @@
             outline: none !important;
         }
 
-        .inp:focus, input:focus, select:focus {
+        .inp:focus,
+        input:focus,
+        select:focus {
             background: #FFFCE0 !important;
             box-shadow: 4px 4px 0 0 var(--neon-green) !important;
         }
@@ -190,7 +210,9 @@
         }
 
         /* ── Buttons ── */
-        .btn-cta, button, [role="button"] {
+        .btn-cta,
+        button,
+        [role="button"] {
             font-family: var(--font-comic) !important;
             font-weight: 800 !important;
             text-transform: uppercase !important;
@@ -203,17 +225,20 @@
             cursor: pointer;
         }
 
-        .btn-cta:hover, button:hover {
+        .btn-cta:hover,
+        button:hover {
             box-shadow: 2px 2px 0 0 #000 !important;
             transform: translate(2px, 2px) !important;
         }
 
-        .btn-cta:active, button:active {
+        .btn-cta:active,
+        button:active {
             transform: translate(3px, 3px) !important;
             box-shadow: 1px 1px 0 0 #000 !important;
         }
 
-        .btn-cta:disabled, button:disabled {
+        .btn-cta:disabled,
+        button:disabled {
             background: #e2e8f0 !important;
             color: #94a3b8 !important;
             border-color: #cbd5e1 !important;
@@ -262,7 +287,7 @@
             padding: 0.4rem 0;
             font-size: 0.8rem;
             color: var(--ink);
-            border-bottom: 1px dashed rgba(0,0,0,0.1);
+            border-bottom: 1px dashed rgba(0, 0, 0, 0.1);
         }
 
         .result-row .val {
@@ -271,15 +296,30 @@
         }
 
         /* ── Color overrides to preserve comic readability ── */
-        body, .glass, .pedido-card, h1, h2, h3, h4, h5, p, span, label, strong {
+        body,
+        .glass,
+        .pedido-card,
+        h1,
+        h2,
+        h3,
+        h4,
+        h5,
+        p,
+        span,
+        label,
+        strong {
             color: var(--ink) !important;
         }
 
-        .text-slate-400, .text-slate-500, .text-slate-600 {
-            color: rgba(0,0,0,0.6) !important;
+        .text-slate-400,
+        .text-slate-500,
+        .text-slate-600 {
+            color: rgba(0, 0, 0, 0.6) !important;
         }
 
-        .text-slate-300, .text-slate-200, .text-slate-100 {
+        .text-slate-300,
+        .text-slate-200,
+        .text-slate-100 {
             color: var(--ink) !important;
         }
 
@@ -288,29 +328,93 @@
             font-family: var(--font-comic) !important;
             background: var(--paper) !important;
             border: 3px solid #000 !important;
-            box-shadow: 3px 3px 0 0 rgba(0,0,0,0.08) !important;
+            box-shadow: 3px 3px 0 0 rgba(0, 0, 0, 0.08) !important;
             border-radius: var(--radius) !important;
             color: var(--ink) !important;
             animation: toast-in 0.3s ease-out forwards;
             max-width: 320px;
         }
 
-        .toast.success { border-color: #10B981 !important; box-shadow: 2px 2px 0 0 rgba(16,185,129,0.25) !important; }
-        .toast.error   { border-color: #EF4444 !important; box-shadow: 2px 2px 0 0 rgba(239,68,68,0.25) !important; }
-        .toast.warning { border-color: #F59E0B !important; box-shadow: 2px 2px 0 0 rgba(245,158,11,0.25) !important; }
+        .toast.success {
+            border-color: #10B981 !important;
+            box-shadow: 2px 2px 0 0 rgba(16, 185, 129, 0.25) !important;
+        }
+
+        .toast.error {
+            border-color: #EF4444 !important;
+            box-shadow: 2px 2px 0 0 rgba(239, 68, 68, 0.25) !important;
+        }
+
+        .toast.warning {
+            border-color: #F59E0B !important;
+            box-shadow: 2px 2px 0 0 rgba(245, 158, 11, 0.25) !important;
+        }
 
         @keyframes toast-in {
-            from { transform: translateY(1rem) scale(0.95); opacity: 0; }
-            to   { transform: translateY(0) scale(1); opacity: 1; }
+            from {
+                transform: translateY(1rem) scale(0.95);
+                opacity: 0;
+            }
+
+            to {
+                transform: translateY(0) scale(1);
+                opacity: 1;
+            }
         }
 
         @keyframes fadeUp {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
 
         .anim-in {
             animation: fadeUp 0.35s ease forwards;
+        }
+
+        /* ── CALCULATOR CLASSES ── */
+        .card {
+            background: var(--panel-bg);
+            border: var(--border-thick);
+            box-shadow: var(--shadow-hard);
+            border-radius: var(--radius) !important;
+            overflow: hidden;
+        }
+
+        .input-group {
+            margin-bottom: 1rem;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 0.3rem;
+            font-size: 0.75rem;
+            font-weight: 800;
+            color: var(--ink);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            font-family: var(--font-comic);
+        }
+
+        .input-group input:disabled {
+            background: #E8E5D5 !important;
+            color: #777 !important;
+            cursor: not-allowed;
+            box-shadow: none !important;
+            border-color: #555 !important;
+        }
+
+        .input-group input[readonly] {
+            background: #F0EDE0 !important;
+            color: var(--ink) !important;
+            cursor: not-allowed;
+            box-shadow: var(--shadow-hard-sm) !important;
         }
     </style>
 </head>
@@ -353,104 +457,60 @@
                 </p>
             </div>
 
-            <div class="glass rounded-2xl p-6 space-y-6 anim-in" style="animation-delay:0.05s">
+            <div class="card p-6 space-y-6">
+                <!-- Tarjeta del Formulario de la Calculadora -->
+                <form id="calculadora-form" class="space-y-4">
+                    <div class="input-group">
+                        <label for="calc-url-producto">Enlace del producto (URL)</label>
+                        <input type="text" id="calc-url-producto" required placeholder="   URL del producto">
+                    </div>
+                    <div class="input-group">
+                        <label for="calc-precio-fob">Precio</label>
+                        <input type="number" id="calc-precio-fob" step="0.01" min="0" placeholder=" 0.00">
+                    </div>
+                    <div class="input-group">
+                        <label for="calc-costo-envio">Costo de Envío</label>
+                        <input type="number" id="calc-costo-envio" step="0.01" min="0" placeholder=" 0.00">
+                    </div>
+                    <button type="submit" class="btn-cta" style="width: 100%; display: block; padding: 12px;">Calcular
+                        Costos</button>
+                </form>
 
-                <!-- 1. URL -->
-                <div class="space-y-1">
-                    <div class="section-title">1. Producto a Importar</div>
-                    <label class="inp-label" for="inp-url">URL del Producto (tienda de origen)</label>
-                    <input type="url" id="inp-url" class="inp" placeholder="https://www.amazon.com/dp/B0XXXXXX"
-                        autocomplete="off">
-                    <p class="text-[0.7rem] text-slate-600 mt-1">Pega el enlace exacto del producto que deseas importar.
-                    </p>
-                </div>
-
-                <!-- 2. Costos Origen -->
-                <div class="space-y-3">
-                    <div class="section-title">2. Costos de Origen (USD)</div>
-                    <div class="grid grid-cols-3 gap-3">
-                        <div>
-                            <label class="inp-label" for="c-price">Precio Producto</label>
-                            <div class="relative">
-                                <span class="absolute left-3 top-[9px] text-slate-500 text-[11px] select-none">$</span>
-                                <input type="number" id="c-price" class="inp pl-5" value="0" step="0.01" min="0"
-                                    oninput="calcClient()">
-                            </div>
+                <!-- Bloque de Resultados (Read-only) -->
+                <div class="card p-6 space-y-4">
+                    <h3 class="text-sm font-bold text-slate-800" style="text-transform: uppercase;">Resultados</h3>
+                    <div id="calc-resultados-container" class="space-y-4">
+                        <div class="input-group">
+                            <label>Valor CIF</label>
+                            <input type="text" id="calc-res-cif" readonly placeholder=" 0.00">
                         </div>
-                        <div>
-                            <label class="inp-label" for="c-freight">Flete Internacional</label>
-                            <div class="relative">
-                                <span class="absolute left-3 top-[9px] text-slate-500 text-[11px] select-none">$</span>
-                                <input type="number" id="c-freight" class="inp pl-5" value="85" step="0.01" min="0"
-                                    oninput="calcClient()">
-                            </div>
+                        <div class="input-group">
+                            <label>IVA </label>
+                            <input type="text" id="calc-res-iva" readonly placeholder="  0.00">
                         </div>
-                        <div>
-                            <label class="inp-label" for="c-insurance">Seguro</label>
-                            <div class="relative">
-                                <span class="absolute left-3 top-[9px] text-slate-500 text-[11px] select-none">$</span>
-                                <input type="number" id="c-insurance" class="inp pl-5" value="25" step="0.01" min="0"
-                                    oninput="calcClient()">
-                            </div>
+                        <div class="input-group">
+                            <label>Costo Total a Pagar</label>
+                            <input type="text" id="calc-res-total" readonly placeholder="  total a pagar"
+                                style="font-weight: 900; border-color: var(--ink);">
                         </div>
                     </div>
-                </div>
-
-                <!-- 3. Aranceles -->
-                <div class="space-y-3">
-                    <div class="section-title">3. Tasas Aduaneras</div>
-                    <div class="grid grid-cols-2 gap-3">
-                        <div>
-                            <label class="inp-label" for="c-tariff">Arancel Ad-Valorem</label>
-                            <div class="relative">
-                                <input type="number" id="c-tariff" class="inp pr-7" value="6" step="0.1" min="0"
-                                    oninput="calcClient()">
-                                <span class="absolute right-3 top-[9px] text-slate-500 text-[11px] select-none">%</span>
-                            </div>
-                        </div>
-                        <div>
-                            <label class="inp-label" for="c-vat">IVA de Internación</label>
-                            <div class="relative">
-                                <input type="number" id="c-vat" class="inp pr-7" value="19" step="0.1" min="0"
-                                    oninput="calcClient()">
-                                <span class="absolute right-3 top-[9px] text-slate-500 text-[11px] select-none">%</span>
-                            </div>
-                        </div>
+                    <!-- Para mensajes de revisión o errores -->
+                    <div id="calc-mensaje-container" class="mt-4 p-4 rounded border-2 border-black"
+                        style="display: none; background: var(--sky-blue); font-weight: 700; color: #000;">
+                        <p id="calc-mensaje-texto" class="text-sm"></p>
                     </div>
-                </div>
-
-                <!-- Live Results -->
-                <div class="bg-[#FEFAE8] border-3 border-black rounded-lg p-4 space-y-1.5 shadow-sm">
-                    <div class="result-row"><span>Valor CIF:</span><span class="val" id="r-cif">$0.00</span></div>
-                    <div class="result-row"><span>Arancel calculado:</span><span class="val" id="r-tariff">$0.00</span>
-                    </div>
-                    <div class="result-row"><span>IVA internación:</span><span class="val" id="r-vat">$0.00</span></div>
-                    <div class="result-row"><span>Gastos operacionales:</span><span class="val">$45.00</span></div>
-                    <div class="border-t-2 border-black pt-2 mt-1 result-row">
-                        <span class="font-semibold">Total Impuestos:</span>
-                        <span class="font-bold" id="r-taxes">$0.00</span>
-                    </div>
-                </div>
-
-                <!-- Total Hero -->
-                <div class="bg-[#FFFCE0] border-3 border-black rounded-lg p-5 text-center shadow-sm">
-                    <p class="text-[0.65rem] font-bold uppercase tracking-widest text-slate-800 mb-1">Total Estimado a
-                        Pagar (USD)</p>
-                    <p class="text-[2.75rem] font-black text-black tracking-tight leading-none" id="r-total">$0.00</p>
-                    <p class="text-[0.68rem] text-slate-600 mt-2">Estimación referencial — el agente confirmará el total
-                        oficial.</p>
                 </div>
 
                 <!-- CTA -->
-                <div class="space-y-2">
-                    <button id="btn-solicitar" onclick="solicitarAsesoria()" class="btn-cta">
+                <div class="space-y-2 pt-2">
+                    <button id="btn-solicitar" onclick="solicitarAsesoria()" class="btn-cta"
+                        style="width: 100%; display: block; padding: 14px;">
                         <span id="btn-solicitar-inner">Solicitar Asesoría</span>
                     </button>
                     <p class="text-center text-[0.7rem] text-slate-600">
-                        Se crea un ticket.
+                        Se crea un ticket de importación para que un agente revise su cotización.
                     </p>
                 </div>
-
             </div>
         </section>
 
@@ -475,16 +535,52 @@
             </div>
         </section>
 
+        <!-- ── MIS COTIZACIONES (Seguimiento Logístico) ── -->
+        <section class="lg:col-span-3 space-y-4 anim-in" style="animation-delay:0.2s">
+            <div class="flex items-center justify-between">
+                <div>
+                    <h2 class="text-[0.9375rem] font-bold text-slate-200">📦 Mis Cotizaciones &amp; Seguimiento</h2>
+                    <p class="text-[0.72rem] text-slate-500 mt-0.5">Seguimiento en tiempo real del estado logístico de
+                        tus pedidos.</p>
+                </div>
+                <button onclick="cargarMisCotizaciones()" class="text-[0.7rem] text-indigo-400 hover:text-indigo-300 font-semibold
+                           hover:underline transition-colors flex items-center gap-1">
+                    &#8635; Actualizar
+                </button>
+            </div>
+            <div id="mis-cotizaciones-list" class="space-y-3">
+                <div class="flex justify-center items-center py-8">
+                    <div class="flex items-center gap-2 text-[0.8125rem] text-slate-500">
+                        <div
+                            class="w-4 h-4 border-2 border-indigo-500/30 border-t-indigo-500 rounded-full animate-spin">
+                        </div>
+                        Cargando cotizaciones...
+                    </div>
+                </div>
+            </div>
+        </section>
+
     </main>
 
     <!-- Toast Container -->
     <div id="toast-container" class="fixed bottom-6 right-6 z-50 flex flex-col gap-2 pointer-events-none"></div>
 
 
-
     <script>
-        const API_URL = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' ? `${window.location.protocol}//${window.location.hostname}:3000` : '';
+        const API_URL = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' 
+            ? 'http://localhost:3000' 
+            : 'https://TU_URL_DE_RENDER.onrender.com'; // Nota para mí: cambiar esta URL después
         let currentUser = null;
+
+        // Elementos de la calculadora unificada
+        let calcUrlProducto = null;
+        let calcPrecioFob = null;
+        let calcCostoEnvio = null;
+        let calcResCif = null;
+        let calcResIva = null;
+        let calcResTotal = null;
+        let calcMensajeContainer = null;
+        let calcMensajeTexto = null;
 
         // ── Helpers ──────────────────────────────────────────
         function getAuthHeaders() {
@@ -521,16 +617,16 @@
 
             let iconText = '';
             const textToCheck = ((title || '') + ' ' + (message || '')).toLowerCase();
-            const isLogro = textToCheck.includes('éxito') || 
-                            textToCheck.includes('exito') || 
-                            textToCheck.includes('correctamente') || 
-                            textToCheck.includes('registrad') || 
-                            textToCheck.includes('enviad') || 
-                            textToCheck.includes('confirmad') || 
-                            textToCheck.includes('bienvenido') || 
-                            textToCheck.includes('creado') || 
-                            textToCheck.includes('actualizado') || 
-                            textToCheck.includes('eliminado');
+            const isLogro = textToCheck.includes('éxito') ||
+                textToCheck.includes('exito') ||
+                textToCheck.includes('correctamente') ||
+                textToCheck.includes('registrad') ||
+                textToCheck.includes('enviad') ||
+                textToCheck.includes('confirmad') ||
+                textToCheck.includes('bienvenido') ||
+                textToCheck.includes('creado') ||
+                textToCheck.includes('actualizado') ||
+                textToCheck.includes('eliminado');
             const isCredenciales = textToCheck.includes('credenciales') || textToCheck.includes('incorrect');
 
             if (!isLogro && !isCredenciales) {
@@ -538,8 +634,8 @@
                 if (type === 'error') iconText = 'error';
             }
 
-            const iconBadge = iconText 
-                ? `<span class="px-1.5 py-0.5 text-[9px] font-bold uppercase rounded bg-black/40 text-slate-100 border border-slate-700/50 mt-0.5 flex-shrink-0">${iconText}</span>` 
+            const iconBadge = iconText
+                ? `<span class="px-1.5 py-0.5 text-[9px] font-bold uppercase rounded bg-black/40 text-slate-100 border border-slate-700/50 mt-0.5 flex-shrink-0">${iconText}</span>`
                 : '';
 
             toast.innerHTML = `
@@ -551,27 +647,179 @@
             container.appendChild(toast);
             setTimeout(() => { if (toast.parentNode) toast.remove(); }, 4200);
         }
+        // ── Calculadora Cliente Unificada ──────────────────────
+        function handlePrecioFobInput() {
+            const val = parseFloat(calcPrecioFob.value);
+            if (!isNaN(val) && val > 0) {
+                calcCostoEnvio.disabled = false;
+                calcCostoEnvio.required = true;
+            } else {
+                calcCostoEnvio.disabled = true;
+                calcCostoEnvio.required = false;
+                calcCostoEnvio.value = '';
+            }
+        }
 
-        // ── Calculadora Cliente ───────────────────────────────
-        function calcClient() {
-            const price = parseFloat(document.getElementById('c-price').value) || 0;
-            const freight = parseFloat(document.getElementById('c-freight').value) || 0;
-            const insurance = parseFloat(document.getElementById('c-insurance').value) || 0;
-            const tariffPct = parseFloat(document.getElementById('c-tariff').value) || 0;
-            const vatPct = parseFloat(document.getElementById('c-vat').value) || 0;
+        async function handleCalculadoraSubmit(e) {
+            if (e) e.preventDefault();
 
-            const cif = price + freight + insurance;
-            const tariff = cif * (tariffPct / 100);
-            const vat = (cif + tariff) * (vatPct / 100);
-            const opex = 45;
-            const taxes = tariff + vat + opex;
-            const total = cif + taxes;
+            const url_producto = calcUrlProducto.value;
+            const precio_fob = calcPrecioFob.value;
+            const costo_envio = calcCostoEnvio.value;
 
-            document.getElementById('r-cif').textContent = fmt(cif);
-            document.getElementById('r-tariff').textContent = fmt(tariff);
-            document.getElementById('r-vat').textContent = fmt(vat);
-            document.getElementById('r-taxes').textContent = fmt(taxes);
-            document.getElementById('r-total').textContent = fmt(total);
+            // Reiniciar resultados y contenedor de mensajes
+            calcResCif.value = '';
+            calcResIva.value = '';
+            calcResTotal.value = '';
+            calcMensajeContainer.style.display = 'none';
+            calcMensajeTexto.textContent = '';
+
+            try {
+                const payload = {
+                    url_producto,
+                    precio_fob: precio_fob !== '' ? parseFloat(precio_fob) : null,
+                    costo_envio: costo_envio !== '' ? parseFloat(costo_envio) : null
+                };
+
+                const response = await fetch(`${API_URL}/calcular-importacion`, {
+                    method: 'POST',
+                    headers: getAuthHeaders(),
+                    body: JSON.stringify(payload)
+                });
+
+                const data = await response.json();
+
+                if (!response.ok) {
+                    throw new Error(data.mensaje || 'Error al realizar el cálculo');
+                }
+
+                if (data.mensaje) {
+                    // Muestra mensaje de pendiente de revisión
+                    calcMensajeTexto.textContent = data.mensaje;
+                    calcMensajeContainer.style.display = 'block';
+
+                    calcResCif.placeholder = 'Pendiente';
+                    calcResIva.placeholder = 'Pendiente';
+                    calcResTotal.placeholder = 'Pendiente';
+                } else {
+                    // Muestra los resultados matemáticos
+                    calcResCif.value = data.valor_cif.toFixed(2);
+                    calcResIva.value = data.iva_importacion.toFixed(2);
+                    calcResTotal.value = data.costo_total_aduana.toFixed(2);
+
+                    calcResCif.placeholder = 'Esperando cálculo...';
+                    calcResIva.placeholder = 'Esperando cálculo...';
+                    calcResTotal.placeholder = 'Esperando cálculo...';
+                }
+
+            } catch (error) {
+                console.error('[Calculadora Submit Error]', error);
+                showToast('Error de Cálculo', error.message, 'error');
+            }
+        }
+
+        // ── Mis Cotizaciones (Seguimiento Logístico) ─────────
+        async function cargarMisCotizaciones() {
+            const list = document.getElementById('mis-cotizaciones-list');
+            try {
+                const res = await fetch(API_URL + '/mis-cotizaciones', { headers: getAuthHeaders() });
+                if (!res.ok) { if (res.status === 401) { handleLogout(); return; } throw new Error('HTTP ' + res.status); }
+                const cotizaciones = await res.json();
+                renderMisCotizaciones(cotizaciones);
+            } catch (err) {
+                console.error('[cargarMisCotizaciones]', err);
+                list.innerHTML = `<div class="text-center py-8 text-slate-500 text-sm">Error al cargar cotizaciones.</div>`;
+            }
+        }
+
+        function logisticoBadge(estado) {
+            const map = {
+                pendiente: { bg: '#e2e8f0', color: '#475569', icon: '⏳', label: 'Pendiente' },
+                comprado: { bg: '#dbeafe', color: '#1d4ed8', icon: '🛏️', label: 'Comprado' },
+                en_camino: { bg: '#ffedd5', color: '#c2410c', icon: '🚚', label: 'En Camino' },
+                en_aduana: { bg: '#f3e8ff', color: '#7e22ce', icon: '🏦', label: 'En Aduana' },
+                listo_para_recoger: { bg: '#dcfce7', color: '#15803d', icon: '✅', label: 'Listo para Recoger' }
+            };
+            const s = map[estado] || map.pendiente;
+            return `<span style="
+                display:inline-flex; align-items:center; gap:5px;
+                background:${s.bg}; color:${s.color};
+                border:2px solid ${s.color}40; border-radius:20px;
+                padding:4px 12px; font-size:0.72rem; font-weight:800;
+                letter-spacing:0.02em; white-space:nowrap;
+            ">${s.icon} ${s.label}</span>`;
+        }
+
+        function renderMisCotizaciones(cotizaciones) {
+            const list = document.getElementById('mis-cotizaciones-list');
+            if (!cotizaciones.length) {
+                list.innerHTML = `
+                    <div class="flex flex-col items-center justify-center py-10 text-center glass" style="border-style:dashed;">
+                        <span class="text-3xl mb-3">📦</span>
+                        <p class="text-[0.875rem] font-semibold text-slate-400">Sin cotizaciones aún</p>
+                        <p class="text-[0.75rem] text-slate-600 mt-1">Solicita asesoría para ver tus cotizaciones aquí.</p>
+                    </div>`;
+                return;
+            }
+            list.innerHTML = cotizaciones.map(function (cot) {
+                const fecha = cot.fecha_creacion
+                    ? new Date(cot.fecha_creacion).toLocaleDateString('es-ES', { day: '2-digit', month: 'short', year: 'numeric' })
+                    : '';
+                const urlCorta = (cot.url_producto || '').replace(/^https?:\/\/[^/]+/, '').substring(0, 40);
+                const pagadaBadge = cot.estado === 'pagada'
+                    ? `<span style="background:#dcfce7;color:#15803d;border:2px solid #86efac;border-radius:20px;padding:3px 10px;font-size:0.68rem;font-weight:800;">🟢 Pagada</span>`
+                    : `<span style="background:#fef9c3;color:#854d0e;border:2px solid #fde047;border-radius:20px;padding:3px 10px;font-size:0.68rem;font-weight:800;">🟡 Activa</span>`;
+                return `
+                <div class="pedido-card">
+                    <div class="flex items-start justify-between gap-3 flex-wrap mb-3">
+                        <div style="flex:1; min-width:0;">
+                            <span class="text-[0.65rem] font-bold text-slate-600 uppercase tracking-wider">COT-#${String(cot.id).padStart(4, '0')}</span>
+                            <p class="text-[0.78rem] text-slate-600 truncate mt-0.5" title="${cot.url_producto || ''}">${urlCorta || cot.url_producto}</p>
+                        </div>
+                        <div class="flex gap-2 flex-wrap flex-shrink-0">
+                            ${pagadaBadge}
+                        </div>
+                    </div>
+
+                    <!-- Seguimiento logístico visual -->
+                    <div class="mb-3">
+                        <p class="text-[0.65rem] font-bold text-slate-600 uppercase tracking-wider mb-2">Estado Logístico</p>
+                        ${logisticoBadge(cot.estado_logistico)}
+                    </div>
+
+                    <!-- Barra de progreso logística -->
+                    <div style="margin-bottom:10px;">
+                        ${(() => {
+                        const pasos = ['pendiente', 'comprado', 'en_camino', 'en_aduana', 'listo_para_recoger'];
+                        const idx = pasos.indexOf(cot.estado_logistico);
+                        const pct = Math.round(((idx + 1) / pasos.length) * 100);
+                        return `<div style="background:#e2e8f0;border-radius:999px;height:8px;border:2px solid #000;overflow:hidden;">
+                                <div style="background:${idx === 4 ? '#22c55e' : idx >= 2 ? '#f97316' : '#6366f1'};height:100%;width:${pct}%;transition:width 0.4s ease;border-radius:999px;"></div>
+                            </div>
+                            <div style="display:flex;justify-content:space-between;margin-top:4px;">
+                                <span style="font-size:0.6rem;color:#64748b;font-weight:700;">Inicio</span>
+                                <span style="font-size:0.6rem;color:#64748b;font-weight:700;">${pct}%</span>
+                                <span style="font-size:0.6rem;color:#64748b;font-weight:700;">Entregado</span>
+                            </div>`;
+                    })()}
+                    </div>
+
+                    <!-- Valores económicos -->
+                    <div class="grid grid-cols-2 gap-2 text-[0.7rem] pt-2.5 border-t" style="border-color: rgba(0,0,0,0.15);">
+                        <div>
+                            <span class="text-slate-600 block">Valor CIF</span>
+                            <span class="font-bold">${cot.valor_cif ? '$' + parseFloat(cot.valor_cif).toFixed(2) : '—'}</span>
+                        </div>
+                        <div>
+                            <span class="text-slate-600 block">Total Aduana</span>
+                            <span class="font-bold">${cot.costo_total_aduana ? '$' + parseFloat(cot.costo_total_aduana).toFixed(2) : '—'}</span>
+                        </div>
+                        <div class="col-span-2 text-right">
+                            <span class="text-slate-600" style="font-size:0.62rem;">${fecha}</span>
+                        </div>
+                    </div>
+                </div>`;
+            }).join('');
         }
 
         // ── Mis Pedidos ───────────────────────────────────────
@@ -634,12 +882,11 @@
                     </div>`;
             }).join('');
         }
-
         // ── Solicitar Asesoria de Agente ──────────────────────
         async function solicitarAsesoria() {
-            const urlInput = document.getElementById('inp-url');
+            const urlInput = document.getElementById('calc-url-producto');
             const url = urlInput.value.trim();
-            const precio = parseFloat(document.getElementById('c-price').value) || 0;
+            const precio = parseFloat(document.getElementById('calc-precio-fob').value) || 0;
 
             if (!url) {
                 urlInput.focus();
@@ -681,7 +928,7 @@
                 showToast('Error al registrar', err.message, 'error');
             } finally {
                 btn.disabled = false;
-                inner.innerHTML = 'Solicitar Asesoría de un Agente &nbsp;⚡';
+                inner.innerHTML = 'Solicitar Asesoría';
             }
         }
 
@@ -695,8 +942,26 @@
                 if (currentUser.rol !== 'usuario') { window.location.href = 'index.html'; return; }
                 document.getElementById('client-name-display').textContent = currentUser.nombre || 'Cliente';
             } catch (e) { window.location.href = 'index.html'; return; }
-            calcClient();
+            // Inicializar e integrar la calculadora unificada
+            calcUrlProducto = document.getElementById('calc-url-producto');
+            calcPrecioFob = document.getElementById('calc-precio-fob');
+            calcCostoEnvio = document.getElementById('calc-costo-envio');
+            calcResCif = document.getElementById('calc-res-cif');
+            calcResIva = document.getElementById('calc-res-iva');
+            calcResTotal = document.getElementById('calc-res-total');
+            calcMensajeContainer = document.getElementById('calc-mensaje-container');
+            calcMensajeTexto = document.getElementById('calc-mensaje-texto');
+
+            if (calcPrecioFob) {
+                calcPrecioFob.addEventListener('input', handlePrecioFobInput);
+            }
+            const calculadoraForm = document.getElementById('calculadora-form');
+            if (calculadoraForm) {
+                calculadoraForm.addEventListener('submit', handleCalculadoraSubmit);
+            }
+
             cargarMisPedidos();
+            cargarMisCotizaciones();
         });
     </script>
 </body>

@@ -616,6 +616,36 @@ app.post('/api/pedidos', verificarToken, async (req, res) => {
 // ==========================================
 
 /**
+ * GET /api/admin/pedidos
+ * Endpoint dedicado para el panel de Admin.
+ * Devuelve todos los pedidos con JOIN a la tabla de usuarios
+ * para obtener el nombre del cliente.
+ * Acceso: solo admin.
+ */
+app.get('/api/admin/pedidos', verificarToken, soloAdmin, async (req, res) => {
+    try {
+        const [pedidos] = await db.query(`
+            SELECT
+                p.id,
+                u.nombre  AS cliente_nombre,
+                u.email   AS cliente_email,
+                p.url_producto,
+                p.total_a_pagar,
+                p.estado,
+                p.fecha_creacion
+            FROM pedidos_importacion p
+            JOIN usuarios u ON p.cliente_id = u.id
+            ORDER BY p.fecha_creacion DESC
+        `);
+        res.json(pedidos);
+    } catch (error) {
+        console.error('[GET /api/admin/pedidos]', error);
+        res.status(500).json({ mensaje: 'Error al obtener los pedidos' });
+    }
+});
+
+
+/**
  * GET /api/pedidos
  * Lista todos los pedidos de importación con datos JOIN del cliente y agente.
  * Acceso: admin, agente.
@@ -683,7 +713,7 @@ app.get('/api/pedidos/:id', verificarToken, async (req, res) => {
 app.patch('/api/pedidos/:id/estado', verificarToken, async (req, res) => {
     const { id } = req.params;
     const { estado } = req.body;
-    const estadosValidos = ['cotizando', 'esperando_pago', 'finalizado'];
+    const estadosValidos = ['cotizando', 'esperando_pago', 'pago_confirmado', 'siendo_comprado', 'en_transito', 'en_aduana', 'entregado', 'cancelado', 'finalizado'];
 
     if (!estado || !estadosValidos.includes(estado)) {
         return res.status(400).json({ mensaje: `Estado inválido. Use: ${estadosValidos.join(', ')}` });
@@ -812,9 +842,9 @@ app.post('/api/pedidos/:id/cotizar', verificarToken, async (req, res) => {
             [precioNum, arancelNum, totalNum, id]
         );
 
-        // Generar URL dinámica del código QR (API pública, sin dependencias npm)
-        const totalFormatted = totalNum.toFixed(2).replace('.', '_');
-        const qrData = encodeURIComponent(`Pago_Pedido_${id}_Total_${totalFormatted}_USD`);
+        // Generar URL dinámica del código QR que apunta al endpoint público de confirmación
+        const confirmUrl = `${req.protocol}://${req.get('host')}/api/pedidos/${id}/confirmar-qr`;
+        const qrData = encodeURIComponent(confirmUrl);
         const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=${qrData}`;
 
         res.json({
@@ -832,50 +862,316 @@ app.post('/api/pedidos/:id/cotizar', verificarToken, async (req, res) => {
 });
 
 /**
+ * Función interna compartida: confirma el pago de un pedido.
+ * Cambia el estado a 'pago_confirmado' e inserta un mensaje automático.
+ * @param {number|string} id - ID del pedido
+ * @param {number|null} emisorIdOverride - ID del usuario emisor del mensaje (si se conoce)
+ * @returns {object} { facturaNum, mensajeRow, pedido }
+ */
+async function _procesarConfirmacionPago(id, emisorIdOverride = null) {
+    // Verificar que el pedido exista
+    const [pedidos] = await db.query(
+        'SELECT id, estado, agente_id, total_a_pagar FROM pedidos_importacion WHERE id = ?',
+        [id]
+    );
+    if (pedidos.length === 0) throw Object.assign(new Error('Pedido no encontrado'), { statusCode: 404 });
+
+    const pedido = pedidos[0];
+    // Bloquear si el pago ya fue procesado en cualquier estado posterior a 'esperando_pago'
+    const ESTADOS_YA_PAGADOS = [
+        'pago_confirmado', 'siendo_comprado', 'en_transito',
+        'en_aduana', 'listo_para_entrega', 'entregado', 'finalizado'
+    ];
+    if (ESTADOS_YA_PAGADOS.includes(pedido.estado)) {
+        throw Object.assign(new Error('Este pedido ya tiene el pago confirmado'), { statusCode: 409 });
+    }
+
+    // Número de factura aleatorio (formato: FACT-YYYYMMDD-XXXXX)
+    const now = new Date();
+    const date = `${now.getFullYear()}${String(now.getMonth() + 1).padStart(2, '0')}${String(now.getDate()).padStart(2, '0')}`;
+    const rand = Math.floor(10000 + Math.random() * 90000);
+    const facturaNum = `FACT-${date}-${rand}`;
+
+    // Remitente del mensaje: agente asignado al pedido, o emisorIdOverride como fallback
+    const emisorId = pedido.agente_id || emisorIdOverride;
+    if (!emisorId) throw Object.assign(new Error('No hay agente asignado para emitir el mensaje'), { statusCode: 422 });
+
+    // 1. Cambiar estado a 'pago_confirmado'
+    await db.query(
+        "UPDATE pedidos_importacion SET estado = 'pago_confirmado' WHERE id = ?",
+        [id]
+    );
+
+    // 2. Insertar mensaje automático del sistema
+    const mensajeAutomatico = `✅ Pago confirmado exitosamente. Factura N°${facturaNum} emitida. El agente iniciará la compra pronto.`;
+    const [insertResult] = await db.query(
+        'INSERT INTO mensajes_chat (pedido_id, usuario_id, contenido_mensaje) VALUES (?, ?, ?)',
+        [id, emisorId, mensajeAutomatico]
+    );
+
+    // 3. Recuperar el mensaje recién creado con datos del remitente
+    const [mensajeRows] = await db.query(`
+        SELECT
+            m.id, m.pedido_id, m.contenido_mensaje, m.fecha_envio,
+            u.id AS usuario_id, u.nombre AS usuario_nombre, u.rol AS usuario_rol
+        FROM mensajes_chat m
+        JOIN usuarios u ON m.usuario_id = u.id
+        WHERE m.id = ?
+    `, [insertResult.insertId]);
+
+    return { facturaNum, mensajeRow: mensajeRows[0], pedido };
+}
+
+/**
  * POST /api/pedidos/:id/simular-pago
- * Webhook simulado del banco: confirma el pago, cierra el pedido
+ * Webhook simulado del banco: confirma el pago, cambia estado a 'pago_confirmado'
  * e inserta un mensaje automático del sistema en mensajes_chat.
  * El remitente es el agente asignado (o el usuario autenticado como fallback).
  */
 app.post('/api/pedidos/:id/simular-pago', verificarToken, async (req, res) => {
     const { id } = req.params;
+    console.log(`\n🚀 [INICIO] Simulando pago para el pedido ID: ${id}`);
 
     try {
-        // Verificar que el pedido exista y esté en estado correcto
+        const { facturaNum, mensajeRow } = await _procesarConfirmacionPago(id, req.usuarioId);
+
+        console.log(`✅ [ÉXITO] _procesarConfirmacionPago terminó. Enviando estado 'pago_confirmado' al frontend.`);
+        res.json({
+            mensaje: 'Pago simulado exitosamente',
+            estado: 'pago_confirmado',
+            pedido_id: parseInt(id),
+            factura: facturaNum,
+            mensaje_chat: mensajeRow
+        });
+
+    } catch (error) {
+        console.error('❌ [ERROR en simular-pago]:', error);
+        const status = error.statusCode || 500;
+        res.status(status).json({ mensaje: error.message || 'Error al simular el pago' });
+    }
+});
+
+async function _procesarConfirmacionPago(id, emisorIdOverride = null) {
+    console.log(`🛠️ [PROCESANDO] Entrando a _procesarConfirmacionPago para pedido ID: ${id}`);
+
+    const [pedidos] = await db.query('SELECT id, estado, agente_id FROM pedidos_importacion WHERE id = ?', [id]);
+    if (pedidos.length === 0) throw Object.assign(new Error('Pedido no encontrado'), { statusCode: 404 });
+
+    const pedido = pedidos[0];
+    const emisorId = pedido.agente_id || emisorIdOverride;
+
+    console.log(`📝 [BASE DE DATOS] Haciendo UPDATE a 'pago_confirmado'...`);
+
+    // 1. Cambiar estado a 'pago_confirmado'
+    await db.query("UPDATE pedidos_importacion SET estado = 'pago_confirmado' WHERE id = ?", [id]);
+
+    console.log(`✔️ [BASE DE DATOS] UPDATE terminado.`);
+
+    // 2. Insertar mensaje automático
+    const facturaNum = `FACT-TEST-${Math.floor(Math.random() * 90000)}`;
+    const mensajeAutomatico = `✅ Pago confirmado exitosamente. Factura N°${facturaNum} emitida.`;
+
+    const [insertResult] = await db.query(
+        'INSERT INTO mensajes_chat (pedido_id, usuario_id, contenido_mensaje) VALUES (?, ?, ?)',
+        [id, emisorId, mensajeAutomatico]
+    );
+
+    const [mensajeRows] = await db.query(`SELECT m.*, u.nombre AS usuario_nombre FROM mensajes_chat m JOIN usuarios u ON m.usuario_id = u.id WHERE m.id = ?`, [insertResult.insertId]);
+
+    console.log(`🏁 [FIN] Saliendo de _procesarConfirmacionPago.`);
+    return { facturaNum, mensajeRow: mensajeRows[0], pedido };
+}
+
+/**
+ * GET /api/pedidos/:id/confirmar-qr
+ * Endpoint PÚBLICO (sin token) que simula la acción de escanear el QR.
+ * Confirma el pago del pedido, cambia estado a 'pago_confirmado' y
+ * devuelve una página HTML de confirmación amigable.
+ */
+app.get('/api/pedidos/:id/confirmar-qr', async (req, res) => {
+    const { id } = req.params;
+
+    try {
+        const { facturaNum } = await _procesarConfirmacionPago(id, null);
+
+        // Devolver página HTML de confirmación
+        res.setHeader('Content-Type', 'text/html; charset=utf-8');
+        res.send(`<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pago Confirmado — TechStore Imports</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%);
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      padding: 1.5rem;
+    }
+    .card {
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.12);
+      border-radius: 1.5rem;
+      padding: 2.5rem 2rem;
+      max-width: 420px;
+      width: 100%;
+      text-align: center;
+      backdrop-filter: blur(12px);
+      box-shadow: 0 25px 50px rgba(0,0,0,0.5);
+    }
+    .icon { font-size: 3.5rem; margin-bottom: 1rem; }
+    h1 { color: #34d399; font-size: 1.375rem; font-weight: 800; margin-bottom: 0.5rem; }
+    .subtitle { color: #94a3b8; font-size: 0.875rem; line-height: 1.6; margin-bottom: 1.5rem; }
+    .factura {
+      background: rgba(52,211,153,0.1);
+      border: 1px solid rgba(52,211,153,0.25);
+      border-radius: 0.75rem;
+      padding: 0.75rem 1rem;
+      color: #6ee7b7;
+      font-size: 0.8rem;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      margin-bottom: 1.5rem;
+    }
+    .note { color: #64748b; font-size: 0.75rem; }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <div class="icon">✅</div>
+    <h1>Pago Registrado Correctamente</h1>
+    <p class="subtitle">
+      Tu pago ha sido confirmado y tu solicitud de importación
+      ha pasado al siguiente estado. El agente iniciará la compra pronto.
+    </p>
+    <div class="factura">Factura N° ${facturaNum}</div>
+    <p class="note">Puedes cerrar esta ventana y volver a la aplicación.</p>
+  </div>
+</body>
+</html>`);
+
+    } catch (error) {
+        console.error('[GET /api/pedidos/:id/confirmar-qr]', error);
+        const status = error.statusCode || 500;
+
+        // Para errores (ej: ya confirmado), también devolver HTML amigable
+        res.setHeader('Content-Type', 'text/html; charset=utf-8');
+        res.status(status).send(`<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Aviso — TechStore Imports</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%);
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      padding: 1.5rem;
+    }
+    .card {
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.12);
+      border-radius: 1.5rem;
+      padding: 2.5rem 2rem;
+      max-width: 420px;
+      width: 100%;
+      text-align: center;
+      backdrop-filter: blur(12px);
+    }
+    .icon { font-size: 3.5rem; margin-bottom: 1rem; }
+    h1 { color: #f59e0b; font-size: 1.25rem; font-weight: 800; margin-bottom: 0.5rem; }
+    .msg { color: #94a3b8; font-size: 0.875rem; line-height: 1.6; }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <div class="icon">ℹ️</div>
+    <h1>Aviso</h1>
+    <p class="msg">${error.message || 'Ocurrió un error al procesar la confirmación.'}</p>
+  </div>
+</body>
+</html>`);
+    }
+});
+
+
+/**
+ * PUT /api/pedidos/:id/estado
+ * Permite al agente actualizar el pedido a los nuevos estados logísticos.
+ * Inserta automáticamente un mensaje en el chat informando al cliente del nuevo estado.
+ * Acceso: admin, agente.
+ */
+app.put('/api/pedidos/:id/estado', verificarToken, async (req, res) => {
+    const rolesPermitidos = ['admin', 'agente'];
+    if (!rolesPermitidos.includes(req.usuarioRol)) {
+        return res.status(403).json({ mensaje: 'Acceso denegado: se requiere rol admin o agente' });
+    }
+
+    const { id } = req.params;
+    const { estado } = req.body;
+
+    const ESTADOS_LOGISTICOS = [
+        'siendo_comprado',
+        'en_transito',
+        'en_aduana',
+        'listo_para_entrega',
+        'entregado'
+    ];
+
+    if (!estado || !ESTADOS_LOGISTICOS.includes(estado)) {
+        return res.status(400).json({
+            mensaje: `Estado inválido. Los estados logísticos permitidos son: ${ESTADOS_LOGISTICOS.join(', ')}`
+        });
+    }
+
+    // Mensajes automáticos por estado
+    const MENSAJES_ESTADO = {
+        'siendo_comprado': '🛒 ¡Excelente! Tu agente ha iniciado la compra del producto en origen. Te mantendremos informado/a.',
+        'en_transito': '✈️ Tu paquete está en tránsito hacia Bolivia. El envío internacional está en camino.',
+        'en_aduana': '🏛️ Tu paquete llegó a Bolivia y está siendo procesado por la Aduana Nacional. Este proceso puede tomar unos días.',
+        'listo_para_entrega': '📦 ¡Tu paquete está listo para entrega! Nuestro equipo coordinará la entrega contigo muy pronto.',
+        'entregado': '🏁 ¡Tu importación fue entregada exitosamente! Gracias por confiar en TechStore Imports. ¡Disfruta tu producto!'
+    };
+
+    try {
+        // Verificar que el pedido exista y obtener el agente asignado
         const [pedidos] = await db.query(
-            'SELECT id, estado, agente_id, total_a_pagar FROM pedidos_importacion WHERE id = ?',
+            'SELECT id, estado, agente_id FROM pedidos_importacion WHERE id = ?',
             [id]
         );
-        if (pedidos.length === 0) return res.status(404).json({ mensaje: 'Pedido no encontrado' });
-
-        const pedido = pedidos[0];
-        if (pedido.estado === 'finalizado') {
-            return res.status(409).json({ mensaje: 'Este pedido ya está finalizado' });
+        if (pedidos.length === 0) {
+            return res.status(404).json({ mensaje: 'Pedido no encontrado' });
         }
 
-        // Número de factura aleatorio (formato: FACT-YYYYMMDD-XXXXX)
-        const now = new Date();
-        const date = `${now.getFullYear()}${String(now.getMonth() + 1).padStart(2, '0')}${String(now.getDate()).padStart(2, '0')}`;
-        const rand = Math.floor(10000 + Math.random() * 90000);
-        const facturaNum = `FACT-${date}-${rand}`;
+        const pedido = pedidos[0];
 
-        // Remitente del mensaje automático: agente del pedido o usuario autenticado
-        const emisorId = pedido.agente_id || req.usuarioId;
-
-        // 1. Cambiar estado a 'finalizado'
+        // Actualizar el estado del pedido
         await db.query(
-            "UPDATE pedidos_importacion SET estado = 'finalizado' WHERE id = ?",
-            [id]
+            'UPDATE pedidos_importacion SET estado = ? WHERE id = ?',
+            [estado, id]
         );
 
-        // 2. Insertar mensaje automático del sistema
-        const mensajeAutomatico = ` Pago confirmado exitosamente. Factura N°${facturaNum} emitida. Iniciando proceso logístico.`;
+        // Determinar el emisor del mensaje: agente asignado o el usuario autenticado
+        const emisorId = pedido.agente_id || req.usuarioId;
+
+        // Insertar mensaje automático en el chat
+        const mensajeAutomatico = MENSAJES_ESTADO[estado];
         const [insertResult] = await db.query(
             'INSERT INTO mensajes_chat (pedido_id, usuario_id, contenido_mensaje) VALUES (?, ?, ?)',
             [id, emisorId, mensajeAutomatico]
         );
 
-        // 3. Recuperar el mensaje recién creado con datos del remitente (eager loading)
+        // Recuperar el mensaje recién creado con datos del remitente
         const [mensajeRows] = await db.query(`
             SELECT
                 m.id, m.pedido_id, m.contenido_mensaje, m.fecha_envio,
@@ -886,20 +1182,17 @@ app.post('/api/pedidos/:id/simular-pago', verificarToken, async (req, res) => {
         `, [insertResult.insertId]);
 
         res.json({
-            mensaje: 'Pago simulado exitosamente',
-            estado: 'finalizado',
+            mensaje: 'Estado logístico actualizado correctamente',
+            estado,
             pedido_id: parseInt(id),
-            factura: facturaNum,
             mensaje_chat: mensajeRows[0]
         });
 
     } catch (error) {
-        console.error('[POST /api/pedidos/:id/simular-pago]', error);
-        res.status(500).json({ mensaje: 'Error al simular el pago' });
+        console.error('[PUT /api/pedidos/:id/estado]', error);
+        res.status(500).json({ mensaje: 'Error al actualizar el estado logístico' });
     }
 });
-
-
 
 // 30. POST /calcular-importacion - Calculadora de Importaciones para Bolivia (público)
 app.post('/calcular-importacion', async (req, res) => {

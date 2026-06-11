@@ -82,8 +82,7 @@ async function initDatabaseTables() {
                 url_producto VARCHAR(500) NOT NULL,
                 precio_origen DECIMAL(10, 2) NOT NULL DEFAULT 0,
                 arancel_calculado DECIMAL(10, 2) DEFAULT 0,
-                total_a_pagar DECIMAL(10, 2) DEFAULT 0,
-                estado ENUM('cotizando', 'esperando_pago', 'finalizado') NOT NULL DEFAULT 'cotizando',
+                total_a_pagar DECIMAL(10, 2) DEFAULT 0,estado ENUM('cotizando', 'esperando_pago', 'pago_confirmado', 'siendo_comprado', 'en_transito', 'en_aduana', 'listo_para_entrega', 'entregado', 'cancelado', 'finalizado') NOT NULL DEFAULT 'cotizando',
                 fecha_creacion TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                 FOREIGN KEY (cliente_id) REFERENCES usuarios(id) ON DELETE CASCADE,
                 FOREIGN KEY (agente_id) REFERENCES usuarios(id) ON DELETE SET NULL

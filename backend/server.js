@@ -901,34 +901,124 @@ app.post('/api/pedidos/:id/simular-pago', verificarToken, async (req, res) => {
 
 
 
-// 30. POST /calcular-importacion - Calculadora de Importaciones para Bolivia (protegido: todos los roles)
-app.post('/calcular-importacion', verificarToken, async (req, res) => {
-    const { url_producto, precio_fob, costo_envio } = req.body;
+// 30. POST /calcular-importacion - Calculadora de Importaciones para Bolivia (público)
+app.post('/calcular-importacion', async (req, res) => {
+    try {
+        const { url_producto, precio_fob, costo_envio } = req.body;
 
-    if (!url_producto || typeof url_producto !== 'string' || url_producto.trim() === '') {
-        return res.status(400).json({ mensaje: 'El enlace del producto (url_producto) es obligatorio.' });
-    }
-
-    const fPrecioFob = (precio_fob !== undefined && precio_fob !== null && precio_fob !== '') ? Number(precio_fob) : NaN;
-    const tienePrecio = !isNaN(fPrecioFob) && fPrecioFob > 0;
-
-    if (tienePrecio) {
-        const fCostoEnvio = (costo_envio !== undefined && costo_envio !== null && costo_envio !== '') ? Number(costo_envio) : NaN;
-        if (isNaN(fCostoEnvio) || fCostoEnvio < 0) {
-            return res.status(400).json({ mensaje: 'El costo de envío es obligatorio y debe ser mayor o igual a 0.' });
+        if (!url_producto || typeof url_producto !== 'string' || url_producto.trim() === '') {
+            return res.status(400).json({ mensaje: 'El enlace del producto (url_producto) es obligatorio.' });
         }
 
-        const valor_cif = parseFloat((fPrecioFob + fCostoEnvio).toFixed(2));
-        const iva_importacion = parseFloat((valor_cif * (13 / 87)).toFixed(2));
-        const costo_total_aduana = parseFloat((valor_cif + iva_importacion).toFixed(2));
+        const fPrecioFob = (precio_fob !== undefined && precio_fob !== null && precio_fob !== '') ? Number(precio_fob) : NaN;
+        const tienePrecio = !isNaN(fPrecioFob) && fPrecioFob > 0;
 
-        return res.json({
-            valor_cif,
-            iva_importacion,
-            costo_total_aduana
+        if (tienePrecio) {
+            const fCostoEnvio = (costo_envio !== undefined && costo_envio !== null && costo_envio !== '') ? Number(costo_envio) : NaN;
+            if (isNaN(fCostoEnvio) || fCostoEnvio < 0) {
+                return res.status(400).json({ mensaje: 'El costo de envío es obligatorio y debe ser mayor o igual a 0.' });
+            }
+
+            const valor_cif = parseFloat((fPrecioFob + fCostoEnvio).toFixed(2));
+            const iva_importacion = parseFloat((valor_cif * (13 / 87)).toFixed(2));
+            const costo_total_aduana = parseFloat((valor_cif + iva_importacion).toFixed(2));
+
+            return res.json({
+                valor_cif,
+                iva_importacion,
+                costo_total_aduana
+            });
+        } else {
+            return res.json({ mensaje: 'Cotización pendiente de revisión mediante el enlace.' });
+        }
+    } catch (error) {
+        console.error('[POST /calcular-importacion Error]', error);
+        return res.status(500).json({ mensaje: 'Error interno del servidor al realizar el cálculo.' });
+    }
+});
+
+// ==========================================
+// REGISTRO PÚBLICO DE CLIENTES
+// POST /api/auth/register
+// ==========================================
+
+/**
+ * POST /api/auth/register
+ * Permite a cualquier visitante crear una cuenta con rol "usuario" (cliente).
+ * No requiere token. Valida estrictamente los campos, verifica duplicados,
+ * hashea la contraseña con bcrypt y devuelve un JWT listo para usar.
+ *
+ * Body: { nombre, email, password }
+ * Response 201: { mensaje, token, usuario: { id, nombre, email, rol } }
+ */
+app.post('/api/auth/register', async (req, res) => {
+    const { nombre, email, password } = req.body;
+
+    // ── Validación de presencia ──────────────────────────────────────────────
+    if (!nombre || typeof nombre !== 'string' || nombre.trim().length < 2) {
+        return res.status(400).json({ mensaje: 'El nombre es obligatorio y debe tener al menos 2 caracteres.' });
+    }
+
+    if (!email || typeof email !== 'string') {
+        return res.status(400).json({ mensaje: 'El correo electrónico es obligatorio.' });
+    }
+
+    // Validación de formato de email con regex
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email.trim())) {
+        return res.status(400).json({ mensaje: 'El correo electrónico no tiene un formato válido.' });
+    }
+
+    if (!password || typeof password !== 'string' || password.length < 6) {
+        return res.status(400).json({ mensaje: 'La contraseña es obligatoria y debe tener al menos 6 caracteres.' });
+    }
+
+    const nombreLimpio = nombre.trim();
+    const emailLimpio = email.trim().toLowerCase();
+
+    try {
+        // ── Verificar que el correo no esté ya registrado ────────────────────
+        const [existentes] = await db.query(
+            'SELECT id FROM usuarios WHERE email = ?',
+            [emailLimpio]
+        );
+        if (existentes.length > 0) {
+            return res.status(409).json({ mensaje: 'Ya existe una cuenta registrada con ese correo electrónico.' });
+        }
+
+        // ── Hashear contraseña con bcrypt (10 rondas) ────────────────────────
+        const salt = await bcrypt.genSalt(10);
+        const passwordEncriptada = await bcrypt.hash(password, salt);
+
+        // ── Insertar usuario con rol "usuario" (cliente por defecto) ─────────
+        const [resultado] = await db.query(
+            'INSERT INTO usuarios (nombre, email, password, rol) VALUES (?, ?, ?, ?)',
+            [nombreLimpio, emailLimpio, passwordEncriptada, 'usuario']
+        );
+
+        const nuevoUsuarioId = resultado.insertId;
+
+        // ── Generar JWT igual al login (sesión inmediata) ────────────────────
+        const token = jwt.sign(
+            { id: nuevoUsuarioId, rol: 'usuario' },
+            JWT_SECRET,
+            { expiresIn: '8h' }
+        );
+
+        return res.status(201).json({
+            mensaje: 'Cuenta creada exitosamente. ¡Bienvenido a TechStore!',
+            token,
+            usuario: {
+                id: nuevoUsuarioId,
+                nombre: nombreLimpio,
+                email: emailLimpio,
+                rol: 'usuario'
+            }
         });
-    } else {
-        return res.json({ mensaje: 'Cotización pendiente de revisión mediante el enlace.' });
+
+    } catch (error) {
+        console.error('[POST /api/auth/register]', error);
+        return res.status(500).json({ mensaje: 'Error interno al registrar el usuario. Inténtalo de nuevo.' });
     }
 });
 
